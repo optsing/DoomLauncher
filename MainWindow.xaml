@@ -1,0 +1,73 @@
+﻿<Window
+    x:Class="DoomLauncher.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:DoomLauncher"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+>
+    <Grid>
+        <SplitView
+            x:Name="splitView"
+            IsPaneOpen="True"
+            OpenPaneLength="256"
+            CompactPaneLength="48"
+            DisplayMode="Inline"
+        >
+            <SplitView.Pane>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Doom Launcher" Margin="10" Style="{StaticResource BaseTextBlockStyle}"/>
+                    <ListView
+                        x:Name="DoomList"
+                        SelectionMode="Single"
+                        Grid.Row="1"
+                        VerticalAlignment="Stretch"
+                        IsItemClickEnabled="True"
+                        ItemsSource="{x:Bind settings.Entries}"
+                        SelectionChanged="DoomList_SelectionChanged"
+                        AllowDrop="True"
+                        CanReorderItems="True"
+                    >
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="local:DoomEntry">
+                                <TextBlock Text="{x:Bind Name, Mode=OneWay}" />
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    <StackPanel Grid.Row="2" Margin="8,4,8,4">
+                        <Button Click="Button_Click" HorizontalAlignment="Stretch" Margin="0,4,0,4">
+                            <StackPanel Orientation="Horizontal">
+                                <SymbolIcon Symbol="Add" Margin="0,0,4,0" />
+                                <TextBlock>Добавить мод</TextBlock>
+                            </StackPanel>
+                        </Button>
+                        <Button Click="Remove_Click" HorizontalAlignment="Stretch" Margin="0,4,0,4">
+                            <StackPanel Orientation="Horizontal">
+                                <SymbolIcon Symbol="Remove" Margin="0,0,4,0" />
+                                <TextBlock>Удалить мод</TextBlock>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </SplitView.Pane>
+            <SplitView.Content>
+                <Grid>
+                    <Frame x:Name="mainFrame" />
+                    <TextBlock
+                    Visibility="{x:Bind HasNoContent, Mode=OneWay}"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    FontSize="24"
+                >Выберите или добавьте мод</TextBlock>
+                </Grid>
+            </SplitView.Content>
+        </SplitView>
+        <Border x:Name="titleBar" Height="40" VerticalAlignment="Top" Grid.Row="0" />
+    </Grid>
+</Window>

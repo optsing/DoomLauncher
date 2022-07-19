@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "DoomLauncher (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "DoomLauncher (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
