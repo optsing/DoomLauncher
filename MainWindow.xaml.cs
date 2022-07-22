@@ -175,7 +175,7 @@ public sealed partial class MainWindow : Window, INotifyPropertyChanged
 
         // Now we can use the picker object as normal
         picker.FileTypeFilter.Add(".exe");
-        picker.CommitButtonText = "Выбрать gzdoom.exe";
+        picker.CommitButtonText = "Выбрать GZDoom";
         var file = await picker.PickSingleFileAsync();
         if (file != null)
         {

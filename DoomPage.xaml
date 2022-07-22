@@ -10,14 +10,20 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="40"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+        <TextBlock
+            Visibility="{x:Bind local:DoomPage.HasNoModFiles(Entry.ModFiles.Count), Mode=OneWay}"
+            FontSize="24"
+            Grid.RowSpan="3"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+        >Выберите или перетащите файлы</TextBlock>
         <CommandBar
             DefaultLabelPosition="Right"
-            Grid.Row="1"
+            Grid.Row="0"
         >
             <CommandBar.PrimaryCommands>
                 <AppBarButton Icon="Add" Label="Добавить файлы" Click="Append_Click" />
@@ -26,7 +32,7 @@
         </CommandBar>
         <ListView 
             x:Name="lwModFiles"
-            Grid.Row="2"
+            Grid.Row="1"
             SelectionMode="Multiple"
             CanReorderItems="True"
             AllowDrop="True"
@@ -42,15 +48,7 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <TextBlock
-            Visibility="{x:Bind local:DoomPage.HasNoModFiles(Entry.ModFiles.Count), Mode=OneWay}"
-            FontSize="24"
-            Grid.RowSpan="2"
-            Grid.Row="1"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-        >Выберите или перетащите файлы</TextBlock>
-        <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="8">
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="8">
             <TextBlock VerticalAlignment="Center">Название</TextBlock>
             <TextBox Width="160" Margin="8,0,8,0" Text="{x:Bind Entry.Name, Mode=TwoWay}" />
             <TextBlock VerticalAlignment="Center">Игра</TextBlock>
