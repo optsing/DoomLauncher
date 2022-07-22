@@ -12,6 +12,11 @@ public class Settings
 {
     public string GZDoomPath { get; set; }
 
+    public int SelectedModIndex
+    {
+        get; set;
+    }
+
     public ObservableCollection<DoomEntry> Entries { get; set; }
 
     public static readonly List<KeyValue> IWads = new()

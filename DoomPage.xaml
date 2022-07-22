@@ -10,30 +10,26 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
         <TextBlock
             Visibility="{x:Bind local:DoomPage.HasNoModFiles(Entry.ModFiles.Count), Mode=OneWay}"
             FontSize="24"
-            Grid.RowSpan="3"
+            Grid.RowSpan="2"
+            Grid.ColumnSpan="2"
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
         >Выберите или перетащите файлы</TextBlock>
-        <CommandBar
-            DefaultLabelPosition="Right"
-            Grid.Row="0"
-        >
-            <CommandBar.PrimaryCommands>
-                <AppBarButton Icon="Add" Label="Добавить файлы" Click="Append_Click" />
-                <AppBarButton Icon="Remove" Label="Удалить файлы" Click="Remove_Click" />
-            </CommandBar.PrimaryCommands>
-        </CommandBar>
         <ListView 
             x:Name="lwModFiles"
-            Grid.Row="1"
-            SelectionMode="Multiple"
+            Grid.Row="0"
+            Grid.ColumnSpan="2"
+            SelectionMode="None"
             CanReorderItems="True"
             AllowDrop="True"
             ItemsSource="{x:Bind Entry.ModFiles}"
@@ -43,11 +39,26 @@
         >
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="local:NamePath">
-                    <TextBlock Text="{x:Bind Name}" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{x:Bind Name}" VerticalAlignment="Center" />
+                        <Button Grid.Column="1" Click="RemoveFile_Click" Style="{StaticResource EllipsisButton}" Height="40" Width="40" ToolTipService.ToolTip="Удалить файл">
+                            <SymbolIcon Symbol="Cancel" />
+                        </Button>
+                    </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="8">
+        <Button Margin="8" Width="160" Click="Append_Click" Grid.Row="1" Grid.Column="0" >
+            <StackPanel Orientation="Horizontal">
+                <SymbolIcon Symbol="Add" Margin="0,0,4,0"/>
+                <TextBlock>Добавить файлы</TextBlock>
+            </StackPanel>
+        </Button>
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="8">
             <TextBlock VerticalAlignment="Center">Название</TextBlock>
             <TextBox Width="160" Margin="8,0,8,0" Text="{x:Bind Entry.Name, Mode=TwoWay}" />
             <TextBlock VerticalAlignment="Center">Игра</TextBlock>

@@ -11,7 +11,7 @@
   <Identity
     Name="1bcbad53-0b76-4d23-96a8-5c1882ca8b8e"
     Publisher="CN=optsi"
-    Version="1.0.17.0" />
+    Version="1.0.18.0" />
 
   <Properties>
     <DisplayName>DoomLauncher</DisplayName>

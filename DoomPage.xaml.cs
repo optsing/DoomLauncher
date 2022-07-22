@@ -24,18 +24,6 @@ public sealed partial class DoomPage : Page
         InitializeComponent();
         Entry = entry;
         HWND = hwnd;
-        Entry.PropertyChanged += Entry_PropertyChanged;
-        Entry.ModFiles.CollectionChanged += ModFiles_CollectionChanged;
-    }
-
-    private void ModFiles_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-    {
-        OnSave?.Invoke(this, new());
-    }
-
-    private void Entry_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
-        OnSave?.Invoke(this, new());
     }
 
     private DoomEntry Entry { get; set; }
@@ -44,7 +32,6 @@ public sealed partial class DoomPage : Page
         get; set;
     }
     public event EventHandler<DoomEntry> OnStart;
-    public event EventHandler OnSave;
  
 
     private void Button_Click(object sender, RoutedEventArgs e)
@@ -81,14 +68,6 @@ public sealed partial class DoomPage : Page
         }
     } 
 
-
-    private void Remove_Click(object sender, RoutedEventArgs e)
-    {
-        while (lwModFiles.SelectedItems.Count > 0)
-        {
-            Entry.ModFiles.Remove(lwModFiles.SelectedItems[0] as NamePath);
-        }
-    }
 
     public static Visibility HasNoModFiles(int count)
     {
@@ -133,5 +112,12 @@ public sealed partial class DoomPage : Page
             AddFiles(files);
         }
         deferral.Complete();
+    }
+
+    private void RemoveFile_Click(object sender, RoutedEventArgs e)
+    {
+        var button = sender as Button;
+        var file = button.DataContext as NamePath;
+        Entry.ModFiles.Remove(file);
     }
 }

@@ -25,6 +25,8 @@ public sealed partial class MainWindow : Window, INotifyPropertyChanged
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(titleBar);
 
+        Closed += MainWindow_Closed;
+
         HWND = WinRT.Interop.WindowNative.GetWindowHandle(this);
 
         try
@@ -49,15 +51,14 @@ public sealed partial class MainWindow : Window, INotifyPropertyChanged
             {
                 GZDoomPath = "",
                 Entries = new(),
+                SelectedModIndex = 0,
             };
         }
 
-        settings.Entries.CollectionChanged += Entries_CollectionChanged;
-
-        DoomList.SelectedIndex = 0;
+        DoomList.SelectedIndex = settings.SelectedModIndex;
     }
 
-    private void Entries_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    private void MainWindow_Closed(object sender, WindowEventArgs args)
     {
         Save();
     }
@@ -81,11 +82,11 @@ public sealed partial class MainWindow : Window, INotifyPropertyChanged
 
     private void DoomList_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        settings.SelectedModIndex = DoomList.SelectedIndex;
         if (DoomList.SelectedItem is DoomEntry item)
         {
             DoomPage page = new(item, HWND);
             page.OnStart += Page_OnStart;
-            page.OnSave += Page_OnSave;
             mainFrame.Content = page;
             HasNoContent = false;
         }
@@ -94,11 +95,6 @@ public sealed partial class MainWindow : Window, INotifyPropertyChanged
             mainFrame.Content = null;
             HasNoContent = true;
         }
-    }
-
-    private void Page_OnSave(object sender, EventArgs e)
-    {
-        Save();
     }
 
     private void Page_OnStart(object sender, DoomEntry entry)
@@ -115,7 +111,6 @@ public sealed partial class MainWindow : Window, INotifyPropertyChanged
             {
                 return;
             }
-            Save();
         }
         ProcessStartInfo processInfo = new()
         {
@@ -138,7 +133,7 @@ public sealed partial class MainWindow : Window, INotifyPropertyChanged
         Process.Start(processInfo);
     }
 
-    private void Save()
+    public void Save()
     {
         var text = JsonSerializer.Serialize<Settings>(settings, jsonOptions);
         File.WriteAllText(configFilePath, text);
@@ -153,16 +148,6 @@ public sealed partial class MainWindow : Window, INotifyPropertyChanged
             ModFiles = new(),
         });
         DoomList.SelectedItem = settings.Entries.Last();
-    }
-
-    private void Remove_Click(object sender, RoutedEventArgs e)
-    {
-        var ind = DoomList.SelectedIndex;
-        settings.Entries.RemoveAt(ind);
-        if (settings.Entries.Count > 0)
-        {
-            DoomList.SelectedIndex = Math.Min(ind, settings.Entries.Count - 1);
-        }
     }
 
 
@@ -213,5 +198,20 @@ public sealed partial class MainWindow : Window, INotifyPropertyChanged
     private void OnPropertyChanged(string propertyName)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    private void RemoveMod_Click(object sender, RoutedEventArgs e)
+    {
+        var button = sender as Button;
+        var entry = button.DataContext as DoomEntry;
+        var ind = settings.Entries.IndexOf(entry);
+        if (ind > -1)
+        {
+            settings.Entries.RemoveAt(ind);
+            if (settings.Entries.Count > 0)
+            {
+                DoomList.SelectedIndex = Math.Min(ind, settings.Entries.Count - 1);
+            }
+        }
     }
 }
