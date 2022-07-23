@@ -14,7 +14,7 @@
     Version="1.0.18.0" />
 
   <Properties>
-    <DisplayName>DoomLauncher</DisplayName>
+    <DisplayName>GZDoom Launcher</DisplayName>
     <PublisherDisplayName>optsi</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -33,10 +33,10 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="Doom Launcher"
+        DisplayName="GZDoom Launcher"
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
-        Square44x44Logo="Assets\Square44x44Logo.png" Description="Doom Launcher">
+        Square44x44Logo="Assets\Square44x44Logo.png" Description="GZDoom Launcher">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"  Square71x71Logo="Assets\SmallTile.png" Square310x310Logo="Assets\LargeTile.png"/>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>

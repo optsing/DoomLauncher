@@ -17,7 +17,7 @@
             Grid.Row="0"
         >
             <TextBlock
-                Text="Doom Launcher"
+                Text="GZDoom Launcher"
                 Margin="16,0,0,0"
                 VerticalAlignment="Center"
                 Style="{StaticResource BaseTextBlockStyle}"

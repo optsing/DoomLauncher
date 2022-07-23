@@ -200,17 +200,31 @@ public sealed partial class MainWindow : Window, INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    private void RemoveMod_Click(object sender, RoutedEventArgs e)
+    private async void RemoveMod_Click(object sender, RoutedEventArgs e)
     {
         var button = sender as Button;
         var entry = button.DataContext as DoomEntry;
-        var ind = settings.Entries.IndexOf(entry);
-        if (ind > -1)
+
+        ContentDialog dialog = new()
         {
-            settings.Entries.RemoveAt(ind);
-            if (settings.Entries.Count > 0)
+            XamlRoot = Content.XamlRoot,
+            PrimaryButtonText = "Удалить",
+            Content = $"Вы уверены, что хотите удалить '{entry.Name}'?",
+            CloseButtonText = "Отмена",
+            DefaultButton = ContentDialogButton.Primary,
+        };
+
+        var result = await dialog.ShowAsync();
+        if (result == ContentDialogResult.Primary)
+        {
+            var ind = settings.Entries.IndexOf(entry);
+            if (ind > -1)
             {
-                DoomList.SelectedIndex = Math.Min(ind, settings.Entries.Count - 1);
+                settings.Entries.RemoveAt(ind);
+                if (settings.Entries.Count > 0)
+                {
+                    DoomList.SelectedIndex = Math.Min(ind, settings.Entries.Count - 1);
+                }
             }
         }
     }
