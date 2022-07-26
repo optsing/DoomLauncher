@@ -38,6 +38,11 @@ public class DoomEntry : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler PropertyChanged;
 
+    public string Id
+    {
+        get; set;
+    }
+
     public string Name
     {
         get => name;

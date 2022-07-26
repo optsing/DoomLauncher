@@ -6,12 +6,17 @@
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3"
   xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+  xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
   IgnorableNamespaces="uap uap3 rescap desktop">
 
   <Identity
     Name="1bcbad53-0b76-4d23-96a8-5c1882ca8b8e"
     Publisher="CN=optsi"
-    Version="1.0.18.0" />
+    Version="1.0.21.0" />
+
+  <!--<mp:PhoneIdentity
+	PhoneProductId="1bcbad53-0b76-4d23-96a8-5c1882ca8b8e"
+	PhonePublisherId="00000000-0000-0000-0000-000000000000" />-->
 
   <Properties>
     <DisplayName>GZDoom Launcher</DisplayName>

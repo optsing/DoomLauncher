@@ -19,20 +19,29 @@ namespace DoomLauncher;
 /// </summary>
 public sealed partial class DoomPage : Page
 {
-    public DoomPage(DoomEntry entry, IntPtr hwnd)
+    private readonly bool IS_COPY_TO_INNER_FOLDER = false;
+
+    public DoomPage(DoomEntry entry, IntPtr hwnd, string dataFolderPath)
     {
         InitializeComponent();
         Entry = entry;
         HWND = hwnd;
+        WadsFolderPath = Path.Combine(dataFolderPath, entry.Id);
     }
 
-    private DoomEntry Entry { get; set; }
+    private string WadsFolderPath
+    {
+        get; set;
+    }
+    private DoomEntry Entry
+    {
+        get; set;
+    }
     private IntPtr HWND
     {
         get; set;
     }
     public event EventHandler<DoomEntry> OnStart;
- 
 
     private void Button_Click(object sender, RoutedEventArgs e)
     {
@@ -51,22 +60,35 @@ public sealed partial class DoomPage : Page
         {
             picker.FileTypeFilter.Add(fileExtension);
         }
-        
+
         var files = await picker.PickMultipleFilesAsync();
-        AddFiles(files);
+        AddFiles(files.Select(file => file.Path));
     }
 
-    private void AddFiles(IEnumerable<IStorageItem> files)
+    private void AddFiles(IEnumerable<string> filePathes)
     {
-        foreach (var file in files)
+        if (IS_COPY_TO_INNER_FOLDER)
         {
-            var path = file.Path;
-            if (!Entry.ModFiles.Any(item => item.Path == path))
+            if (!Directory.Exists(WadsFolderPath))
             {
-                Entry.ModFiles.Add(new(path));
+                Directory.CreateDirectory(WadsFolderPath);
             }
         }
-    } 
+        foreach (var path in filePathes)
+        {
+            var targetPath = path;
+            if (IS_COPY_TO_INNER_FOLDER)
+            {
+                targetPath = Path.Combine(WadsFolderPath, Path.GetFileName(path));
+                File.Copy(path, targetPath, true);
+            }
+            var modFile = new NamePath(targetPath);
+            if (!Entry.ModFiles.Any(item => item.Name == modFile.Name))
+            {
+                Entry.ModFiles.Add(modFile);
+            }
+        }
+    }
 
 
     public static Visibility HasNoModFiles(int count)
@@ -76,27 +98,32 @@ public sealed partial class DoomPage : Page
 
     private readonly string[] SupportedFileExtensions = new[] { ".pk3", ".wad" };
 
-    private async Task<IStorageItem[]> GetDraggedFiles(DataPackageView data)
+    private async Task<List<string>> GetDraggedFiles(DataPackageView data)
     {
+        var result = new List<string>();
         if (data.Contains(StandardDataFormats.StorageItems))
         {
             var items = await data.GetStorageItemsAsync();
-            if (items.Count > 0)
+            foreach (var item in items)
             {
-                return items.Where(item => {
-                    var ext = Path.GetExtension(item.Name).ToLowerInvariant();
-                    return SupportedFileExtensions.Contains(ext);
-                }).ToArray();
+                if (item is StorageFile file)
+                {
+                    var ext = Path.GetExtension(file.Name).ToLowerInvariant();
+                    if (SupportedFileExtensions.Contains(ext))
+                    {
+                        result.Add(file.Path);
+                    }
+                }
             }
         }
-        return Array.Empty<IStorageItem>();
-    } 
+        return result;
+    }
 
     private async void LwModFiles_DragOver(object sender, DragEventArgs e)
     {
         var deferral = e.GetDeferral();
         var files = await GetDraggedFiles(e.DataView);
-        if (files.Length > 0)
+        if (files.Count > 0)
         {
             e.AcceptedOperation = DataPackageOperation.Link;
         }
@@ -107,7 +134,7 @@ public sealed partial class DoomPage : Page
     {
         var deferral = e.GetDeferral();
         var files = await GetDraggedFiles(e.DataView);
-        if (files.Length > 0)
+        if (files.Count > 0)
         {
             AddFiles(files);
         }

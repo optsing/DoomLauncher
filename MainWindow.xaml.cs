@@ -22,6 +22,7 @@ public sealed partial class MainWindow : Window, INotifyPropertyChanged
     public MainWindow()
     {
         InitializeComponent();
+        Title = "GZDoom Launcher";
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(titleBar);
 
@@ -32,13 +33,18 @@ public sealed partial class MainWindow : Window, INotifyPropertyChanged
         try
         {
             // Packaged only
-            configFilePath = Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, "config.json");
+            dataFolderPath = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
         }
         catch
         {
             // Unpackaged only
-            configFilePath = "config.json";
+            dataFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "data");
+            if (!Directory.Exists(dataFolderPath))
+            {
+                Directory.CreateDirectory(dataFolderPath);
+            }
         }
+        configFilePath = Path.Combine(dataFolderPath, "config.json");
 
         if (File.Exists(configFilePath))
         {
@@ -63,6 +69,7 @@ public sealed partial class MainWindow : Window, INotifyPropertyChanged
         Save();
     }
 
+    private readonly string dataFolderPath;
     private readonly string configFilePath;
     private readonly IntPtr HWND;
     private readonly JsonSerializerOptions jsonOptions = new()
@@ -70,7 +77,7 @@ public sealed partial class MainWindow : Window, INotifyPropertyChanged
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         WriteIndented = true,
         Converters = {
-        new NamePathConverter(),
+            new NamePathConverter(),
             new KeyValueConverter(),
         },
     };
@@ -85,7 +92,7 @@ public sealed partial class MainWindow : Window, INotifyPropertyChanged
         settings.SelectedModIndex = DoomList.SelectedIndex;
         if (DoomList.SelectedItem is DoomEntry item)
         {
-            DoomPage page = new(item, HWND);
+            DoomPage page = new(item, HWND, dataFolderPath);
             page.OnStart += Page_OnStart;
             mainFrame.Content = page;
             HasNoContent = false;
@@ -141,13 +148,15 @@ public sealed partial class MainWindow : Window, INotifyPropertyChanged
 
     private void Button_Click(object sender, RoutedEventArgs e)
     {
-        settings.Entries.Add(new()
+        DoomEntry entry = new()
         {
+            Id = Guid.NewGuid().ToString(),
             Name = "Новый мод",
             IWadFile = Settings.IWads.First(),
             ModFiles = new(),
-        });
-        DoomList.SelectedItem = settings.Entries.Last();
+        };
+        settings.Entries.Add(entry);
+        DoomList.SelectedItem = entry;
     }
 
 

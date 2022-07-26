@@ -1,5 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+	<AssemblyName>GZDoomLauncher</AssemblyName>
+	<ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.18362.0</TargetPlatformMinVersion>
@@ -32,7 +34,7 @@
     <Content Remove="Assets\StoreLogo.scale-200.png" />
     <Content Remove="Assets\StoreLogo.scale-400.png" />
   </ItemGroup>
-
+	
   <ItemGroup>
     <Content Include="Assets\SplashScreen.scale-200.png" />
     <Content Include="Assets\Square150x150Logo.scale-200.png" />
