@@ -10,25 +10,37 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+        <Image
+            Grid.RowSpan="2"
+            Source="{x:Bind local:DoomPage.FirstOrDefault(Entry.ImageFiles), Mode=OneWay}"
+            Opacity="0.25"
+            Stretch="UniformToFill"
+        />
         <TextBlock
             Visibility="{x:Bind local:DoomPage.HasNoModFiles(Entry.ModFiles.Count), Mode=OneWay}"
             FontSize="24"
             Grid.RowSpan="2"
-            Grid.ColumnSpan="2"
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
         >Выберите или перетащите файлы</TextBlock>
+        <CommandBar DefaultLabelPosition="Right">
+            <AppBarButton Icon="Add" Label="Добавить файлы" Click="Append_Click"/>
+            <AppBarButton Icon="Pictures" Label="Изменить фон" Click="Background_Click"/>
+            <AppBarSeparator />
+            <AppBarButton Icon="Setting" Label="Настройка" Click="EditMod_Click"/>
+            <AppBarSeparator />
+            <AppBarButton Label="Играть" Click="Start_Click">
+                <AppBarButton.Icon>
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7FC;"/>
+                </AppBarButton.Icon>
+            </AppBarButton>
+        </CommandBar>
         <ListView 
             x:Name="lwModFiles"
-            Grid.Row="0"
-            Grid.ColumnSpan="2"
+            Grid.Row="1"
             SelectionMode="None"
             CanReorderItems="True"
             AllowDrop="True"
@@ -52,29 +64,31 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <Button Margin="8" Width="160" Click="Append_Click" Grid.Row="1" Grid.Column="0" >
-            <StackPanel Orientation="Horizontal">
-                <SymbolIcon Symbol="Add" Margin="0,0,4,0"/>
-                <TextBlock>Добавить файлы</TextBlock>
-            </StackPanel>
-        </Button>
-        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="8">
-            <TextBlock VerticalAlignment="Center">Название</TextBlock>
-            <TextBox Width="160" Margin="8,0,8,0" Text="{x:Bind Entry.Name, Mode=TwoWay}" />
-            <TextBlock VerticalAlignment="Center">Игра</TextBlock>
-            <ComboBox Width="160" ItemsSource="{x:Bind local:Settings.IWads}" Margin="8,0,8,0" SelectedItem="{x:Bind Entry.IWadFile, Mode=TwoWay}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate x:DataType="local:KeyValue">
-                        <TextBlock Text="{x:Bind Value}"/>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-            <Button Width="160" Click="Button_Click" Style="{StaticResource AccentButtonStyle}">
+        <!--<StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Margin="8">
+            <Button Margin="0,0,8,0" Width="160" Click="Append_Click">
+                <StackPanel Orientation="Horizontal">
+                    <SymbolIcon Symbol="Add" Margin="0,0,4,0"/>
+                    <TextBlock>Добавить файлы</TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Width="160" Click="Background_Click">
+                <StackPanel Orientation="Horizontal">
+                    <SymbolIcon Symbol="Pictures" Margin="0,0,4,0"/>
+                    <TextBlock>Изменить фон</TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Width="160" Click="EditMod_Click">
+                <StackPanel Orientation="Horizontal">
+                    <SymbolIcon Symbol="Edit" Margin="0,0,4,0"/>
+                    <TextBlock>Редактировать мод</TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Width="160" Click="Start_Click" Style="{StaticResource AccentButtonStyle}">
                 <StackPanel Orientation="Horizontal">
                     <SymbolIcon Symbol="Play" Margin="0,0,4,0"/>
                     <TextBlock>Запустить</TextBlock>
                 </StackPanel>
             </Button>
-        </StackPanel>
+        </StackPanel>-->
     </Grid>
 </Page>

@@ -12,7 +12,7 @@
             <RowDefinition Height="48" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Border
+        <Grid
             x:Name="titleBar"
             Grid.Row="0"
         >
@@ -22,7 +22,7 @@
                 VerticalAlignment="Center"
                 Style="{StaticResource BaseTextBlockStyle}"
             />
-        </Border>
+        </Grid>
         <SplitView
             x:Name="splitView"
             IsPaneOpen="True"
@@ -35,13 +35,13 @@
             <SplitView.Pane>
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
                         <RowDefinition Height="auto" />
+                        <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <ListView
                         x:Name="DoomList"
                         SelectionMode="Single"
-                        Grid.Row="0"
+                        Grid.Row="1"
                         VerticalAlignment="Stretch"
                         IsItemClickEnabled="True"
                         ItemsSource="{x:Bind settings.Entries}"
@@ -64,7 +64,7 @@
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
-                    <Button Grid.Row="1" Click="Button_Click" HorizontalAlignment="Stretch" Margin="8">
+                    <Button Grid.Row="0" Click="Button_Click" HorizontalAlignment="Stretch" Margin="8">
                         <StackPanel Orientation="Horizontal">
                             <SymbolIcon Symbol="Add" Margin="0,0,4,0"  />
                             <TextBlock>Добавить мод</TextBlock>
@@ -78,13 +78,10 @@
                         Background="{ThemeResource CustomColor}"
                         CornerRadius="8,0,0,0"
                     />
-                    <Frame x:Name="mainFrame" />
-                    <TextBlock
-                        Visibility="{x:Bind HasNoContent, Mode=OneWay}"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
-                        FontSize="24"
-                    >Выберите или добавьте мод</TextBlock>
+                    <Frame
+                        x:Name="mainFrame"
+                        CornerRadius="8,0,0,0"
+                    />
                 </Grid>
             </SplitView.Content>
         </SplitView>

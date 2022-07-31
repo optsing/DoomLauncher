@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 
@@ -42,8 +42,9 @@ public sealed partial class DoomPage : Page
         get; set;
     }
     public event EventHandler<DoomEntry> OnStart;
+    public event EventHandler<DoomEntry> OnEdit;
 
-    private void Button_Click(object sender, RoutedEventArgs e)
+    private void Start_Click(object sender, RoutedEventArgs e)
     {
         OnStart?.Invoke(this, Entry);
     }
@@ -56,13 +57,33 @@ public sealed partial class DoomPage : Page
         WinRT.Interop.InitializeWithWindow.Initialize(picker, HWND);
 
         // Now we can use the picker object as normal
-        foreach (var fileExtension in SupportedFileExtensions)
+        foreach (var fileExtension in SupportedModExtensions)
         {
             picker.FileTypeFilter.Add(fileExtension);
         }
 
         var files = await picker.PickMultipleFilesAsync();
         AddFiles(files.Select(file => file.Path));
+    }
+
+    private async void Background_Click(object sender, RoutedEventArgs e)
+    {
+        var picker = new Windows.Storage.Pickers.FileOpenPicker();
+
+        // Need to initialize the picker object with the hwnd / IInitializeWithWindow 
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, HWND);
+
+        // Now we can use the picker object as normal
+        foreach (var fileExtension in SupportedImageExtensions)
+        {
+            picker.FileTypeFilter.Add(fileExtension);
+        }
+
+        var file = await picker.PickSingleFileAsync();
+        if (file != null)
+        {
+            SetImage(file.Path);
+        }
     }
 
     private void AddFiles(IEnumerable<string> filePathes)
@@ -90,17 +111,34 @@ public sealed partial class DoomPage : Page
         }
     }
 
+    private void SetImage(string imagePath)
+    {
+        Entry.ImageFiles.Clear();
+        Entry.ImageFiles.Add(imagePath);
+    }
+
+    public static BitmapImage FirstOrDefault(IEnumerable<string> list)
+    {
+        if (list.Any())
+        {
+            return new BitmapImage(new Uri(list.First()));
+        }
+        return null;
+    }
+
 
     public static Visibility HasNoModFiles(int count)
     {
         return count > 0 ? Visibility.Collapsed : Visibility.Visible;
     }
 
-    private readonly string[] SupportedFileExtensions = new[] { ".pk3", ".wad" };
+    private readonly string[] SupportedModExtensions = new[] { ".pk3", ".wad" };
+    private readonly string[] SupportedImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
 
-    private async Task<List<string>> GetDraggedFiles(DataPackageView data)
+    private async Task<(List<string>, List<string>)> GetDraggedFiles(DataPackageView data)
     {
-        var result = new List<string>();
+        var modResult = new List<string>();
+        var imageResult = new List<string>();
         if (data.Contains(StandardDataFormats.StorageItems))
         {
             var items = await data.GetStorageItemsAsync();
@@ -109,21 +147,25 @@ public sealed partial class DoomPage : Page
                 if (item is StorageFile file)
                 {
                     var ext = Path.GetExtension(file.Name).ToLowerInvariant();
-                    if (SupportedFileExtensions.Contains(ext))
+                    if (SupportedModExtensions.Contains(ext))
                     {
-                        result.Add(file.Path);
+                        modResult.Add(file.Path);
+                    }
+                    else if (SupportedImageExtensions.Contains(ext))
+                    {
+                        imageResult.Add(file.Path);
                     }
                 }
             }
         }
-        return result;
+        return (modResult, imageResult);
     }
 
     private async void LwModFiles_DragOver(object sender, DragEventArgs e)
     {
         var deferral = e.GetDeferral();
-        var files = await GetDraggedFiles(e.DataView);
-        if (files.Count > 0)
+        var (files, images) = await GetDraggedFiles(e.DataView);
+        if (files.Count + images.Count > 0)
         {
             e.AcceptedOperation = DataPackageOperation.Link;
         }
@@ -133,10 +175,14 @@ public sealed partial class DoomPage : Page
     private async void LwModFiles_Drop(object sender, DragEventArgs e)
     {
         var deferral = e.GetDeferral();
-        var files = await GetDraggedFiles(e.DataView);
+        var (files, images) = await GetDraggedFiles(e.DataView);
         if (files.Count > 0)
         {
             AddFiles(files);
+        }
+        if (images.Count > 0)
+        {
+            SetImage(images[0]);
         }
         deferral.Complete();
     }
@@ -146,5 +192,10 @@ public sealed partial class DoomPage : Page
         var button = sender as Button;
         var file = button.DataContext as NamePath;
         Entry.ModFiles.Remove(file);
+    }
+
+    private void EditMod_Click(object sender, RoutedEventArgs e)
+    {
+        OnEdit?.Invoke(this, Entry);
     }
 }

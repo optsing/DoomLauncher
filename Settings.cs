@@ -67,6 +67,11 @@ public class DoomEntry : INotifyPropertyChanged
         }
     }
 
+    public ObservableCollection<string> ImageFiles
+    {
+        get; set;
+    } = new();
+
     public ObservableCollection<NamePath> ModFiles
     {
         get; set;

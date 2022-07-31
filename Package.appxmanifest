@@ -12,7 +12,7 @@
   <Identity
     Name="1bcbad53-0b76-4d23-96a8-5c1882ca8b8e"
     Publisher="CN=optsi"
-    Version="1.0.21.0" />
+    Version="1.0.29.0" />
 
   <!--<mp:PhoneIdentity
 	PhoneProductId="1bcbad53-0b76-4d23-96a8-5c1882ca8b8e"
@@ -25,8 +25,8 @@
   </Properties>
 
   <Dependencies>
-    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.17763.0" MaxVersionTested="10.0.19041.0" />
-    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.19041.0" />
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.18362.0" MaxVersionTested="10.0.22000.0" />
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.18362.0" MaxVersionTested="10.0.22000.0" />
   </Dependencies>
 
   <Resources>
