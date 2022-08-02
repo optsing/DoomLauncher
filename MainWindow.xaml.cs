@@ -30,7 +30,7 @@ public sealed partial class MainWindow : Window
         Closed += MainWindow_Closed;
 
         HWND = WinRT.Interop.WindowNative.GetWindowHandle(this);
-        
+
         var windowId = Win32Interop.GetWindowIdFromWindow(HWND);
         appWindow = AppWindow.GetFromWindowId(windowId);
 
@@ -39,7 +39,7 @@ public sealed partial class MainWindow : Window
         appWindow.TitleBar.ExtendsContentIntoTitleBar = true;
         appWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
         appWindow.TitleBar.ButtonBackgroundColor = Colors.Transparent;
-        appWindow.TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;        
+        appWindow.TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
 
         try
         {
@@ -100,6 +100,9 @@ public sealed partial class MainWindow : Window
 
     private readonly AppWindow appWindow;
 
+    public static string[] SupportedModExtensions = new[] { ".pk3", ".wad" };
+    public static string[] SupportedImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+
     private void DoomList_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         settings.SelectedModIndex = DoomList.SelectedIndex;
@@ -108,6 +111,7 @@ public sealed partial class MainWindow : Window
             DoomPage page = new(item, HWND, dataFolderPath);
             page.OnStart += Page_OnStart;
             page.OnEdit += Page_OnEdit;
+            page.OnRemove += Page_OnRemove;
             mainFrame.Content = page;
         }
         else
@@ -116,11 +120,31 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private async void Page_OnEdit(object sender, DoomEntry e)
+    private async void Page_OnRemove(object sender, DoomEntry entry)
     {
-        if (await AddOrEditModDialogShow(e.Name, e.IWadFile, true) is EditModDialogResult result) {
-            e.Name = result.name;
-            e.IWadFile = result.iWadFile;
+        ContentDialog dialog = new()
+        {
+            XamlRoot = Content.XamlRoot,
+            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+            PrimaryButtonText = "Удалить",
+            Content = $"Вы уверены, что хотите удалить '{entry.Name}'?",
+            CloseButtonText = "Отмена",
+            DefaultButton = ContentDialogButton.Primary,
+        };
+
+        var result = await dialog.ShowAsync();
+        if (result == ContentDialogResult.Primary)
+        {
+            settings.Entries.Remove(entry);
+        }
+    }
+
+    private async void Page_OnEdit(object sender, DoomEntry entry)
+    {
+        if (await AddOrEditModDialogShow(entry.Name, entry.IWadFile, true) is EditModDialogResult result)
+        {
+            entry.Name = result.name;
+            entry.IWadFile = result.iWadFile;
         }
     }
 
@@ -172,7 +196,7 @@ public sealed partial class MainWindow : Window
 
     private async void Button_Click(object sender, RoutedEventArgs e)
     {
-        if (await AddOrEditModDialogShow("Новый мод", Settings.IWads.First(), false) is EditModDialogResult result)
+        if (await AddOrEditModDialogShow("", Settings.IWads.First(), false) is EditModDialogResult result)
         {
             DoomEntry entry = new()
             {
@@ -219,28 +243,6 @@ public sealed partial class MainWindow : Window
         return true;
     }
 
-    private async void RemoveMod_Click(object sender, RoutedEventArgs e)
-    {
-        var button = sender as Button;
-        var entry = button.DataContext as DoomEntry;
-
-        ContentDialog dialog = new()
-        {
-            XamlRoot = Content.XamlRoot,
-            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
-            PrimaryButtonText = "Удалить",
-            Content = $"Вы уверены, что хотите удалить '{entry.Name}'?",
-            CloseButtonText = "Отмена",
-            DefaultButton = ContentDialogButton.Primary,
-        };
-
-        var result = await dialog.ShowAsync();
-        if (result == ContentDialogResult.Primary)
-        {
-            settings.Entries.Remove(entry);
-        }
-    }
-
     public readonly struct EditModDialogResult
     {
         public readonly string name;
@@ -261,14 +263,14 @@ public sealed partial class MainWindow : Window
             XamlRoot = Content.XamlRoot,
             Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
             Content = content,
-            PrimaryButtonText = isEditMode ? "Изменить" : "Добавить",
+            PrimaryButtonText = isEditMode ? "Изменить" : "Создать",
             CloseButtonText = "Отмена",
             DefaultButton = ContentDialogButton.Primary,
         };
 
         if (ContentDialogResult.Primary == await dialog.ShowAsync())
         {
-            return new (content.ModName, content.IWadFile);
+            return new(content.ModName, content.IWadFile);
         }
         return null;
     }

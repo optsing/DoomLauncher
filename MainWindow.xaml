@@ -51,39 +51,28 @@
                     >
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="local:DoomEntry">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="{x:Bind Name, Mode=OneWay}" VerticalAlignment="Center" FontSize="16" />
-                                    <Button Grid.Column="1" Click="RemoveMod_Click" Style="{StaticResource EllipsisButton}" Height="40" Width="40">
-                                        <SymbolIcon Symbol="Cancel" />
-                                    </Button>
-                                </Grid>
+                                <TextBlock Text="{x:Bind Name, Mode=OneWay}" VerticalAlignment="Center" FontSize="16" />
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
                     <Button Grid.Row="0" Click="Button_Click" HorizontalAlignment="Stretch" Margin="8">
                         <StackPanel Orientation="Horizontal">
                             <SymbolIcon Symbol="Add" Margin="0,0,4,0"  />
-                            <TextBlock>Добавить мод</TextBlock>
+                            <TextBlock>Создать сборку</TextBlock>
                         </StackPanel>
                     </Button>
                 </Grid>
             </SplitView.Pane>
-            <SplitView.Content>
-                <Grid>
-                    <Border
-                        Background="{ThemeResource CustomColor}"
-                        CornerRadius="8,0,0,0"
-                    />
-                    <Frame
-                        x:Name="mainFrame"
-                        CornerRadius="8,0,0,0"
-                    />
-                </Grid>
-            </SplitView.Content>
+            <Grid>
+                <Border
+                    Background="{ThemeResource CustomColor}"
+                    CornerRadius="8,0,0,0"
+                />
+                <Frame
+                    x:Name="mainFrame"
+                    CornerRadius="8,0,0,0"
+                />
+            </Grid>
         </SplitView>
     </Grid>
 </Window>

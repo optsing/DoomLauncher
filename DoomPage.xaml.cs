@@ -43,6 +43,7 @@ public sealed partial class DoomPage : Page
     }
     public event EventHandler<DoomEntry> OnStart;
     public event EventHandler<DoomEntry> OnEdit;
+    public event EventHandler<DoomEntry> OnRemove;
 
     private void Start_Click(object sender, RoutedEventArgs e)
     {
@@ -57,7 +58,7 @@ public sealed partial class DoomPage : Page
         WinRT.Interop.InitializeWithWindow.Initialize(picker, HWND);
 
         // Now we can use the picker object as normal
-        foreach (var fileExtension in SupportedModExtensions)
+        foreach (var fileExtension in MainWindow.SupportedModExtensions)
         {
             picker.FileTypeFilter.Add(fileExtension);
         }
@@ -74,7 +75,7 @@ public sealed partial class DoomPage : Page
         WinRT.Interop.InitializeWithWindow.Initialize(picker, HWND);
 
         // Now we can use the picker object as normal
-        foreach (var fileExtension in SupportedImageExtensions)
+        foreach (var fileExtension in MainWindow.SupportedImageExtensions)
         {
             picker.FileTypeFilter.Add(fileExtension);
         }
@@ -123,6 +124,8 @@ public sealed partial class DoomPage : Page
         {
             return new BitmapImage(new Uri(list.First()));
         }
+        //var path = Path.GetFullPath("Assets/DefaultCover.jpg");
+        //return new BitmapImage(new Uri(path));
         return null;
     }
 
@@ -131,9 +134,6 @@ public sealed partial class DoomPage : Page
     {
         return count > 0 ? Visibility.Collapsed : Visibility.Visible;
     }
-
-    private readonly string[] SupportedModExtensions = new[] { ".pk3", ".wad" };
-    private readonly string[] SupportedImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
 
     private async Task<(List<string>, List<string>)> GetDraggedFiles(DataPackageView data)
     {
@@ -147,11 +147,11 @@ public sealed partial class DoomPage : Page
                 if (item is StorageFile file)
                 {
                     var ext = Path.GetExtension(file.Name).ToLowerInvariant();
-                    if (SupportedModExtensions.Contains(ext))
+                    if (MainWindow.SupportedModExtensions.Contains(ext))
                     {
                         modResult.Add(file.Path);
                     }
-                    else if (SupportedImageExtensions.Contains(ext))
+                    else if (MainWindow.SupportedImageExtensions.Contains(ext))
                     {
                         imageResult.Add(file.Path);
                     }
@@ -197,5 +197,10 @@ public sealed partial class DoomPage : Page
     private void EditMod_Click(object sender, RoutedEventArgs e)
     {
         OnEdit?.Invoke(this, Entry);
+    }
+
+    private void RemoveMod_Click(object sender, RoutedEventArgs e)
+    {
+        OnRemove?.Invoke(this, Entry);
     }
 }
