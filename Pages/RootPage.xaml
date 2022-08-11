@@ -1,0 +1,106 @@
+﻿<Page
+    x:Class="DoomLauncher.RootPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:DoomLauncher"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
+    mc:Ignorable="d"
+>
+    <Grid>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="800" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="swMain.DisplayMode" Value="Inline" />
+                        <Setter Target="swMain.IsPaneOpen" Value="true" />
+                        <Setter Target="gridPane.Background" Value="Transparent" />
+                        <!--<Setter Target="buttonMenu.Visibility" Value="Collapsed" />-->
+                        <!--<Setter Target="frameMain.CornerRadius" Value="8,0,0,0" />-->
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <SplitView
+            x:Name="swMain"
+            IsPaneOpen="True"
+            OpenPaneLength="256"
+            CompactPaneLength="48"
+            Grid.RowSpan="2"
+            DisplayMode="Overlay"
+            PaneBackground="Transparent"
+        >
+            <SplitView.Pane>
+                <Grid x:Name="gridPane" Background="{ThemeResource SystemControlPageBackgroundChromeLowBrush}" CornerRadius="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="48" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="1" Click="Button_Click" HorizontalAlignment="Stretch" Margin="8">
+                        <StackPanel Orientation="Horizontal">
+                            <SymbolIcon Symbol="Add" Margin="0,0,4,0" />
+                            <TextBlock>Создать сборку</TextBlock>
+                        </StackPanel>
+                    </Button>
+                    <ListView
+                        x:Name="DoomList"
+                        SelectionMode="Single"
+                        Grid.Row="2"
+                        VerticalAlignment="Stretch"
+                        IsItemClickEnabled="True"
+                        ItemsSource="{x:Bind settings.Entries}"
+                        SelectionChanged="DoomList_SelectionChanged"
+                        AllowDrop="True"
+                        CanReorderItems="True"
+                    >
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="local:DoomEntry">
+                                <TextBlock Text="{x:Bind Name, Mode=OneWay}" VerticalAlignment="Center" FontSize="16" />
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </SplitView.Pane>
+            <Frame
+                Margin="0,48,0,0"
+                CornerRadius="8"
+                x:Name="frameMain"
+                Background="{ThemeResource CustomColor}"
+            />
+        </SplitView>
+        <Grid
+            x:Name="titleBar"
+            Height="48"
+            Grid.Row="0"
+        >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button
+                x:Name="buttonMenu"
+                Grid.Column="0"
+                Width="48"
+                Height="48"
+                Margin="4,0,0,0"
+                Click="ButtonMenu_Click"
+                Style="{StaticResource PaneToggleButtonStyle}" />
+            <TextBlock
+                Grid.Column="1"
+                Text="GZDoom Launcher"
+                Margin="8,0,0,0"
+                VerticalAlignment="Center"
+                Style="{StaticResource BaseTextBlockStyle}"
+            />
+        </Grid>
+    </Grid>
+</Page>

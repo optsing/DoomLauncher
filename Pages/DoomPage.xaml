@@ -1,0 +1,120 @@
+﻿<Page
+    x:Class="DoomLauncher.DoomPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:DoomLauncher"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
+    d:DataContext="{d:DesignInstance Type=local:DoomEntry}"
+    mc:Ignorable="d"
+    Background="Transparent"
+>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Image
+            Grid.RowSpan="2"
+            Source="{x:Bind local:DoomPage.GetCurrentBackground(Entry.ImageFiles), Mode=OneWay}"
+            Opacity="0.25"
+            Stretch="UniformToFill"
+        />
+        <TextBlock
+            Visibility="{x:Bind local:DoomPage.HasNoModFiles(Entry.ModFiles.Count), Mode=OneWay}"
+            FontSize="24"
+            Grid.RowSpan="2"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+        >Перетащите или выберите файлы</TextBlock>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                Margin="16,0"
+                Text="{x:Bind Entry.Name, Mode=OneWay}"
+                FontSize="18"
+                Style="{StaticResource BaseTextBlockStyle}"
+                TextWrapping="NoWrap"
+            />
+            <Button Grid.Column="1" VerticalAlignment="Center">
+                <Button.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="Добавить файлы" Click="Append_Click">
+                            <MenuFlyoutItem.Icon>
+                                <SymbolIcon Symbol="Add" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutSeparator />
+                        <MenuFlyoutItem Text="Изменить фон" Click="Background_Click">
+                            <MenuFlyoutItem.Icon>
+                                <SymbolIcon Symbol="Pictures" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="Убрать фон" Click="RemoveBackground_Click" IsEnabled="{x:Bind local:DoomPage.HasCurrentBackground(Entry.ImageFiles), Mode=OneWay}"/>
+                        <MenuFlyoutSeparator />
+                        <MenuFlyoutItem Text="Настроить сборку" Click="EditMod_Click">
+                            <MenuFlyoutItem.Icon>
+                                <SymbolIcon Symbol="Edit" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="Удалить сборку" Click="RemoveMod_Click">
+                            <MenuFlyoutItem.Icon>
+                                <SymbolIcon Symbol="Delete" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </Button.Flyout>
+                <StackPanel Orientation="Horizontal">
+                    <AnimatedIcon Height="18" Margin="0,0,4,0">
+                        <AnimatedIcon.Source>
+                            <animatedvisuals:AnimatedSettingsVisualSource />
+                        </AnimatedIcon.Source>
+                        <AnimatedIcon.FallbackIconSource>
+                            <SymbolIconSource Symbol="Setting"/>
+                        </AnimatedIcon.FallbackIconSource>
+                    </AnimatedIcon>
+                    <TextBlock>Параметры</TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Grid.Column="2" Width="180" Margin="8" VerticalAlignment="Center" Click="Start_Click" Style="{StaticResource AccentButtonStyle}">
+                <StackPanel Orientation="Horizontal">
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7FC;" Margin="0,0,4,0" />
+                    <TextBlock>Играть</TextBlock>
+                </StackPanel>
+            </Button>
+        </Grid>
+        <ListView 
+            x:Name="lwModFiles"
+            Grid.Row="1"
+            SelectionMode="None"
+            CanReorderItems="True"
+            AllowDrop="True"
+            ItemsSource="{x:Bind Entry.ModFiles}"
+            IsMultiSelectCheckBoxEnabled="False"
+            DragOver="LwModFiles_DragOver"
+            Drop="LwModFiles_Drop"
+        >
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="local:NamePath">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{x:Bind Name}" VerticalAlignment="Center" />
+                        <Button Grid.Column="1" Click="RemoveFile_Click" Style="{StaticResource EllipsisButton}" Height="40" Width="40" ToolTipService.ToolTip="Удалить файл">
+                            <FontIcon Glyph="&#xE74D;" FontSize="16" />
+                        </Button>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</Page>

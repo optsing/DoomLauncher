@@ -118,7 +118,7 @@ public sealed partial class DoomPage : Page
         Entry.ImageFiles.Add(imagePath);
     }
 
-    public static BitmapImage FirstOrDefault(IEnumerable<string> list)
+    public static BitmapImage GetCurrentBackground(IEnumerable<string> list)
     {
         if (list.Any())
         {
@@ -129,6 +129,10 @@ public sealed partial class DoomPage : Page
         return null;
     }
 
+    public static bool HasCurrentBackground(IEnumerable<string> list)
+    {
+        return list.Any();
+    }
 
     public static Visibility HasNoModFiles(int count)
     {
@@ -202,5 +206,10 @@ public sealed partial class DoomPage : Page
     private void RemoveMod_Click(object sender, RoutedEventArgs e)
     {
         OnRemove?.Invoke(this, Entry);
+    }
+
+    private void RemoveBackground_Click(object sender, RoutedEventArgs e)
+    {
+        Entry.ImageFiles.Clear();
     }
 }
