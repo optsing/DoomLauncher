@@ -11,6 +11,6 @@ public sealed partial class NotSelectedPage : Page
 {
     public NotSelectedPage()
     {
-        this.InitializeComponent();
+        InitializeComponent();
     }
 }

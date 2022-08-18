@@ -154,10 +154,11 @@ public sealed partial class RootPage : Page
             }
         }
         Process.Start(processInfo);
-        if (appWindow.Presenter is OverlappedPresenter presenter)
-        {
-            presenter.Minimize();
-        }
+        //if (appWindow.Presenter is OverlappedPresenter presenter)
+        //{
+        //    presenter.Minimize();
+        //}
+        Application.Current.Exit();
     }
 
     private async void Button_Click(object sender, RoutedEventArgs e)
@@ -244,5 +245,10 @@ public sealed partial class RootPage : Page
     private void ButtonMenu_Click(object sender, RoutedEventArgs e)
     {
         swMain.IsPaneOpen = !swMain.IsPaneOpen;
+    }
+
+    private async void SettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+        await ChooseGZDoomPath();
     }
 }

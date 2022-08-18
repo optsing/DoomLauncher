@@ -26,7 +26,7 @@ public partial class App : Application
     /// will be used such as when the application is launched to open a specific file.
     /// </summary>
     /// <param name="args">Details about the launch request and process.</param>
-    protected async override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+    protected async override void OnLaunched(LaunchActivatedEventArgs args)
     {
         // Get or register the main instance
         var mainInstance = AppInstance.FindOrRegisterForKey("doom");
