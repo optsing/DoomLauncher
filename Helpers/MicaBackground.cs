@@ -8,7 +8,8 @@ namespace DoomLauncher;
 public class MicaBackground
 {
     private readonly Window _window;
-    private DesktopAcrylicController _micaController = new();
+    private MicaController _micaController = new();
+
     private SystemBackdropConfiguration _backdropConfiguration = new();
     private readonly WindowsSystemDispatcherQueueHelper _dispatcherQueueHelper = new();
 
@@ -19,7 +20,7 @@ public class MicaBackground
 
     public bool TrySetAcrylicBackdrop()
     {
-        if (DesktopAcrylicController.IsSupported())
+        if (MicaController.IsSupported())
         {
             _dispatcherQueueHelper.EnsureWindowsSystemDispatcherQueueController();
 
@@ -37,6 +38,7 @@ public class MicaBackground
             // Note: Be sure to have "using WinRT;" to support the Window.As<...>() call.
             _micaController.AddSystemBackdropTarget(_window.As<ICompositionSupportsSystemBackdrop>());
             _micaController.SetSystemBackdropConfiguration(_backdropConfiguration);
+            //_micaController.Kind = MicaKind.BaseAlt;
             return true; // succeeded
         }
 

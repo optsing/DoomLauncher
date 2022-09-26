@@ -90,6 +90,10 @@ public sealed partial class RootPage : Page
         {
             frameMain.Content = notSelectedPage;
         }
+        if (swMain.DisplayMode == SplitViewDisplayMode.Overlay)
+        {
+            swMain.IsPaneOpen = false;
+        }
     }
 
     private async void Page_OnRemove(object sender, DoomEntry entry)
