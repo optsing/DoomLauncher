@@ -117,10 +117,11 @@ public sealed partial class RootPage : Page
 
     private async void Page_OnEdit(object sender, DoomEntry entry)
     {
-        if (await AddOrEditModDialogShow(entry.Name, entry.IWadFile, true) is EditModDialogResult result)
+        if (await AddOrEditModDialogShow(new EditModDialogResult(entry.Name, entry.IWadFile, entry.CloseOnLaunch), true) is EditModDialogResult result)
         {
             entry.Name = result.name;
             entry.IWadFile = result.iWadFile;
+            entry.CloseOnLaunch = result.closeOnLaunch;
         }
     }
 
@@ -158,22 +159,27 @@ public sealed partial class RootPage : Page
             }
         }
         Process.Start(processInfo);
-        //if (appWindow.Presenter is OverlappedPresenter presenter)
-        //{
-        //    presenter.Minimize();
-        //}
-        Application.Current.Exit();
+
+        if (entry.CloseOnLaunch)
+        {
+            Application.Current.Exit();
+        }
+        else if (appWindow.Presenter is OverlappedPresenter presenter)
+        {
+            presenter.Minimize();
+        }
     }
 
     private async void Button_Click(object sender, RoutedEventArgs e)
     {
-        if (await AddOrEditModDialogShow("", Settings.IWads.First(), false) is EditModDialogResult result)
+        if (await AddOrEditModDialogShow(new EditModDialogResult("", Settings.IWads.First(), false), false) is EditModDialogResult result)
         {
             DoomEntry entry = new()
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = result.name,
                 IWadFile = result.iWadFile,
+                CloseOnLaunch = result.closeOnLaunch,
                 ModFiles = new(),
             };
             settings.Entries.Add(entry);
@@ -214,21 +220,9 @@ public sealed partial class RootPage : Page
         return true;
     }
 
-    public readonly struct EditModDialogResult
+    public async Task<EditModDialogResult?> AddOrEditModDialogShow(EditModDialogResult initial, bool isEditMode)
     {
-        public readonly string name;
-        public readonly KeyValue iWadFile;
-
-        public EditModDialogResult(string name, KeyValue iWadFile)
-        {
-            this.name = name;
-            this.iWadFile = iWadFile;
-        }
-    }
-
-    public async Task<EditModDialogResult?> AddOrEditModDialogShow(string modName, KeyValue iWadFile, bool isEditMode)
-    {
-        var content = new EditModContentDialog(modName, iWadFile);
+        var content = new EditModContentDialog(initial);
         ContentDialog dialog = new()
         {
             XamlRoot = Content.XamlRoot,
@@ -241,7 +235,7 @@ public sealed partial class RootPage : Page
 
         if (ContentDialogResult.Primary == await dialog.ShowAsync())
         {
-            return new(content.ModName, content.IWadFile);
+            return new(content.ModName, content.IWadFile, content.CloseOnLaunch);
         }
         return null;
     }

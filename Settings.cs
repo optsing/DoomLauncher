@@ -67,6 +67,11 @@ public class DoomEntry : INotifyPropertyChanged
         }
     }
 
+    public bool CloseOnLaunch
+    {
+        get; set;
+    }
+
     public ObservableCollection<string> ImageFiles
     {
         get; set;

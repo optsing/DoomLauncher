@@ -18,5 +18,8 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
+        <CheckBox
+            IsChecked="{x:Bind CloseOnLaunch, Mode=TwoWay}"
+        >Закрывать окно при запуске</CheckBox>
     </StackPanel>
 </Page>

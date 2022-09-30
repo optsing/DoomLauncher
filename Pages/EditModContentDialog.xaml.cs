@@ -22,11 +22,12 @@ namespace DoomLauncher;
 /// </summary>
 public sealed partial class EditModContentDialog : Page
 {
-    public EditModContentDialog(string modName, KeyValue iWadFile)
+    public EditModContentDialog(EditModDialogResult initial)
     {
         InitializeComponent();
-        ModName = modName;
-        IWadFile = iWadFile;
+        ModName = initial.name;
+        IWadFile = initial.iWadFile;
+        CloseOnLaunch = initial.closeOnLaunch;
     }
 
     public string ModName
@@ -37,5 +38,24 @@ public sealed partial class EditModContentDialog : Page
     public KeyValue IWadFile
     {
         get; private set;
+    }
+
+    public bool CloseOnLaunch
+    {
+        get; set;
+    }
+}
+
+public readonly struct EditModDialogResult
+{
+    public readonly string name;
+    public readonly KeyValue iWadFile;
+    public readonly bool closeOnLaunch;
+
+    public EditModDialogResult(string name, KeyValue iWadFile, bool closeOnLaunch)
+    {
+        this.name = name;
+        this.iWadFile = iWadFile;
+        this.closeOnLaunch = closeOnLaunch;
     }
 }
