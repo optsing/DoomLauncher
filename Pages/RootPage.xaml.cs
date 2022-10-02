@@ -172,7 +172,7 @@ public sealed partial class RootPage : Page
 
     private async void Button_Click(object sender, RoutedEventArgs e)
     {
-        if (await AddOrEditModDialogShow(new EditModDialogResult("", Settings.IWads.First(), false), false) is EditModDialogResult result)
+        if (await AddOrEditModDialogShow(new EditModDialogResult("", Settings.IWads.First(), true), false) is EditModDialogResult result)
         {
             DoomEntry entry = new()
             {
