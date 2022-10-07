@@ -47,11 +47,7 @@ public sealed partial class MainWindow : Window
         catch
         {
             // Unpackaged only
-            dataFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "data");
-            if (!Directory.Exists(dataFolderPath))
-            {
-                Directory.CreateDirectory(dataFolderPath);
-            }
+            dataFolderPath = Directory.GetCurrentDirectory();
         }
         configFilePath = Path.Combine(dataFolderPath, "config.json");
 
