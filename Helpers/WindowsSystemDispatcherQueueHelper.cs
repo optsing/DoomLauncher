@@ -1,10 +1,11 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 
 namespace DoomLauncher;
 
 public class WindowsSystemDispatcherQueueHelper
 {
-    private object _dispatcherQueueController;
+    private IntPtr _dispatcherQueueController = IntPtr.Zero;
 
     [StructLayout(LayoutKind.Sequential)]
     internal struct DispatcherQueueOptions
@@ -15,7 +16,7 @@ public class WindowsSystemDispatcherQueueHelper
     }
 
     [DllImport("CoreMessaging.dll")]
-    private static extern int CreateDispatcherQueueController([In] DispatcherQueueOptions options, [In, Out, MarshalAs(UnmanagedType.IUnknown)] ref object dispatcherQueueController);
+    private static extern int CreateDispatcherQueueController(DispatcherQueueOptions options, ref IntPtr instance);
 
     public void EnsureWindowsSystemDispatcherQueueController()
     {
@@ -25,7 +26,7 @@ public class WindowsSystemDispatcherQueueHelper
             return;
         }
 
-        if (_dispatcherQueueController == null)
+        if (_dispatcherQueueController == IntPtr.Zero)
         {
             DispatcherQueueOptions options;
             options.dwSize = Marshal.SizeOf(typeof(DispatcherQueueOptions));
