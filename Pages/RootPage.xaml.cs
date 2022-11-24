@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.UI.Windowing;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.UI;
-using Microsoft.UI.Windowing;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
+using System.Runtime.InteropServices;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -18,6 +17,9 @@ namespace DoomLauncher;
 /// </summary>
 public sealed partial class RootPage : Page
 {
+    [DllImport("User32.dll")]
+    private static extern bool SetForegroundWindow(IntPtr handle);
+
     public RootPage(AppWindow appWindow, Settings settings, IntPtr hWnd, string dataFolderPath)
     {
         InitializeComponent();
@@ -158,7 +160,9 @@ public sealed partial class RootPage : Page
                 processInfo.ArgumentList.Add(modFile.Path);
             }
         }
-        Process.Start(processInfo);
+        var process = Process.Start(processInfo);
+
+        SetForegroundWindow(process.MainWindowHandle);
 
         if (entry.CloseOnLaunch)
         {

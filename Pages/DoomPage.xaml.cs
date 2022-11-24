@@ -54,7 +54,7 @@ public sealed partial class DoomPage : Page
     {
         var picker = new Windows.Storage.Pickers.FileOpenPicker();
 
-        // Need to initialize the picker object with the hwnd / IInitializeWithWindow 
+        // Need to initialize the picker object with the hwnd / IInitializeWithWindow
         WinRT.Interop.InitializeWithWindow.Initialize(picker, HWND);
 
         // Now we can use the picker object as normal
@@ -71,7 +71,7 @@ public sealed partial class DoomPage : Page
     {
         var picker = new Windows.Storage.Pickers.FileOpenPicker();
 
-        // Need to initialize the picker object with the hwnd / IInitializeWithWindow 
+        // Need to initialize the picker object with the hwnd / IInitializeWithWindow
         WinRT.Interop.InitializeWithWindow.Initialize(picker, HWND);
 
         // Now we can use the picker object as normal
