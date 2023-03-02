@@ -14,7 +14,7 @@ public class DPIHelper
         MDT_Effective_DPI = 0,
         MDT_Angular_DPI = 1,
         MDT_Raw_DPI = 2,
-        MDT_Default = MDT_Effective_DPI
+        MDT_Default = MDT_Effective_DPI,
     }
 
     public static double GetScaleAdjustment(IntPtr hWnd)

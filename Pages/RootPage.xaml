@@ -8,7 +8,7 @@
     xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
     mc:Ignorable="d"
 >
-    <Grid>
+    <Grid RowDefinitions="Auto,*">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
                 <VisualState>
@@ -25,10 +25,6 @@
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
         <SplitView
             x:Name="swMain"
             IsPaneOpen="True"
@@ -39,12 +35,12 @@
             PaneBackground="Transparent"
         >
             <SplitView.Pane>
-                <Grid x:Name="gridPane" Background="{ThemeResource SystemControlPageBackgroundChromeLowBrush}" CornerRadius="8">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="48" />
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
+                <Grid
+                    x:Name="gridPane"
+                    Background="{ThemeResource SystemControlPageBackgroundChromeLowBrush}"
+                    CornerRadius="8"
+                    RowDefinitions="48,Auto,*"
+                >
                     <Button Grid.Row="1" Click="Button_Click" HorizontalAlignment="Stretch" Margin="8">
                         <StackPanel Orientation="Horizontal">
                             <SymbolIcon Symbol="Add" Margin="0,0,4,0" />
@@ -81,11 +77,8 @@
             x:Name="titleBar"
             Height="48"
             Grid.Row="0"
+            ColumnDefinitions="Auto,*"
         >
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
             <Button
                 x:Name="buttonMenu"
                 Grid.Column="0"

@@ -8,16 +8,14 @@
     mc:Ignorable="d"
     Background="Transparent">
 
-    <Grid>
-        <StackPanel
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            Orientation="Horizontal"
-        >
-            <FontIcon Glyph="&#xF0B0;" Margin="0,4,8,0" FontSize="24" VerticalAlignment="Center" />
-            <TextBlock
-                FontSize="24"
-            >Создайте или выберите сборку</TextBlock>
-        </StackPanel>
-    </Grid>
+    <StackPanel
+        VerticalAlignment="Center"
+        HorizontalAlignment="Center"
+        Orientation="Horizontal"
+    >
+    <FontIcon Glyph="&#xF0B0;" Margin="0,4,8,0" FontSize="24" VerticalAlignment="Center" />
+    <TextBlock
+            FontSize="24"
+    >Создайте или выберите сборку</TextBlock>
+    </StackPanel>
 </Page>
