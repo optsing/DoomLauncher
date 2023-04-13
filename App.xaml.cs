@@ -47,8 +47,6 @@ public partial class App : Application
 
         m_window = new MainWindow();
         m_window.Activate();
-        var mica = new MicaBackground(m_window);
-        mica.TrySetAcrylicBackdrop();
     }
 
     private Window m_window;

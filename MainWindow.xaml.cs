@@ -4,6 +4,7 @@ using System.Text.Json;
 using Microsoft.UI.Windowing;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -18,23 +19,23 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+
+        SystemBackdrop = new MicaBackdrop();
         //Title = "GZDoom Launcher";
         //ExtendsContentIntoTitleBar = true;
         //SetTitleBar(titleBar);
 
         var HWND = WinRT.Interop.WindowNative.GetWindowHandle(this);
-        var windowId = Win32Interop.GetWindowIdFromWindow(HWND);
-        var appWindow = AppWindow.GetFromWindowId(windowId);
 
-        appWindow.Title = "GZDoom Launcher";
-        appWindow.SetIcon("Assets/app.ico");
+        AppWindow.Title = "GZDoom Launcher";
+        AppWindow.SetIcon("Assets/app.ico");
         if (AppWindowTitleBar.IsCustomizationSupported())
         {
-            appWindow.TitleBar.IconShowOptions = IconShowOptions.HideIconAndSystemMenu;
-            appWindow.TitleBar.ExtendsContentIntoTitleBar = true;
-            appWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
-            appWindow.TitleBar.ButtonBackgroundColor = Colors.Transparent;
-            appWindow.TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
+            AppWindow.TitleBar.IconShowOptions = IconShowOptions.HideIconAndSystemMenu;
+            AppWindow.TitleBar.ExtendsContentIntoTitleBar = true;
+            AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
+            AppWindow.TitleBar.ButtonBackgroundColor = Colors.Transparent;
+            AppWindow.TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
         }
 
         Closed += MainWindow_Closed;
@@ -66,7 +67,7 @@ public sealed partial class MainWindow : Window
             };
         }
 
-        frameRoot.Content = new RootPage(appWindow, settings, HWND, dataFolderPath);
+        frameRoot.Content = new RootPage(AppWindow, settings, HWND, dataFolderPath);
     }
 
 
