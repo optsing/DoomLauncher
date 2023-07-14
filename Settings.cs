@@ -1,35 +1,66 @@
-﻿using System;
+﻿using Microsoft.UI.Xaml.Media;
+using Microsoft.WindowsAppSDK.Runtime;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Windows.Globalization;
 
 namespace DoomLauncher;
 
-public class Settings
+public class Settings : INotifyPropertyChanged
 {
-    public string GZDoomPath { get; set; }
+    private string gzDoomPath = "";
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    public string GZDoomPath {
+        get => gzDoomPath;
+        set
+        {
+            if (gzDoomPath != value)
+            {
+                gzDoomPath = value;
+                OnPropertyChanged(nameof(GZDoomPath));
+            }
+        }
+    }
 
     public int SelectedModIndex
     {
         get; set;
-    }
+    } = 0;
 
-    public ObservableCollection<DoomEntry> Entries { get; set; }
+    public ObservableCollection<DoomEntry> Entries { get; set; } = new();
 
     public static readonly List<KeyValue> IWads = new()
     {
         new () { Key = "", Value = "Не выбрано" },
-        new () { Key = "doom.wad", Value = "Doom" },
+        new () { Key = "doom1.wad", Value = "Doom (Shareware)" },
+        new () { Key = "doom.wad", Value = "Ultimate Doom" },
         new () { Key = "doom2.wad", Value = "Doom II" },
+        new () { Key = "doom2f.wad", Value = "Doom II (French)"},
+        new () { Key = "doom64.wad", Value = "Doom 64"},
         new () { Key = "tnt.wad", Value = "TNT: Evilution" },
         new () { Key = "plutonia.wad", Value = "The Plutonia Experiment" },
+        new () { Key = "heretic1.wad", Value = "Heretic (Shareware)" },
         new () { Key = "heretic.wad", Value = "Heretic" },
         new () { Key = "hexen.wad", Value = "Hexen" },
+        new () { Key = "strife1.wad", Value = "Strife" },
+        new () { Key = "chex.wad", Value = "Chex Quest" },
+        new () { Key = "freedoom1.wad", Value = "Freedoom: Phase 1" },
+        new () { Key = "freedoom2.wad", Value = "Freedoom: Phase 2" },
+        new () { Key = "freedm.wad", Value = "FreeDM" },
     };
+    protected void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 }
+
 
 public class DoomEntry : INotifyPropertyChanged
 {

@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -34,7 +35,6 @@ public sealed partial class RootPage : Page
             titleBar.Loaded += TitleBar_Loaded;
             titleBar.SizeChanged += TitleBar_SizeChanged;
         }
-
 
         frameMain.Content = notSelectedPage;
         DoomList.SelectedIndex = settings.SelectedModIndex;
@@ -79,9 +79,9 @@ public sealed partial class RootPage : Page
 
     private void DoomList_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        settings.SelectedModIndex = DoomList.SelectedIndex;
         if (DoomList.SelectedItem is DoomEntry item)
         {
+            settings.SelectedModIndex = DoomList.SelectedIndex;
             DoomPage page = new(item, hWnd, dataFolderPath);
             page.OnStart += Page_OnStart;
             page.OnEdit += Page_OnEdit;
@@ -226,20 +226,28 @@ public sealed partial class RootPage : Page
 
     public async Task<EditModDialogResult?> AddOrEditModDialogShow(EditModDialogResult initial, bool isEditMode)
     {
-        var content = new EditModContentDialog(initial);
-        ContentDialog dialog = new()
+        if (!IsGZDoomPathChoosen())
         {
-            XamlRoot = Content.XamlRoot,
-            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
-            Content = content,
-            PrimaryButtonText = isEditMode ? "Изменить" : "Создать",
-            CloseButtonText = "Отмена",
-            DefaultButton = ContentDialogButton.Primary,
-        };
+            var success = await ChooseGZDoomPath();
+            if (!success)
+            {
+                return null;
+            }
+        }
+        List<KeyValue> filteredIWads = new() { Settings.IWads.First() };
+        var gzDoomDirectoryPath = Path.GetDirectoryName(settings.GZDoomPath);
+        foreach (var iwad in Settings.IWads)
+        {
+            if (iwad.Key != "" && File.Exists(Path.Combine(gzDoomDirectoryPath, iwad.Key)))
+            {
+                filteredIWads.Add(iwad);
+            }
+        }
 
+        var dialog = new EditModContentDialog(Content.XamlRoot, initial, filteredIWads, isEditMode);
         if (ContentDialogResult.Primary == await dialog.ShowAsync())
         {
-            return new(content.ModName, content.IWadFile, content.CloseOnLaunch);
+            return new(dialog.ModName, dialog.IWadFile, dialog.CloseOnLaunch);
         }
         return null;
     }
@@ -252,5 +260,16 @@ public sealed partial class RootPage : Page
     private async void SettingsButton_Click(object sender, RoutedEventArgs e)
     {
         await ChooseGZDoomPath();
+    }
+
+    public static string GZDoomPathTitle(string path)
+    {
+        if (string.IsNullOrEmpty(path))
+        {
+            return "GZDoom не выбран";
+        } else
+        {
+            return path;
+        }
     }
 }

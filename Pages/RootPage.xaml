@@ -63,6 +63,25 @@
                                 <TextBlock Text="{x:Bind Name, Mode=OneWay}" VerticalAlignment="Center" FontSize="16" />
                             </DataTemplate>
                         </ListView.ItemTemplate>
+                        <ListView.Footer>
+                            <Button
+                                Click="SettingsButton_Click"
+                                ToolTipService.ToolTip="{x:Bind local:RootPage.GZDoomPathTitle(settings.GZDoomPath), Mode=OneWay}"
+                                Margin="8"
+                                HorizontalAlignment="Stretch"
+                            >
+                                <StackPanel Orientation="Horizontal">
+                                    <FontIcon
+                                        Margin="0,0,4,0"
+                                        Glyph="&#xE838;"
+                                        FontSize="16"
+                                    />
+                                    <TextBlock
+                                        Text="Выбрать GZDoom"
+                                    />
+                                </StackPanel>
+                            </Button>
+                        </ListView.Footer>
                     </ListView>
                 </Grid>
             </SplitView.Pane>
@@ -86,13 +105,13 @@
                 Height="48"
                 Margin="4,0,0,0"
                 Click="ButtonMenu_Click"
-                Style="{StaticResource PaneToggleButtonStyle}" />
+                Style="{ThemeResource PaneToggleButtonStyle}" />
             <TextBlock
                 Grid.Column="1"
                 Text="GZDoom Launcher"
                 Margin="8,0,0,0"
                 VerticalAlignment="Center"
-                Style="{StaticResource BaseTextBlockStyle}"
+                Style="{ThemeResource BaseTextBlockStyle}"
             />
         </Grid>
     </Grid>

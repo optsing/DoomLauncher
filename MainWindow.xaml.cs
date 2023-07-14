@@ -20,11 +20,6 @@ public sealed partial class MainWindow : Window
     {
         InitializeComponent();
 
-        SystemBackdrop = new MicaBackdrop();
-        //Title = "GZDoom Launcher";
-        //ExtendsContentIntoTitleBar = true;
-        //SetTitleBar(titleBar);
-
         var HWND = WinRT.Interop.WindowNative.GetWindowHandle(this);
 
         AppWindow.Title = "GZDoom Launcher";
@@ -59,12 +54,7 @@ public sealed partial class MainWindow : Window
         }
         else
         {
-            settings = new()
-            {
-                GZDoomPath = "",
-                Entries = new(),
-                SelectedModIndex = 0,
-            };
+            settings = new();
         }
 
         frameRoot.Content = new RootPage(AppWindow, settings, HWND, dataFolderPath);
