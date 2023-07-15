@@ -1,7 +1,7 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -43,46 +43,17 @@ public class Settings
 }
 
 
-public class DoomEntry : INotifyPropertyChanged
+public partial class DoomEntry: ObservableObject
 {
+    [ObservableProperty]
     private string name;
+    [ObservableProperty]
     private KeyValue iWadFile;
-
-    public event PropertyChangedEventHandler PropertyChanged;
 
     public string Id { get; set; }
 
-    public string Name
-    {
-        get => name;
-        set
-        {
-            if (name != value)
-            {
-                name = value;
-                OnPropertyChanged(nameof(Name));
-            }
-        }
-    }
-    public KeyValue IWadFile
-    {
-        get => iWadFile;
-        set {
-            if (iWadFile != value)
-            {
-                iWadFile = value;
-                OnPropertyChanged(nameof(IWadFile));
-            }
-        }
-    }
-
     public ObservableCollection<string> ImageFiles { get; set; } = new();
     public ObservableCollection<NamePath> ModFiles { get; set; } = new();
-
-    protected void OnPropertyChanged(string propertyName)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
 }
 
 

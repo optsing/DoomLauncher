@@ -19,7 +19,7 @@
             x:Name="tbGZDoomPath"
             HorizontalAlignment="Stretch"
             Margin="0,8,0,8"
-            Text="{x:Bind GZDoomPath, Mode=TwoWay}"
+            Text="{x:Bind State.GZDoomPath, Mode=TwoWay}"
             AcceptsReturn="False"
         />
         <Button
@@ -39,7 +39,7 @@
             </StackPanel>
         </Button>
         <CheckBox
-            IsChecked="{x:Bind CloseOnLaunch, Mode=TwoWay}"
+            IsChecked="{x:Bind State.CloseOnLaunch, Mode=TwoWay}"
         >Закрывать лаунчер при запуске сборки</CheckBox>
     </StackPanel>
 </ContentDialog>

@@ -190,11 +190,11 @@ public sealed partial class RootPage : Page
 
     private async Task<bool> OpenSettings()
     {
-        var dialog = new SettingsContentDialog(XamlRoot, hWnd, settings.GZDoomPath, settings.CloseOnLaunch);
+        var dialog = new SettingsContentDialog(XamlRoot, hWnd, new() { GZDoomPath = settings.GZDoomPath, CloseOnLaunch = settings.CloseOnLaunch });
         if (ContentDialogResult.Primary == await dialog.ShowAsync())
         {
-            settings.GZDoomPath = dialog.GZDoomPath;
-            settings.CloseOnLaunch = dialog.CloseOnLaunch;
+            settings.GZDoomPath = dialog.State.GZDoomPath;
+            settings.CloseOnLaunch = dialog.State.CloseOnLaunch;
             return true;
         }
         return false;

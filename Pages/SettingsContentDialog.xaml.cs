@@ -1,7 +1,7 @@
-﻿using Microsoft.UI.Xaml;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
-using System.ComponentModel;
 using System.Threading.Tasks;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -11,45 +11,18 @@ namespace DoomLauncher;
 /// <summary>
 /// An empty page that can be used on its own or navigated to within a Frame.
 /// </summary>
-public sealed partial class SettingsContentDialog : ContentDialog, INotifyPropertyChanged
+
+public sealed partial class SettingsContentDialog : ContentDialog
 {
     private readonly IntPtr hWnd;
-    private string gzDoomPath;
-    private bool closeOnLaunch;
+    public SettingsDialogState State { get; private set; }
 
-    public SettingsContentDialog(XamlRoot root, IntPtr hWnd, string gzDoomPath, bool closeOnLaunch)
+    public SettingsContentDialog(XamlRoot root, IntPtr hWnd, SettingsDialogState state)
     {
         this.InitializeComponent();
         this.XamlRoot = root;
         this.hWnd = hWnd;
-        this.gzDoomPath = gzDoomPath;
-        this.closeOnLaunch = closeOnLaunch;
-    }
-
-    public string GZDoomPath
-    {
-        get => gzDoomPath;
-        set
-        {
-            if (gzDoomPath != value)
-            {
-                gzDoomPath = value;
-                OnPropertyChanged(nameof(GZDoomPath));
-            }
-        }
-    }
-
-    public bool CloseOnLaunch
-    {
-        get => closeOnLaunch;
-        set
-        {
-            if (closeOnLaunch != value)
-            {
-                closeOnLaunch = value;
-                OnPropertyChanged(nameof(CloseOnLaunch));
-            }
-        }
+        this.State = state;
     }
 
     private async Task ChooseGZDoomPath()
@@ -65,7 +38,7 @@ public sealed partial class SettingsContentDialog : ContentDialog, INotifyProper
         var file = await picker.PickSingleFileAsync();
         if (file != null)
         {
-            GZDoomPath = file.Path;
+            State.GZDoomPath = file.Path;
         }
     }
 
@@ -76,16 +49,18 @@ public sealed partial class SettingsContentDialog : ContentDialog, INotifyProper
 
     private void SettingsContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
-        if (!Settings.ValidateGZDoomPath(GZDoomPath))
+        if (!Settings.ValidateGZDoomPath(State.GZDoomPath))
         {
             tbGZDoomPath.Focus(FocusState.Programmatic);
             args.Cancel = true;
         }
     }
+}
 
-    public event PropertyChangedEventHandler PropertyChanged;
-    private void OnPropertyChanged(string propertyName)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
+public partial class SettingsDialogState: ObservableObject
+{
+    [ObservableProperty]
+    private string gZDoomPath;
+    [ObservableProperty]
+    private bool closeOnLaunch;
 }
