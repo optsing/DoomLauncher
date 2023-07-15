@@ -2,12 +2,12 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Runtime.InteropServices;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -38,6 +38,14 @@ public sealed partial class RootPage : Page
 
         frameMain.Content = notSelectedPage;
         DoomList.SelectedIndex = settings.SelectedModIndex;
+    }
+
+    private async void Page_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (!Settings.ValidateGZDoomPath(settings.GZDoomPath))
+        {
+            await OpenSettings();
+        }
     }
 
     private void TitleBar_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -100,18 +108,8 @@ public sealed partial class RootPage : Page
 
     private async void Page_OnRemove(object sender, DoomEntry entry)
     {
-        ContentDialog dialog = new()
-        {
-            XamlRoot = Content.XamlRoot,
-            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
-            PrimaryButtonText = "Удалить",
-            Content = $"Вы уверены, что хотите удалить '{entry.Name}'?",
-            CloseButtonText = "Отмена",
-            DefaultButton = ContentDialogButton.Primary,
-        };
-
-        var result = await dialog.ShowAsync();
-        if (result == ContentDialogResult.Primary)
+        var dialog = new AskDialog(XamlRoot, $"Вы уверены, что хотите удалить сборку '{entry.Name}'?", "Удалить");
+        if (ContentDialogResult.Primary == await dialog.ShowAsync())
         {
             settings.Entries.Remove(entry);
         }
@@ -119,11 +117,10 @@ public sealed partial class RootPage : Page
 
     private async void Page_OnEdit(object sender, DoomEntry entry)
     {
-        if (await AddOrEditModDialogShow(new EditModDialogResult(entry.Name, entry.IWadFile, entry.CloseOnLaunch), true) is EditModDialogResult result)
+        if (await AddOrEditModDialogShow(new EditModDialogResult(entry.Name, entry.IWadFile), true) is EditModDialogResult result)
         {
             entry.Name = result.name;
             entry.IWadFile = result.iWadFile;
-            entry.CloseOnLaunch = result.closeOnLaunch;
         }
     }
 
@@ -134,9 +131,9 @@ public sealed partial class RootPage : Page
 
     private async void Start(DoomEntry entry)
     {
-        if (!IsGZDoomPathChoosen())
+        if (!Settings.ValidateGZDoomPath(settings.GZDoomPath))
         {
-            var success = await ChooseGZDoomPath();
+            var success = await OpenSettings();
             if (!success)
             {
                 return;
@@ -164,7 +161,7 @@ public sealed partial class RootPage : Page
 
         SetForegroundWindow(process.MainWindowHandle);
 
-        if (entry.CloseOnLaunch)
+        if (settings.CloseOnLaunch)
         {
             Application.Current.Exit();
         }
@@ -176,14 +173,13 @@ public sealed partial class RootPage : Page
 
     private async void Button_Click(object sender, RoutedEventArgs e)
     {
-        if (await AddOrEditModDialogShow(new EditModDialogResult("", Settings.IWads.First(), true), false) is EditModDialogResult result)
+        if (await AddOrEditModDialogShow(new EditModDialogResult("", Settings.IWads.First()), false) is EditModDialogResult result)
         {
             DoomEntry entry = new()
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = result.name,
                 IWadFile = result.iWadFile,
-                CloseOnLaunch = result.closeOnLaunch,
                 ModFiles = new(),
             };
             settings.Entries.Add(entry);
@@ -192,43 +188,23 @@ public sealed partial class RootPage : Page
     }
 
 
-    private async Task<bool> ChooseGZDoomPath()
+    private async Task<bool> OpenSettings()
     {
-        var picker = new Windows.Storage.Pickers.FileOpenPicker();
-
-        // Need to initialize the picker object with the hwnd / IInitializeWithWindow 
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
-
-        // Now we can use the picker object as normal
-        picker.FileTypeFilter.Add(".exe");
-        picker.CommitButtonText = "Выбрать GZDoom";
-        var file = await picker.PickSingleFileAsync();
-        if (file != null)
+        var dialog = new SettingsContentDialog(XamlRoot, hWnd, settings.GZDoomPath, settings.CloseOnLaunch);
+        if (ContentDialogResult.Primary == await dialog.ShowAsync())
         {
-            settings.GZDoomPath = file.Path;
+            settings.GZDoomPath = dialog.GZDoomPath;
+            settings.CloseOnLaunch = dialog.CloseOnLaunch;
             return true;
         }
         return false;
     }
 
-    public bool IsGZDoomPathChoosen()
-    {
-        if (string.IsNullOrEmpty(settings.GZDoomPath))
-        {
-            return false;
-        }
-        if (!File.Exists(settings.GZDoomPath))
-        {
-            return false;
-        }
-        return true;
-    }
-
     public async Task<EditModDialogResult?> AddOrEditModDialogShow(EditModDialogResult initial, bool isEditMode)
     {
-        if (!IsGZDoomPathChoosen())
+        if (!Settings.ValidateGZDoomPath(settings.GZDoomPath))
         {
-            var success = await ChooseGZDoomPath();
+            var success = await OpenSettings();
             if (!success)
             {
                 return null;
@@ -244,10 +220,10 @@ public sealed partial class RootPage : Page
             }
         }
 
-        var dialog = new EditModContentDialog(Content.XamlRoot, initial, filteredIWads, isEditMode);
+        var dialog = new EditModContentDialog(XamlRoot, initial, filteredIWads, isEditMode);
         if (ContentDialogResult.Primary == await dialog.ShowAsync())
         {
-            return new(dialog.ModName, dialog.IWadFile, dialog.CloseOnLaunch);
+            return new(dialog.ModName, dialog.IWadFile);
         }
         return null;
     }
@@ -259,7 +235,7 @@ public sealed partial class RootPage : Page
 
     private async void SettingsButton_Click(object sender, RoutedEventArgs e)
     {
-        await ChooseGZDoomPath();
+        await OpenSettings();
     }
 
     public static string GZDoomPathTitle(string path)

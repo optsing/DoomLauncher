@@ -1,0 +1,45 @@
+﻿<ContentDialog
+    x:Class="DoomLauncher.SettingsContentDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:DoomLauncher"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    DefaultButton="Primary"
+    PrimaryButtonText="Сохранить"
+    Style="{ThemeResource DefaultContentDialogStyle}"
+    Title="Настройки"
+    PrimaryButtonClick="SettingsContentDialog_PrimaryButtonClick"
+>
+
+    <StackPanel Width="420">
+        <TextBlock>Путь к GZDoom</TextBlock>
+        <TextBox
+            x:Name="tbGZDoomPath"
+            HorizontalAlignment="Stretch"
+            Margin="0,8,0,8"
+            Text="{x:Bind GZDoomPath, Mode=TwoWay}"
+            AcceptsReturn="False"
+        />
+        <Button
+            Margin="8"
+            HorizontalAlignment="Right"
+            Click="BrowseButton_Click"
+        >
+            <StackPanel Orientation="Horizontal">
+                <FontIcon
+                    Margin="0,0,4,0"
+                    Glyph="&#xE838;"
+                    FontSize="16"
+                />
+                <TextBlock
+                    Text="Выбрать файл"
+                />
+            </StackPanel>
+        </Button>
+        <CheckBox
+            IsChecked="{x:Bind CloseOnLaunch, Mode=TwoWay}"
+        >Закрывать лаунчер при запуске сборки</CheckBox>
+    </StackPanel>
+</ContentDialog>

@@ -1,40 +1,25 @@
-﻿using Microsoft.UI.Xaml.Media;
-using Microsoft.WindowsAppSDK.Runtime;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Windows.Globalization;
 
 namespace DoomLauncher;
 
-public class Settings : INotifyPropertyChanged
+public class Settings
 {
-    private string gzDoomPath = "";
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    public string GZDoomPath {
-        get => gzDoomPath;
-        set
-        {
-            if (gzDoomPath != value)
-            {
-                gzDoomPath = value;
-                OnPropertyChanged(nameof(GZDoomPath));
-            }
-        }
-    }
-
-    public int SelectedModIndex
-    {
-        get; set;
-    } = 0;
-
+    public string GZDoomPath { get; set; } = "";
+    public bool CloseOnLaunch { get; set; } = true;
+    public int SelectedModIndex { get; set; } = 0;
     public ObservableCollection<DoomEntry> Entries { get; set; } = new();
+
+    public static bool ValidateGZDoomPath(string path)
+    {
+        return !string.IsNullOrEmpty(path) && Path.GetExtension(path) == ".exe" && File.Exists(path);
+    }
 
     public static readonly List<KeyValue> IWads = new()
     {
@@ -55,10 +40,6 @@ public class Settings : INotifyPropertyChanged
         new () { Key = "freedoom2.wad", Value = "Freedoom: Phase 2" },
         new () { Key = "freedm.wad", Value = "FreeDM" },
     };
-    protected void OnPropertyChanged(string propertyName)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
 }
 
 
@@ -69,10 +50,7 @@ public class DoomEntry : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler PropertyChanged;
 
-    public string Id
-    {
-        get; set;
-    }
+    public string Id { get; set; }
 
     public string Name
     {
@@ -98,20 +76,8 @@ public class DoomEntry : INotifyPropertyChanged
         }
     }
 
-    public bool CloseOnLaunch
-    {
-        get; set;
-    }
-
-    public ObservableCollection<string> ImageFiles
-    {
-        get; set;
-    } = new();
-
-    public ObservableCollection<NamePath> ModFiles
-    {
-        get; set;
-    }
+    public ObservableCollection<string> ImageFiles { get; set; } = new();
+    public ObservableCollection<NamePath> ModFiles { get; set; } = new();
 
     protected void OnPropertyChanged(string propertyName)
     {
@@ -134,7 +100,7 @@ public class NamePath
 
     public NamePath(string path)
     {
-        Name = System.IO.Path.GetFileNameWithoutExtension(path);
+        Name = System.IO.Path.GetFileName(path);
         Path = path;
     }
 }

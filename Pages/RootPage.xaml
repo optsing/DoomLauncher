@@ -7,6 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
     mc:Ignorable="d"
+    Loaded="Page_Loaded"
 >
     <Grid RowDefinitions="Auto,*">
         <VisualStateManager.VisualStateGroups>
@@ -71,14 +72,15 @@
                                 HorizontalAlignment="Stretch"
                             >
                                 <StackPanel Orientation="Horizontal">
-                                    <FontIcon
-                                        Margin="0,0,4,0"
-                                        Glyph="&#xE838;"
-                                        FontSize="16"
-                                    />
-                                    <TextBlock
-                                        Text="Выбрать GZDoom"
-                                    />
+                                    <AnimatedIcon Height="18" Margin="0,0,4,0">
+                                        <AnimatedIcon.Source>
+                                            <animatedvisuals:AnimatedSettingsVisualSource />
+                                        </AnimatedIcon.Source>
+                                        <AnimatedIcon.FallbackIconSource>
+                                            <SymbolIconSource Symbol="Setting"/>
+                                        </AnimatedIcon.FallbackIconSource>
+                                    </AnimatedIcon>
+                                    <TextBlock>Настройки</TextBlock>
                                 </StackPanel>
                             </Button>
                         </ListView.Footer>

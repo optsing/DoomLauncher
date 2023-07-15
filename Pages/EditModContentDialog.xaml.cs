@@ -17,9 +17,9 @@ public sealed partial class EditModContentDialog : ContentDialog
         XamlRoot = root;
         ModName = initial.name;
         IWadFile = initial.iWadFile;
-        CloseOnLaunch = initial.closeOnLaunch;
         FilteredIWads = filteredIWads;
         PrimaryButtonText = isEditMode ? "Изменить" : "Создать";
+        this.Title = isEditMode ? "Редактирование сборки" : "Создание сборки";
     }
 
     private void EditModContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
@@ -45,23 +45,16 @@ public sealed partial class EditModContentDialog : ContentDialog
     {
         get; private set;
     }
-
-    public bool CloseOnLaunch
-    {
-        get; set;
-    }
 }
 
 public readonly struct EditModDialogResult
 {
     public readonly string name;
     public readonly KeyValue iWadFile;
-    public readonly bool closeOnLaunch;
 
-    public EditModDialogResult(string name, KeyValue iWadFile, bool closeOnLaunch)
+    public EditModDialogResult(string name, KeyValue iWadFile)
     {
         this.name = name;
         this.iWadFile = iWadFile;
-        this.closeOnLaunch = closeOnLaunch;
     }
 }

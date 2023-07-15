@@ -99,9 +99,12 @@
         >
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="local:NamePath">
-                    <Grid ColumnDefinitions="*,Auto">
+                    <Grid ColumnDefinitions="*,Auto,Auto">
                         <TextBlock Text="{x:Bind Name}" VerticalAlignment="Center" />
-                        <Button Grid.Column="1" Click="RemoveFile_Click" Style="{ThemeResource EllipsisButton}" Height="40" Width="40" ToolTipService.ToolTip="Удалить файл">
+                        <Button Grid.Column="1" Click="OpenContainFolder_Click" Style="{ThemeResource EllipsisButton}" Height="40" Width="40" ToolTipService.ToolTip="Открыть расположение файла">
+                            <FontIcon Glyph="&#xE838;" FontSize="16" />
+                        </Button>
+                        <Button Grid.Column="2" Click="RemoveFile_Click" Style="{ThemeResource EllipsisButton}" Height="40" Width="40" ToolTipService.ToolTip="Удалить файл">
                             <FontIcon Glyph="&#xE74D;" FontSize="16" />
                         </Button>
                     </Grid>

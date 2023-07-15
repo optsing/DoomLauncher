@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Imaging;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 
@@ -191,11 +192,23 @@ public sealed partial class DoomPage : Page
         deferral.Complete();
     }
 
-    private void RemoveFile_Click(object sender, RoutedEventArgs e)
+    private void OpenContainFolder_Click(object sender, RoutedEventArgs e)
     {
         var button = sender as Button;
         var file = button.DataContext as NamePath;
-        Entry.ModFiles.Remove(file);
+        Process.Start("explorer.exe", "/select," + file.Path);
+    }
+
+    private async void RemoveFile_Click(object sender, RoutedEventArgs e)
+    {
+        var button = sender as Button;
+        var file = button.DataContext as NamePath;
+        var dialog = new AskDialog(XamlRoot, $"Вы уверены, что хотите удалить файл '{file.Name}'?", "Удалить");
+
+        if (ContentDialogResult.Primary == await dialog.ShowAsync())
+        {
+            Entry.ModFiles.Remove(file);
+        }
     }
 
     private void EditMod_Click(object sender, RoutedEventArgs e)
