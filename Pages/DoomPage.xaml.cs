@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -146,17 +147,17 @@ public sealed partial class DoomPage : Page
         return null;
     }
 
-    public static bool HasCurrentBackground(IEnumerable<string> list)
+    public static bool HasItems(int itemsCount)
     {
-        return list.Any();
+        return itemsCount > 0;
     }
 
-    public static Visibility HasNoModFiles(int count)
+    public static Visibility HasNoItems(int itemsCount)
     {
-        return count > 0 ? Visibility.Collapsed : Visibility.Visible;
+        return itemsCount == 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
-    private async Task<(List<string>, List<string>)> GetDraggedFiles(DataPackageView data)
+    private static async Task<(List<string>, List<string>)> GetDraggedFiles(DataPackageView data)
     {
         var modResult = new List<string>();
         var imageResult = new List<string>();

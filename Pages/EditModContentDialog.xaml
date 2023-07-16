@@ -20,6 +20,7 @@
             Margin="0,8,0,8"
             Text="{x:Bind ModName, Mode=TwoWay}"
             AcceptsReturn="False"
+            PlaceholderText="Введите название сборки"
         />
         <TextBlock>Игра</TextBlock>
         <ComboBox HorizontalAlignment="Stretch" ItemsSource="{x:Bind FilteredIWads}" Margin="0,8,0,8" SelectedItem="{x:Bind IWadFile, Mode=TwoWay}">

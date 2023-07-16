@@ -67,7 +67,6 @@
                         <ListView.Footer>
                             <Button
                                 Click="SettingsButton_Click"
-                                ToolTipService.ToolTip="{x:Bind local:RootPage.GZDoomPathTitle(settings.GZDoomPath), Mode=OneWay}"
                                 Margin="8"
                                 HorizontalAlignment="Stretch"
                             >

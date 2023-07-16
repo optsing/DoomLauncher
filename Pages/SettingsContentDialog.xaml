@@ -15,29 +15,27 @@
 
     <StackPanel Width="420">
         <TextBlock>Путь к GZDoom</TextBlock>
-        <TextBox
-            x:Name="tbGZDoomPath"
-            HorizontalAlignment="Stretch"
-            Margin="0,8,0,8"
-            Text="{x:Bind State.GZDoomPath, Mode=TwoWay}"
-            AcceptsReturn="False"
-        />
-        <Button
-            Margin="8"
-            HorizontalAlignment="Right"
-            Click="BrowseButton_Click"
-        >
-            <StackPanel Orientation="Horizontal">
-                <FontIcon
-                    Margin="0,0,4,0"
-                    Glyph="&#xE838;"
-                    FontSize="16"
-                />
-                <TextBlock
-                    Text="Выбрать файл"
-                />
-            </StackPanel>
-        </Button>
+        <Grid ColumnDefinitions="*,Auto">
+            <TextBox
+                Grid.Column="0"
+                x:Name="tbGZDoomPath"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center"
+                Margin="0,8,8,8"
+                Text="{x:Bind State.GZDoomPath, Mode=TwoWay}"
+                AcceptsReturn="False"
+                PlaceholderText="Выберите исполняемый файл"
+                IsReadOnly="True"
+            />
+            <Button
+                Grid.Column="1"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Click="BrowseButton_Click"
+            >
+                Выбрать
+            </Button>
+        </Grid>
         <CheckBox
             IsChecked="{x:Bind State.CloseOnLaunch, Mode=TwoWay}"
         >Закрывать лаунчер при запуске сборки</CheckBox>

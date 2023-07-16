@@ -21,8 +21,8 @@
             Grid.RowSpan="2"
             Orientation="Horizontal"
             VerticalAlignment="Center"
-                HorizontalAlignment="Center"
-            Visibility="{x:Bind local:DoomPage.HasNoModFiles(entry.ModFiles.Count), Mode=OneWay}"
+            HorizontalAlignment="Center"
+            Visibility="{x:Bind local:DoomPage.HasNoItems(entry.ModFiles.Count), Mode=OneWay}"
         >
             <TextBlock
                 FontSize="24"
@@ -53,7 +53,7 @@
                                 <SymbolIcon Symbol="Pictures" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
-                        <MenuFlyoutItem Text="Убрать фон" Click="RemoveBackground_Click" IsEnabled="{x:Bind local:DoomPage.HasCurrentBackground(entry.ImageFiles), Mode=OneWay}"/>
+                        <MenuFlyoutItem Text="Убрать фон" Click="RemoveBackground_Click" IsEnabled="{x:Bind local:DoomPage.HasItems(entry.ImageFiles.Count), Mode=OneWay}"/>
                         <MenuFlyoutSeparator />
                         <MenuFlyoutItem Text="Настроить сборку" Click="EditMod_Click">
                             <MenuFlyoutItem.Icon>
