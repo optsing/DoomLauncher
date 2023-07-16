@@ -26,6 +26,7 @@
 		<PublishSingleFile>false</PublishSingleFile>
 		<PublishTrimmed>true</PublishTrimmed>
 		<TrimMode>partial</TrimMode>
+		<DefaultLanguage>ru-RU</DefaultLanguage>
 		<!--<WindowsPackageType>None</WindowsPackageType>-->
 	</PropertyGroup>
 	<ItemGroup>
