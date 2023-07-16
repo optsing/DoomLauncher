@@ -14,5 +14,6 @@
 
     <TextBlock
         Text="{x:Bind Text}"
+        TextWrapping="WrapWholeWords"
     />
 </ContentDialog>

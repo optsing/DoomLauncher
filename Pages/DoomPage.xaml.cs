@@ -20,35 +20,29 @@ namespace DoomLauncher;
 /// </summary>
 public sealed partial class DoomPage : Page
 {
-    private readonly bool IS_COPY_TO_INNER_FOLDER = false;
+    private readonly DoomEntry entry;
+    private readonly IntPtr hWnd;
+    private readonly string modsFolderPath;
+    private readonly string imagesFolderPath;
+    private readonly bool copyFilesToLauncherFolder;
 
-    public DoomPage(DoomEntry entry, IntPtr hwnd, string dataFolderPath)
+    public DoomPage(DoomEntry entry, IntPtr hWnd, string dataFolderPath, bool copyFilesToLauncherFolder)
     {
         InitializeComponent();
-        Entry = entry;
-        HWND = hwnd;
-        WadsFolderPath = Path.Combine(dataFolderPath, entry.Id);
+        this.entry = entry;
+        this.hWnd = hWnd;
+        this.modsFolderPath = Path.Combine(dataFolderPath, "mods");
+        this.imagesFolderPath = Path.Combine(dataFolderPath, "images");
+        this.copyFilesToLauncherFolder = copyFilesToLauncherFolder;
     }
 
-    private string WadsFolderPath
-    {
-        get; set;
-    }
-    private DoomEntry Entry
-    {
-        get; set;
-    }
-    private IntPtr HWND
-    {
-        get; set;
-    }
     public event EventHandler<DoomEntry> OnStart;
     public event EventHandler<DoomEntry> OnEdit;
     public event EventHandler<DoomEntry> OnRemove;
 
     private void Start_Click(object sender, RoutedEventArgs e)
     {
-        OnStart?.Invoke(this, Entry);
+        OnStart?.Invoke(this, entry);
     }
 
     private async void Append_Click(object sender, RoutedEventArgs e)
@@ -56,7 +50,7 @@ public sealed partial class DoomPage : Page
         var picker = new Windows.Storage.Pickers.FileOpenPicker();
 
         // Need to initialize the picker object with the hwnd / IInitializeWithWindow
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, HWND);
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
 
         // Now we can use the picker object as normal
         foreach (var fileExtension in MainWindow.SupportedModExtensions)
@@ -65,7 +59,7 @@ public sealed partial class DoomPage : Page
         }
 
         var files = await picker.PickMultipleFilesAsync();
-        AddFiles(files.Select(file => file.Path));
+        await AddFiles(files.Select(file => file.Path));
     }
 
     private async void Background_Click(object sender, RoutedEventArgs e)
@@ -73,7 +67,7 @@ public sealed partial class DoomPage : Page
         var picker = new Windows.Storage.Pickers.FileOpenPicker();
 
         // Need to initialize the picker object with the hwnd / IInitializeWithWindow
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, HWND);
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
 
         // Now we can use the picker object as normal
         foreach (var fileExtension in MainWindow.SupportedImageExtensions)
@@ -84,39 +78,61 @@ public sealed partial class DoomPage : Page
         var file = await picker.PickSingleFileAsync();
         if (file != null)
         {
-            SetImage(file.Path);
+            await SetImage(file.Path);
         }
     }
 
-    private void AddFiles(IEnumerable<string> filePathes)
+    private async Task<bool> ShowAskDialog(string text, string primaryButton)
     {
-        if (IS_COPY_TO_INNER_FOLDER)
+        var dialog = new AskDialog(XamlRoot, text, primaryButton);
+        return ContentDialogResult.Primary == await dialog.ShowAsync();
+    }
+
+    private async Task<string> CopyFileWithConfirmation(string originalPath, string targetFolder)
+    {
+        if (!Directory.Exists(targetFolder))
         {
-            if (!Directory.Exists(WadsFolderPath))
-            {
-                Directory.CreateDirectory(WadsFolderPath);
-            }
+            Directory.CreateDirectory(targetFolder);
         }
+        var fileName = Path.GetFileName(originalPath);
+        var targetPath = Path.Combine(targetFolder, fileName);
+        if (!File.Exists(targetPath) || await ShowAskDialog($"Файл '{fileName}' существует в папке лаунчера.\nЗаменить?", "Заменить"))
+        {
+            File.Copy(originalPath, targetPath, true);
+        }
+        return targetPath;
+    }
+
+    private async Task AddFiles(IEnumerable<string> filePathes)
+    {
         foreach (var path in filePathes)
         {
             var targetPath = path;
-            if (IS_COPY_TO_INNER_FOLDER)
+            if (copyFilesToLauncherFolder)
             {
-                targetPath = Path.Combine(WadsFolderPath, Path.GetFileName(path));
-                File.Copy(path, targetPath, true);
+                targetPath = await CopyFileWithConfirmation(path, modsFolderPath);
             }
-            var modFile = new NamePath(targetPath);
-            if (!Entry.ModFiles.Any(item => item.Name == modFile.Name))
+            var newModFile = new NamePath(targetPath);
+            var existModFile = entry.ModFiles.FirstOrDefault(item => item.Name == newModFile.Name);
+            if (existModFile == null)
             {
-                Entry.ModFiles.Add(modFile);
+                entry.ModFiles.Add(newModFile);
+            }
+            else
+            {
+                existModFile.Path = newModFile.Path;
             }
         }
     }
 
-    private void SetImage(string imagePath)
+    private async Task SetImage(string imagePath)
     {
-        Entry.ImageFiles.Clear();
-        Entry.ImageFiles.Add(imagePath);
+        if (copyFilesToLauncherFolder)
+        {
+            await CopyFileWithConfirmation(imagePath, imagesFolderPath);
+        }
+        entry.ImageFiles.Clear();
+        entry.ImageFiles.Add(imagePath);
     }
 
     public static BitmapImage GetCurrentBackground(IEnumerable<string> list)
@@ -183,11 +199,11 @@ public sealed partial class DoomPage : Page
         var (files, images) = await GetDraggedFiles(e.DataView);
         if (files.Count > 0)
         {
-            AddFiles(files);
+            await AddFiles(files);
         }
         if (images.Count > 0)
         {
-            SetImage(images[0]);
+            await SetImage(images[0]);
         }
         deferral.Complete();
     }
@@ -203,26 +219,24 @@ public sealed partial class DoomPage : Page
     {
         var button = sender as Button;
         var file = button.DataContext as NamePath;
-        var dialog = new AskDialog(XamlRoot, $"Вы уверены, что хотите удалить файл '{file.Name}'?", "Удалить");
-
-        if (ContentDialogResult.Primary == await dialog.ShowAsync())
+        if (await ShowAskDialog($"Вы уверены, что хотите удалить ссылку на файл '{file.Name}'?", "Удалить"))
         {
-            Entry.ModFiles.Remove(file);
+            entry.ModFiles.Remove(file);
         }
     }
 
     private void EditMod_Click(object sender, RoutedEventArgs e)
     {
-        OnEdit?.Invoke(this, Entry);
+        OnEdit?.Invoke(this, entry);
     }
 
     private void RemoveMod_Click(object sender, RoutedEventArgs e)
     {
-        OnRemove?.Invoke(this, Entry);
+        OnRemove?.Invoke(this, entry);
     }
 
     private void RemoveBackground_Click(object sender, RoutedEventArgs e)
     {
-        Entry.ImageFiles.Clear();
+        entry.ImageFiles.Clear();
     }
 }

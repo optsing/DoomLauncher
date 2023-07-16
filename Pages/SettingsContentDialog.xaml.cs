@@ -73,4 +73,6 @@ public partial class SettingsDialogState: ObservableObject
     private string gZDoomPath;
     [ObservableProperty]
     private bool closeOnLaunch;
+    [ObservableProperty]
+    private bool copyFilesToLauncherFolder;
 }

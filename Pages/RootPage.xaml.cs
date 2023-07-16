@@ -90,7 +90,7 @@ public sealed partial class RootPage : Page
         if (DoomList.SelectedItem is DoomEntry item)
         {
             settings.SelectedModIndex = DoomList.SelectedIndex;
-            DoomPage page = new(item, hWnd, dataFolderPath);
+            DoomPage page = new(item, hWnd, dataFolderPath, settings.CopyFilesToLauncherFolder);
             page.OnStart += Page_OnStart;
             page.OnEdit += Page_OnEdit;
             page.OnRemove += Page_OnRemove;
@@ -187,11 +187,16 @@ public sealed partial class RootPage : Page
 
     private async Task OpenSettings(bool forceGZDoomPathSetup)
     {
-        var dialog = new SettingsContentDialog(XamlRoot, hWnd, new() { GZDoomPath = settings.GZDoomPath, CloseOnLaunch = settings.CloseOnLaunch }, forceGZDoomPathSetup);
+        var dialog = new SettingsContentDialog(XamlRoot, hWnd, new() {
+            GZDoomPath = settings.GZDoomPath,
+            CloseOnLaunch = settings.CloseOnLaunch,
+            CopyFilesToLauncherFolder = settings.CopyFilesToLauncherFolder,
+        }, forceGZDoomPathSetup);
         if (ContentDialogResult.Primary == await dialog.ShowAsync())
         {
             settings.GZDoomPath = dialog.State.GZDoomPath;
             settings.CloseOnLaunch = dialog.State.CloseOnLaunch;
+            settings.CopyFilesToLauncherFolder = dialog.State.CopyFilesToLauncherFolder;
         }
     }
 
@@ -203,10 +208,10 @@ public sealed partial class RootPage : Page
             return null;
         }
         List<KeyValue> filteredIWads = new() { Settings.IWads.First() };
-        var gzDoomDirectoryPath = Path.GetDirectoryName(settings.GZDoomPath);
+        var gzDoomFolderPath = Path.GetDirectoryName(settings.GZDoomPath);
         foreach (var iwad in Settings.IWads)
         {
-            if (iwad.Key != "" && File.Exists(Path.Combine(gzDoomDirectoryPath, iwad.Key)))
+            if (iwad.Key != "" && File.Exists(Path.Combine(gzDoomFolderPath, iwad.Key)))
             {
                 filteredIWads.Add(iwad);
             }

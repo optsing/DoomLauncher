@@ -13,6 +13,7 @@ public class Settings
 {
     public string GZDoomPath { get; set; } = "";
     public bool CloseOnLaunch { get; set; } = true;
+    public bool CopyFilesToLauncherFolder { get; set; } = true;
     public int SelectedModIndex { get; set; } = 0;
     public ObservableCollection<DoomEntry> Entries { get; set; } = new();
 
