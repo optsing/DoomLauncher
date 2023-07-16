@@ -47,7 +47,7 @@ public sealed partial class SettingsContentDialog : ContentDialog
         await ChooseGZDoomPath();
     }
 
-    private void SettingsContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+    private void ContentDialog_Closing(ContentDialog sender, ContentDialogClosingEventArgs args)
     {
         if (!Settings.ValidateGZDoomPath(State.GZDoomPath))
         {
