@@ -15,14 +15,21 @@ namespace DoomLauncher;
 public sealed partial class SettingsContentDialog : ContentDialog
 {
     private readonly IntPtr hWnd;
+    private readonly bool forceGZDoomPathSetup;
+
     public SettingsDialogState State { get; private set; }
 
-    public SettingsContentDialog(XamlRoot root, IntPtr hWnd, SettingsDialogState state)
+    public SettingsContentDialog(XamlRoot root, IntPtr hWnd, SettingsDialogState state, bool forceGZDoomPathSetup)
     {
         this.InitializeComponent();
         this.XamlRoot = root;
         this.hWnd = hWnd;
         this.State = state;
+        this.forceGZDoomPathSetup = forceGZDoomPathSetup;
+        if (!forceGZDoomPathSetup)
+        {
+            CloseButtonText = "Отмена";
+        }
     }
 
     private async Task ChooseGZDoomPath()
@@ -49,10 +56,13 @@ public sealed partial class SettingsContentDialog : ContentDialog
 
     private void ContentDialog_Closing(ContentDialog sender, ContentDialogClosingEventArgs args)
     {
-        if (!Settings.ValidateGZDoomPath(State.GZDoomPath))
+        if (forceGZDoomPathSetup || ContentDialogResult.Primary == args.Result)
         {
-            tbGZDoomPath.Focus(FocusState.Programmatic);
-            args.Cancel = true;
+            if (!Settings.ValidateGZDoomPath(State.GZDoomPath))
+            {
+                tbGZDoomPath.Focus(FocusState.Programmatic);
+                args.Cancel = true;
+            }
         }
     }
 }

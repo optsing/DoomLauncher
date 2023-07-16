@@ -18,8 +18,8 @@ public sealed partial class EditModContentDialog : ContentDialog
         ModName = initial.name;
         IWadFile = initial.iWadFile;
         FilteredIWads = filteredIWads;
-        PrimaryButtonText = isEditMode ? "Изменить" : "Создать";
-        this.Title = isEditMode ? "Редактирование сборки" : "Создание сборки";
+        PrimaryButtonText = isEditMode ? "Сохранить" : "Создать";
+        this.Title = isEditMode ? "Настройка сборки" : "Создание сборки";
     }
 
     private void EditModContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)

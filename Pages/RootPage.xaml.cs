@@ -44,7 +44,7 @@ public sealed partial class RootPage : Page
     {
         if (!Settings.ValidateGZDoomPath(settings.GZDoomPath))
         {
-            await OpenSettings();
+            await OpenSettings(true);
         }
     }
 
@@ -133,11 +133,8 @@ public sealed partial class RootPage : Page
     {
         if (!Settings.ValidateGZDoomPath(settings.GZDoomPath))
         {
-            var success = await OpenSettings();
-            if (!success)
-            {
-                return;
-            }
+            await OpenSettings(true);
+            return;
         }
         ProcessStartInfo processInfo = new()
         {
@@ -188,27 +185,22 @@ public sealed partial class RootPage : Page
     }
 
 
-    private async Task<bool> OpenSettings()
+    private async Task OpenSettings(bool forceGZDoomPathSetup)
     {
-        var dialog = new SettingsContentDialog(XamlRoot, hWnd, new() { GZDoomPath = settings.GZDoomPath, CloseOnLaunch = settings.CloseOnLaunch });
+        var dialog = new SettingsContentDialog(XamlRoot, hWnd, new() { GZDoomPath = settings.GZDoomPath, CloseOnLaunch = settings.CloseOnLaunch }, forceGZDoomPathSetup);
         if (ContentDialogResult.Primary == await dialog.ShowAsync())
         {
             settings.GZDoomPath = dialog.State.GZDoomPath;
             settings.CloseOnLaunch = dialog.State.CloseOnLaunch;
-            return true;
         }
-        return false;
     }
 
     public async Task<EditModDialogResult?> AddOrEditModDialogShow(EditModDialogResult initial, bool isEditMode)
     {
         if (!Settings.ValidateGZDoomPath(settings.GZDoomPath))
         {
-            var success = await OpenSettings();
-            if (!success)
-            {
-                return null;
-            }
+            await OpenSettings(true);
+            return null;
         }
         List<KeyValue> filteredIWads = new() { Settings.IWads.First() };
         var gzDoomDirectoryPath = Path.GetDirectoryName(settings.GZDoomPath);
@@ -235,7 +227,8 @@ public sealed partial class RootPage : Page
 
     private async void SettingsButton_Click(object sender, RoutedEventArgs e)
     {
-        await OpenSettings();
+        bool forceGZDoomPathSetup = !Settings.ValidateGZDoomPath(settings.GZDoomPath);
+        await OpenSettings(forceGZDoomPathSetup);
     }
 
     public static string GZDoomPathTitle(string path)
