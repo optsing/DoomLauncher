@@ -25,16 +25,16 @@ public sealed partial class DoomPage : Page
     private readonly IntPtr hWnd;
     private readonly string modsFolderPath;
     private readonly string imagesFolderPath;
-    private readonly bool copyFilesToLauncherFolder;
+    private readonly Settings settings;
 
-    public DoomPage(DoomEntry entry, IntPtr hWnd, string dataFolderPath, bool copyFilesToLauncherFolder)
+    public DoomPage(DoomEntry entry, IntPtr hWnd, string dataFolderPath, Settings settings)
     {
         InitializeComponent();
         this.entry = entry;
         this.hWnd = hWnd;
         this.modsFolderPath = Path.Combine(dataFolderPath, "mods");
         this.imagesFolderPath = Path.Combine(dataFolderPath, "images");
-        this.copyFilesToLauncherFolder = copyFilesToLauncherFolder;
+        this.settings = settings;
     }
 
     public event EventHandler<DoomEntry> OnStart;
@@ -109,7 +109,7 @@ public sealed partial class DoomPage : Page
         foreach (var path in filePathes)
         {
             var targetPath = path;
-            if (copyFilesToLauncherFolder)
+            if (settings.CopyFilesToLauncherFolder)
             {
                 targetPath = await CopyFileWithConfirmation(path, modsFolderPath);
             }
@@ -126,14 +126,15 @@ public sealed partial class DoomPage : Page
         }
     }
 
-    private async Task SetImage(string imagePath)
+    private async Task SetImage(string path)
     {
-        if (copyFilesToLauncherFolder)
+        var targetPath = path;
+        if (settings.CopyFilesToLauncherFolder)
         {
-            await CopyFileWithConfirmation(imagePath, imagesFolderPath);
+            targetPath = await CopyFileWithConfirmation(path, imagesFolderPath);
         }
         entry.ImageFiles.Clear();
-        entry.ImageFiles.Add(imagePath);
+        entry.ImageFiles.Add(targetPath);
     }
 
     public static BitmapImage GetCurrentBackground(IEnumerable<string> list)

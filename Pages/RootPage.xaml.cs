@@ -90,7 +90,7 @@ public sealed partial class RootPage : Page
         if (DoomList.SelectedItem is DoomEntry item)
         {
             settings.SelectedModIndex = DoomList.SelectedIndex;
-            DoomPage page = new(item, hWnd, dataFolderPath, settings.CopyFilesToLauncherFolder);
+            DoomPage page = new(item, hWnd, dataFolderPath, settings);
             page.OnStart += Page_OnStart;
             page.OnEdit += Page_OnEdit;
             page.OnRemove += Page_OnRemove;
