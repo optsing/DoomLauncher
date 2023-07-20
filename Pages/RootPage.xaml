@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
     mc:Ignorable="d"
     Loaded="Page_Loaded"
 >
@@ -130,5 +131,15 @@
                 Style="{ThemeResource BaseTextBlockStyle}"
             />
         </Grid>
+        <controls:Loading
+            x:Name="progressIndicator"
+            Background="{ThemeResource CustomBackdropColor}"
+            Grid.RowSpan="2"
+        >
+            <ProgressRing
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+            />
+        </controls:Loading>
     </Grid>
 </Page>

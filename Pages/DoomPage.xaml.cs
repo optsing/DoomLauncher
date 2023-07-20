@@ -81,6 +81,7 @@ public sealed partial class DoomPage : Page
     public event EventHandler<DoomEntry> OnStart;
     public event EventHandler<DoomEntry> OnEdit;
     public event EventHandler<DoomEntry> OnRemove;
+    public event EventHandler<bool> OnProgress;
 
     private void Start_Click(object sender, RoutedEventArgs e)
     {
@@ -156,12 +157,11 @@ public sealed partial class DoomPage : Page
                 "Не заменять"
             ))
             {
-                progressIndicator.IsLoading = true;
-                using var inputStream = await file.OpenReadAsync();
-                using var sourceStream = inputStream.AsStreamForRead();
+                OnProgress?.Invoke(this, true);
+                using var sourceStream = await file.OpenStreamForReadAsync();
                 using var destinationStream = new FileStream(targetPath, FileMode.Create, FileAccess.Write);
                 await sourceStream.CopyToAsync(destinationStream);
-                progressIndicator.IsLoading = false;
+                OnProgress?.Invoke(this, false);
             }
         }
         return targetPath;

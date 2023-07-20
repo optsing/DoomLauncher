@@ -94,6 +94,7 @@ public sealed partial class RootPage : Page
             page.OnStart += Page_OnStart;
             page.OnEdit += Page_OnEdit;
             page.OnRemove += Page_OnRemove;
+            page.OnProgress += Page_OnProgress;
             frameMain.Content = page;
         }
         else
@@ -104,6 +105,11 @@ public sealed partial class RootPage : Page
         {
             swMain.IsPaneOpen = false;
         }
+    }
+
+    private void Page_OnProgress(object sender, bool e)
+    {
+        progressIndicator.IsLoading = e;
     }
 
     private async void Page_OnRemove(object sender, DoomEntry entry)

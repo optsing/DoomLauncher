@@ -15,9 +15,11 @@
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Light">
                     <SolidColorBrush x:Key="CustomColor" Color="#33ffffff" />
+                    <SolidColorBrush x:Key="CustomBackdropColor" Color="#60ffffff" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Dark">
                     <SolidColorBrush x:Key="CustomColor" Color="#33000000" />
+                    <SolidColorBrush x:Key="CustomBackdropColor" Color="#60000000" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
         </ResourceDictionary>
