@@ -38,7 +38,7 @@ public sealed partial class DoomPage : Page
         RefillFileMenu();
     }
 
-    private void RefillFileMenu()
+    private async void RefillFileMenu()
     {
         mfAppendFile.Items.Clear();
         var browseItem = new MenuFlyoutItem()
@@ -53,23 +53,23 @@ public sealed partial class DoomPage : Page
         mfAppendFile.Items.Add(browseItem);
         if (Directory.Exists(modsFolderPath))
         {
-            var files = Directory
-                .GetFiles(modsFolderPath)
-                .Where(path => !settings.Entries.SelectMany(entry => entry.ModFiles).Any(file => file.Path == path));
+            var folder = await StorageFolder.GetFolderFromPathAsync(modsFolderPath);
+            var files = (await folder.GetFilesAsync())
+                .Where(file => !settings.Entries.SelectMany(entry => entry.ModFiles).Any(modFile => modFile.Path == file.Path));
 
             if (files.Any())
-            {
+            { 
                 mfAppendFile.Items.Add(new MenuFlyoutSeparator());
-                foreach (var path in files)
+                foreach (var file in files)
                 {
-                    var file = new NamePath(path);
+                    var fileItem = new NamePath(file.Path);
                     var item = new MenuFlyoutItem()
                     {
-                        Text = file.Name,
+                        Text = fileItem.Name,
                     };
                     item.Click += async (object sender, RoutedEventArgs e) =>
                     {
-                        await AddFiles(new string[] { path });
+                        await AddFiles(new StorageFile[] { file });
                     };
                     mfAppendFile.Items.Add(item);
                 }
@@ -86,6 +86,16 @@ public sealed partial class DoomPage : Page
         OnStart?.Invoke(this, entry);
     }
 
+    private void EditMod_Click(object sender, RoutedEventArgs e)
+    {
+        OnEdit?.Invoke(this, entry);
+    }
+
+    private void RemoveMod_Click(object sender, RoutedEventArgs e)
+    {
+        OnRemove?.Invoke(this, entry);
+    }
+
     private async void Append_Click(object sender, RoutedEventArgs e)
     {
         var picker = new Windows.Storage.Pickers.FileOpenPicker();
@@ -100,7 +110,7 @@ public sealed partial class DoomPage : Page
         }
 
         var files = await picker.PickMultipleFilesAsync();
-        await AddFiles(files.Select(file => file.Path));
+        await AddFiles(files);
     }
 
     private async void Background_Click(object sender, RoutedEventArgs e)
@@ -119,7 +129,7 @@ public sealed partial class DoomPage : Page
         var file = await picker.PickSingleFileAsync();
         if (file != null)
         {
-            await SetImage(file.Path);
+            await SetImage(file);
         }
     }
 
@@ -129,56 +139,64 @@ public sealed partial class DoomPage : Page
         return ContentDialogResult.Primary == await dialog.ShowAsync();
     }
 
-    private async Task<string> CopyFileWithConfirmation(string originalPath, string targetFolder)
+    private async Task<string> CopyFileWithConfirmation(StorageFile file, string targetFolder)
     {
-        var fileName = Path.GetFileName(originalPath);
-        var targetPath = Path.Combine(targetFolder, fileName);
-        if (targetPath != originalPath)
+        var targetPath = Path.Combine(targetFolder, file.Name);
+        if (targetPath != file.Path)
         {
             if (!Directory.Exists(targetFolder))
             {
                 Directory.CreateDirectory(targetFolder);
             }
-            if (!File.Exists(targetPath) || await ShowAskDialog($"Файл '{fileName}' существует в папке лаунчера.\nЗаменить?", "Заменить"))
+            if (!File.Exists(targetPath) || await ShowAskDialog($"Файл '{file.Name}' существует в папке лаунчера.\nЗаменить?", "Заменить"))
             {
-                File.Copy(originalPath, targetPath, true);
+                using var inputStream = await file.OpenReadAsync();
+                using var sourceStream = inputStream.AsStreamForRead();
+                using var destinationStream = new FileStream(targetPath, FileMode.Create, FileAccess.Write);
+                await sourceStream.CopyToAsync(destinationStream);
             }
         }
         return targetPath;
     }
 
-    private async Task AddFiles(IEnumerable<string> filePathes)
+    private async Task AddFiles(IEnumerable<StorageFile> files)
     {
-        foreach (var path in filePathes)
+        foreach (var file in files)
         {
-            var targetPath = path;
+            var targetPath = file.Path;
             if (settings.CopyFilesToLauncherFolder)
             {
-                targetPath = await CopyFileWithConfirmation(path, modsFolderPath);
+                targetPath = await CopyFileWithConfirmation(file, modsFolderPath);
             }
-            var newModFile = new NamePath(targetPath);
-            var existModFile = entry.ModFiles.FirstOrDefault(item => item.Name == newModFile.Name);
-            if (existModFile == null)
+            if (!string.IsNullOrEmpty(targetPath))
             {
-                entry.ModFiles.Add(newModFile);
-            }
-            else
-            {
-                existModFile.Path = newModFile.Path;
+                var newModFile = new NamePath(targetPath);
+                var existModFile = entry.ModFiles.FirstOrDefault(item => item.Name == newModFile.Name);
+                if (existModFile == null)
+                {
+                    entry.ModFiles.Add(newModFile);
+                }
+                else
+                {
+                    existModFile.Path = newModFile.Path;
+                }
             }
         }
         RefillFileMenu();
     }
 
-    private async Task SetImage(string path)
+    private async Task SetImage(StorageFile file)
     {
-        var targetPath = path;
+        var targetPath = file.Path;
         if (settings.CopyFilesToLauncherFolder)
         {
-            targetPath = await CopyFileWithConfirmation(path, imagesFolderPath);
+            targetPath = await CopyFileWithConfirmation(file, imagesFolderPath);
         }
-        entry.ImageFiles.Clear();
-        entry.ImageFiles.Add(targetPath);
+        if (!string.IsNullOrEmpty(targetPath))
+        {
+            entry.ImageFiles.Clear();
+            entry.ImageFiles.Add(targetPath);
+        }
     }
 
     public static BitmapImage GetCurrentBackground(IEnumerable<string> list)
@@ -202,10 +220,10 @@ public sealed partial class DoomPage : Page
         return itemsCount == 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
-    private static async Task<(List<string>, List<string>)> GetDraggedFiles(DataPackageView data)
+    private static async Task<(List<StorageFile>, List<StorageFile>)> GetDraggedFiles(DataPackageView data)
     {
-        var modResult = new List<string>();
-        var imageResult = new List<string>();
+        var modResult = new List<StorageFile>();
+        var imageResult = new List<StorageFile>();
         if (data.Contains(StandardDataFormats.StorageItems))
         {
             var items = await data.GetStorageItemsAsync();
@@ -216,11 +234,11 @@ public sealed partial class DoomPage : Page
                     var ext = Path.GetExtension(file.Name).ToLowerInvariant();
                     if (MainWindow.SupportedModExtensions.Contains(ext))
                     {
-                        modResult.Add(file.Path);
+                        modResult.Add(file);
                     }
                     else if (MainWindow.SupportedImageExtensions.Contains(ext))
                     {
-                        imageResult.Add(file.Path);
+                        imageResult.Add(file);
                     }
                 }
             }
@@ -241,7 +259,6 @@ public sealed partial class DoomPage : Page
 
     private async void LwModFiles_Drop(object sender, DragEventArgs e)
     {
-        var deferral = e.GetDeferral();
         var (files, images) = await GetDraggedFiles(e.DataView);
         if (files.Count > 0)
         {
@@ -251,7 +268,6 @@ public sealed partial class DoomPage : Page
         {
             await SetImage(images[0]);
         }
-        deferral.Complete();
     }
 
     private void OpenContainFolder_Click(object sender, RoutedEventArgs e)
@@ -270,16 +286,6 @@ public sealed partial class DoomPage : Page
             entry.ModFiles.Remove(file);
             RefillFileMenu();
         }
-    }
-
-    private void EditMod_Click(object sender, RoutedEventArgs e)
-    {
-        OnEdit?.Invoke(this, entry);
-    }
-
-    private void RemoveMod_Click(object sender, RoutedEventArgs e)
-    {
-        OnRemove?.Invoke(this, entry);
     }
 
     private void RemoveBackground_Click(object sender, RoutedEventArgs e)
