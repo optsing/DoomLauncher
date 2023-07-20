@@ -3,7 +3,6 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -35,6 +34,47 @@ public sealed partial class DoomPage : Page
         this.modsFolderPath = Path.Combine(dataFolderPath, "mods");
         this.imagesFolderPath = Path.Combine(dataFolderPath, "images");
         this.settings = settings;
+
+        RefillFileMenu();
+    }
+
+    private void RefillFileMenu()
+    {
+        mfAppendFile.Items.Clear();
+        var browseItem = new MenuFlyoutItem()
+        {
+            Text = "Выбрать файлы",
+            Icon = new FontIcon()
+            {
+                Glyph = "\uEC50",
+            }
+        };
+        browseItem.Click += Append_Click;
+        mfAppendFile.Items.Add(browseItem);
+        if (Directory.Exists(modsFolderPath))
+        {
+            var files = Directory
+                .GetFiles(modsFolderPath)
+                .Where(path => !settings.Entries.SelectMany(entry => entry.ModFiles).Any(file => file.Path == path));
+
+            if (files.Any())
+            {
+                mfAppendFile.Items.Add(new MenuFlyoutSeparator());
+                foreach (var path in files)
+                {
+                    var file = new NamePath(path);
+                    var item = new MenuFlyoutItem()
+                    {
+                        Text = file.Name,
+                    };
+                    item.Click += async (object sender, RoutedEventArgs e) =>
+                    {
+                        await AddFiles(new string[] { path });
+                    };
+                    mfAppendFile.Items.Add(item);
+                }
+            }
+        }
     }
 
     public event EventHandler<DoomEntry> OnStart;
@@ -91,15 +131,18 @@ public sealed partial class DoomPage : Page
 
     private async Task<string> CopyFileWithConfirmation(string originalPath, string targetFolder)
     {
-        if (!Directory.Exists(targetFolder))
-        {
-            Directory.CreateDirectory(targetFolder);
-        }
         var fileName = Path.GetFileName(originalPath);
         var targetPath = Path.Combine(targetFolder, fileName);
-        if (!File.Exists(targetPath) || await ShowAskDialog($"Файл '{fileName}' существует в папке лаунчера.\nЗаменить?", "Заменить"))
+        if (targetPath != originalPath)
         {
-            File.Copy(originalPath, targetPath, true);
+            if (!Directory.Exists(targetFolder))
+            {
+                Directory.CreateDirectory(targetFolder);
+            }
+            if (!File.Exists(targetPath) || await ShowAskDialog($"Файл '{fileName}' существует в папке лаунчера.\nЗаменить?", "Заменить"))
+            {
+                File.Copy(originalPath, targetPath, true);
+            }
         }
         return targetPath;
     }
@@ -124,6 +167,7 @@ public sealed partial class DoomPage : Page
                 existModFile.Path = newModFile.Path;
             }
         }
+        RefillFileMenu();
     }
 
     private async Task SetImage(string path)
@@ -224,6 +268,7 @@ public sealed partial class DoomPage : Page
         if (await ShowAskDialog($"Вы уверены, что хотите удалить ссылку на файл '{file.Name}'?", "Удалить"))
         {
             entry.ModFiles.Remove(file);
+            RefillFileMenu();
         }
     }
 

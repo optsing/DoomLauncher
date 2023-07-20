@@ -108,6 +108,30 @@ public sealed partial class RootPage : Page
 
     private async void Page_OnRemove(object sender, DoomEntry entry)
     {
+        await RemoveMod(entry);
+    }
+
+    private async void RemoveMod_Click(object sender, RoutedEventArgs e)
+    {
+        var el = sender as FrameworkElement;
+        var entry = el.DataContext as DoomEntry;
+        await RemoveMod(entry);
+    }
+
+    private async void Page_OnEdit(object sender, DoomEntry entry)
+    {
+        await EditMod(entry);
+    }
+
+    private async void EditMod_Click(object sender, RoutedEventArgs e)
+    {
+        var el = sender as FrameworkElement;
+        var entry = el.DataContext as DoomEntry;
+        await EditMod(entry);
+    }
+
+    private async Task RemoveMod(DoomEntry entry)
+    {
         var dialog = new AskDialog(XamlRoot, $"Вы уверены, что хотите удалить сборку '{entry.Name}'?", "Удалить");
         if (ContentDialogResult.Primary == await dialog.ShowAsync())
         {
@@ -115,7 +139,7 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private async void Page_OnEdit(object sender, DoomEntry entry)
+    private async Task EditMod(DoomEntry entry)
     {
         if (await AddOrEditModDialogShow(new EditModDialogResult(entry.Name, entry.IWadFile), true) is EditModDialogResult result)
         {

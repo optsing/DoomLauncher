@@ -61,7 +61,22 @@
                     >
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="local:DoomEntry">
-                                <TextBlock Text="{x:Bind Name, Mode=OneWay}" VerticalAlignment="Center" FontSize="16" />
+                                <TextBlock Text="{x:Bind Name, Mode=OneWay}" VerticalAlignment="Center" FontSize="16">
+                                    <TextBlock.ContextFlyout>
+                                        <MenuFlyout>
+                                            <MenuFlyoutItem Text="Настроить сборку" Click="EditMod_Click">
+                                                <MenuFlyoutItem.Icon>
+                                                    <SymbolIcon Symbol="Edit" />
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+                                            <MenuFlyoutItem Text="Удалить сборку" Click="RemoveMod_Click">
+                                                <MenuFlyoutItem.Icon>
+                                                    <SymbolIcon Symbol="Delete" />
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+                                        </MenuFlyout>
+                                    </TextBlock.ContextFlyout>
+                                </TextBlock>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                         <ListView.Footer>

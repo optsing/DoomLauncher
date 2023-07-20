@@ -39,7 +39,13 @@
                 Style="{ThemeResource BaseTextBlockStyle}"
                 TextWrapping="NoWrap"
             />
-            <Button Grid.Column="1" Margin="4,8" Click="Append_Click">
+            <Button Grid.Column="1" Margin="4,8">
+                <Button.Flyout>
+                    <MenuFlyout
+                        Placement="Bottom"
+                        x:Name="mfAppendFile"
+                    />
+                </Button.Flyout>
                 <StackPanel Orientation="Horizontal">
                     <SymbolIcon Symbol="Add" Height="18" Margin="0,0,4,0"/>
                     <TextBlock>Добавить файлы</TextBlock>
@@ -47,7 +53,7 @@
             </Button>
             <Button Grid.Column="2" Margin="4,8" VerticalAlignment="Center">
                 <Button.Flyout>
-                    <MenuFlyout>
+                    <MenuFlyout Placement="Bottom">
                         <MenuFlyoutItem Text="Изменить фон" Click="Background_Click">
                             <MenuFlyoutItem.Icon>
                                 <SymbolIcon Symbol="Pictures" />
@@ -87,7 +93,6 @@
             </Button>
         </Grid>
         <ListView 
-            x:Name="lwModFiles"
             Grid.Row="1"
             SelectionMode="None"
             CanReorderItems="True"
@@ -124,7 +129,7 @@
                             Width="40"
                             ToolTipService.ToolTip="Удалить ссылку на файл"
                         >
-                            <FontIcon Glyph="&#xE74D;" FontSize="16" />
+                            <FontIcon Glyph="&#xE894;" FontSize="16" />
                         </Button>
                     </Grid>
                 </DataTemplate>
