@@ -56,9 +56,47 @@ public sealed partial class MainWindow : Window
             settings = new();
         }
 
+        if (settings.WindowX != null && settings.WindowY != null && settings.WindowWidth != null && settings.WindowHeight != null)
+        {
+            AppWindow.MoveAndResize(new()
+            {
+                X = (int)settings.WindowX,
+                Y = (int)settings.WindowY,
+                Width = (int)settings.WindowWidth,
+                Height = (int)settings.WindowHeight,
+            });
+        }
+        if (settings.WindowMaximized)
+        {
+            if (AppWindow.Presenter is OverlappedPresenter presenter)
+            {
+                presenter.Maximize();
+            }
+        }
+
+        AppWindow.Changed += AppWindow_Changed;
+
         frameRoot.Content = new RootPage(AppWindow, settings, HWND, dataFolderPath);
     }
 
+    private void AppWindow_Changed(AppWindow sender, AppWindowChangedEventArgs args)
+    {
+        if (sender.Presenter is OverlappedPresenter presenter)
+        {
+            if (presenter.State == OverlappedPresenterState.Maximized)
+            {
+                settings.WindowMaximized = true;
+            }
+            else if (presenter.State != OverlappedPresenterState.Minimized)
+            {
+                settings.WindowMaximized = false;
+                settings.WindowX = sender.Position.X;
+                settings.WindowY = sender.Position.Y;
+                settings.WindowWidth = sender.Size.Width;
+                settings.WindowHeight = sender.Size.Height;
+            }
+        }
+    }
 
     public static readonly string[] SupportedModExtensions = new[] { ".pk3", ".wad", ".zip" };
     public static readonly string[] SupportedImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };

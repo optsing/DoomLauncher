@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.Collections.Generic;
@@ -55,7 +56,7 @@ public sealed partial class DoomPage : Page
         {
             var folder = await StorageFolder.GetFolderFromPathAsync(modsFolderPath);
             var files = (await folder.GetFilesAsync())
-                .Where(file => !settings.Entries.SelectMany(entry => entry.ModFiles).Any(modFile => modFile.Path == file.Path));
+                .Where(file => !entry.ModFiles.Any(modFile => modFile.Path == file.Path));
 
             if (files.Any())
             { 
@@ -133,9 +134,9 @@ public sealed partial class DoomPage : Page
         }
     }
 
-    private async Task<bool> ShowAskDialog(string text, string primaryButton)
+    private async Task<bool> ShowAskDialog(string title, string text, string primaryButton, string closeButton)
     {
-        var dialog = new AskDialog(XamlRoot, text, primaryButton);
+        var dialog = new AskDialog(XamlRoot, title, text, primaryButton, closeButton);
         return ContentDialogResult.Primary == await dialog.ShowAsync();
     }
 
@@ -148,12 +149,19 @@ public sealed partial class DoomPage : Page
             {
                 Directory.CreateDirectory(targetFolder);
             }
-            if (!File.Exists(targetPath) || await ShowAskDialog($"Файл '{file.Name}' существует в папке лаунчера.\nЗаменить?", "Заменить"))
+            if (!File.Exists(targetPath) || await ShowAskDialog(
+                "Добавление с заменой",
+                $"Файл '{file.Name}' уже существует в папке лаунчера.\nЗаменить?",
+                "Заменить",
+                "Не заменять"
+            ))
             {
+                progressIndicator.IsLoading = true;
                 using var inputStream = await file.OpenReadAsync();
                 using var sourceStream = inputStream.AsStreamForRead();
                 using var destinationStream = new FileStream(targetPath, FileMode.Create, FileAccess.Write);
                 await sourceStream.CopyToAsync(destinationStream);
+                progressIndicator.IsLoading = false;
             }
         }
         return targetPath;
@@ -281,7 +289,7 @@ public sealed partial class DoomPage : Page
     {
         var button = sender as Button;
         var file = button.DataContext as NamePath;
-        if (await ShowAskDialog($"Вы уверены, что хотите удалить ссылку на файл '{file.Name}'?", "Удалить"))
+        if (await ShowAskDialog("Удаление ссылки на файл", $"Вы уверены, что хотите удалить ссылку на файл '{file.Name}'?", "Удалить", "Отмена"))
         {
             entry.ModFiles.Remove(file);
             RefillFileMenu();

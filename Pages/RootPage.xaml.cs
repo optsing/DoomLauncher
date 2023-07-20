@@ -132,7 +132,7 @@ public sealed partial class RootPage : Page
 
     private async Task RemoveMod(DoomEntry entry)
     {
-        var dialog = new AskDialog(XamlRoot, $"Вы уверены, что хотите удалить сборку '{entry.Name}'?", "Удалить");
+        var dialog = new AskDialog(XamlRoot, "Удаление сборки", $"Вы уверены, что хотите удалить сборку '{entry.Name}'?", "Удалить", "Отмена");
         if (ContentDialogResult.Primary == await dialog.ShowAsync())
         {
             settings.Entries.Remove(entry);

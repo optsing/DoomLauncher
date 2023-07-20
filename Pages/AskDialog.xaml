@@ -7,8 +7,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     DefaultButton="Primary"
-    PrimaryButtonText="{x:Bind PrimaryButton}"
-    CloseButtonText="Отмена"
     Style="{ThemeResource DefaultContentDialogStyle}"
 >
 

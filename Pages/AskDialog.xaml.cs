@@ -11,13 +11,14 @@ namespace DoomLauncher;
 public sealed partial class AskDialog : ContentDialog
 {
     public string Text { get; set; }
-    public string PrimaryButton { get; set; }
 
-    public AskDialog(XamlRoot root, string text, string primaryButton)
+    public AskDialog(XamlRoot root, string title, string text, string primaryButton, string closeButton)
     {
         this.InitializeComponent();
         this.XamlRoot = root;
+        this.Title = title;
         this.Text = text;
-        this.PrimaryButton = primaryButton;
+        this.PrimaryButtonText = primaryButton;
+        this.CloseButtonText = closeButton;
     }
 }

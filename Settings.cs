@@ -17,6 +17,12 @@ public class Settings
     public int SelectedModIndex { get; set; } = 0;
     public ObservableCollection<DoomEntry> Entries { get; set; } = new();
 
+    public int? WindowX { get; set; } = null;
+    public int? WindowY { get; set; } = null;
+    public int? WindowWidth { get; set; } = null;
+    public int? WindowHeight { get; set; } = null;
+    public bool WindowMaximized { get; set; } = false;
+
     public static bool ValidateGZDoomPath(string path)
     {
         return !string.IsNullOrEmpty(path) && Path.GetExtension(path) == ".exe" && File.Exists(path);
