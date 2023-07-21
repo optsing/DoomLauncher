@@ -48,7 +48,7 @@
                 </Button.Flyout>
                 <StackPanel Orientation="Horizontal">
                     <SymbolIcon Symbol="Add" Height="18" Margin="0,0,4,0"/>
-                    <TextBlock>Добавить файлы</TextBlock>
+                    <TextBlock>Добавить</TextBlock>
                 </StackPanel>
             </Button>
             <Button Grid.Column="2" Margin="4,8" VerticalAlignment="Center">

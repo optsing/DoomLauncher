@@ -195,6 +195,9 @@ public sealed partial class RootPage : Page
         else if (appWindow.Presenter is OverlappedPresenter presenter)
         {
             presenter.Minimize();
+            await process.WaitForExitAsync();
+            presenter.Restore();
+            SetForegroundWindow(hWnd);
         }
     }
 
@@ -220,13 +223,11 @@ public sealed partial class RootPage : Page
         var dialog = new SettingsContentDialog(XamlRoot, hWnd, new() {
             GZDoomPath = settings.GZDoomPath,
             CloseOnLaunch = settings.CloseOnLaunch,
-            CopyFilesToLauncherFolder = settings.CopyFilesToLauncherFolder,
         }, forceGZDoomPathSetup);
         if (ContentDialogResult.Primary == await dialog.ShowAsync())
         {
             settings.GZDoomPath = dialog.State.GZDoomPath;
             settings.CloseOnLaunch = dialog.State.CloseOnLaunch;
-            settings.CopyFilesToLauncherFolder = dialog.State.CopyFilesToLauncherFolder;
         }
     }
 

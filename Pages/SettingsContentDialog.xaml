@@ -39,8 +39,5 @@
         <CheckBox
             IsChecked="{x:Bind State.CloseOnLaunch, Mode=TwoWay}"
         >Закрывать лаунчер при запуске сборки</CheckBox>
-        <CheckBox
-            IsChecked="{x:Bind State.CopyFilesToLauncherFolder, Mode=TwoWay}"
-        >Копировать файлы в папку лаунчера</CheckBox>
     </StackPanel>
 </ContentDialog>

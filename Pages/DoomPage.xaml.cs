@@ -112,7 +112,10 @@ public sealed partial class DoomPage : Page
         }
 
         var files = await picker.PickMultipleFilesAsync();
-        await AddFiles(files);
+        if (files.Any())
+        {
+            await AddFiles(files);
+        }
     }
 
     private async void Background_Click(object sender, RoutedEventArgs e)
@@ -171,11 +174,7 @@ public sealed partial class DoomPage : Page
     {
         foreach (var file in files)
         {
-            var targetPath = file.Path;
-            if (settings.CopyFilesToLauncherFolder)
-            {
-                targetPath = await CopyFileWithConfirmation(file, modsFolderPath);
-            }
+            var targetPath = await CopyFileWithConfirmation(file, modsFolderPath);
             if (!string.IsNullOrEmpty(targetPath))
             {
                 var newModFile = new NamePath(targetPath);
@@ -195,11 +194,7 @@ public sealed partial class DoomPage : Page
 
     private async Task SetImage(StorageFile file)
     {
-        var targetPath = file.Path;
-        if (settings.CopyFilesToLauncherFolder)
-        {
-            targetPath = await CopyFileWithConfirmation(file, imagesFolderPath);
-        }
+        var targetPath = await CopyFileWithConfirmation(file, imagesFolderPath);
         if (!string.IsNullOrEmpty(targetPath))
         {
             entry.ImageFiles.Clear();
