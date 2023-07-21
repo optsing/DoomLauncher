@@ -255,7 +255,7 @@ public sealed partial class DoomPage : Page
         var (files, images) = await GetDraggedFiles(e.DataView);
         if (files.Count + images.Count > 0)
         {
-            e.AcceptedOperation = DataPackageOperation.Link;
+            e.AcceptedOperation = DataPackageOperation.Copy;
         }
         deferral.Complete();
     }

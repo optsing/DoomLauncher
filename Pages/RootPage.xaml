@@ -80,11 +80,14 @@
                                             </MenuFlyoutItem>
                                         </MenuFlyout>
                                     </StackPanel.ContextFlyout>
-                                    <TextBlock Text="{x:Bind Name, Mode=OneWay}" VerticalAlignment="Center" FontSize="16"/>
+                                    <TextBlock
+                                        Text="{x:Bind Name, Mode=OneWay}"
+                                        FontSize="16"
+                                        TextWrapping="WrapWholeWords"
+                                    />
                                     <TextBlock
                                         Text="{x:Bind Description, Mode=OneWay}"
                                         Visibility="{x:Bind local:RootPage.HasText(Description), Mode=OneWay}"
-                                        VerticalAlignment="Center"
                                         FontSize="12"
                                         TextWrapping="WrapWholeWords"
                                     />
