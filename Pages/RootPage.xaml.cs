@@ -147,10 +147,12 @@ public sealed partial class RootPage : Page
 
     private async Task EditMod(DoomEntry entry)
     {
-        if (await AddOrEditModDialogShow(new EditModDialogResult(entry.Name, entry.IWadFile), true) is EditModDialogResult result)
+        if (await AddOrEditModDialogShow(new EditModDialogResult(entry.Name, entry.Description, entry.IWadFile, entry.UniqueConfig), true) is EditModDialogResult result)
         {
             entry.Name = result.name;
+            entry.Description = result.description;
             entry.IWadFile = result.iWadFile;
+            entry.UniqueConfig = result.uniqueConfig;
         }
     }
 
@@ -171,6 +173,17 @@ public sealed partial class RootPage : Page
             FileName = settings.GZDoomPath,
             WorkingDirectory = Path.GetDirectoryName(settings.GZDoomPath),
         };
+        if (entry.UniqueConfig)
+        {
+            var configFolderPath = Path.Combine(dataFolderPath, "configs");
+            if (!Directory.Exists(configFolderPath))
+            {
+                Directory.CreateDirectory(configFolderPath);
+            }
+            var configPath = Path.Combine(configFolderPath, $"{entry.Id}.ini");
+            processInfo.ArgumentList.Add("-config");
+            processInfo.ArgumentList.Add(configPath);
+        }
         if (!string.IsNullOrEmpty(entry.IWadFile.Key))
         {
             processInfo.ArgumentList.Add("-iwad");
@@ -203,7 +216,7 @@ public sealed partial class RootPage : Page
 
     private async void Button_Click(object sender, RoutedEventArgs e)
     {
-        if (await AddOrEditModDialogShow(new EditModDialogResult("", Settings.IWads.First()), false) is EditModDialogResult result)
+        if (await AddOrEditModDialogShow(new EditModDialogResult("", "", Settings.IWads.First(), false), false) is EditModDialogResult result)
         {
             DoomEntry entry = new()
             {
@@ -251,7 +264,7 @@ public sealed partial class RootPage : Page
         var dialog = new EditModContentDialog(XamlRoot, initial, filteredIWads, isEditMode);
         if (ContentDialogResult.Primary == await dialog.ShowAsync())
         {
-            return new(dialog.ModName, dialog.IWadFile);
+            return new(dialog.ModName, dialog.ModDescription, dialog.IWadFile, dialog.UniqueConfig);
         }
         return null;
     }
@@ -267,14 +280,8 @@ public sealed partial class RootPage : Page
         await OpenSettings(forceGZDoomPathSetup);
     }
 
-    public static string GZDoomPathTitle(string path)
+    public static Visibility HasText(string text)
     {
-        if (string.IsNullOrEmpty(path))
-        {
-            return "GZDoom не выбран";
-        } else
-        {
-            return path;
-        }
+        return string.IsNullOrEmpty(text) ? Visibility.Collapsed : Visibility.Visible;
     }
 }

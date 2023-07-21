@@ -16,7 +16,9 @@ public sealed partial class EditModContentDialog : ContentDialog
         InitializeComponent();
         XamlRoot = root;
         ModName = initial.name;
+        ModDescription = initial.description;
         IWadFile = initial.iWadFile;
+        UniqueConfig = initial.uniqueConfig;
         FilteredIWads = filteredIWads;
         PrimaryButtonText = isEditMode ? "Сохранить" : "Создать";
         this.Title = isEditMode ? "Настройка сборки" : "Создание сборки";
@@ -41,7 +43,17 @@ public sealed partial class EditModContentDialog : ContentDialog
         get; private set;
     }
 
+    public string ModDescription
+    {
+        get; private set;
+    }
+
     public KeyValue IWadFile
+    {
+        get; private set;
+    }
+
+    public bool UniqueConfig
     {
         get; private set;
     }
@@ -50,11 +62,15 @@ public sealed partial class EditModContentDialog : ContentDialog
 public readonly struct EditModDialogResult
 {
     public readonly string name;
+    public readonly string description;
     public readonly KeyValue iWadFile;
+    public readonly bool uniqueConfig;
 
-    public EditModDialogResult(string name, KeyValue iWadFile)
+    public EditModDialogResult(string name, string description, KeyValue iWadFile, bool uniqueConfig)
     {
         this.name = name;
+        this.description = description;
         this.iWadFile = iWadFile;
+        this.uniqueConfig = uniqueConfig;
     }
 }

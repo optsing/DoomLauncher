@@ -54,7 +54,11 @@ public partial class DoomEntry: ObservableObject
     [ObservableProperty]
     private string name;
     [ObservableProperty]
-    private KeyValue iWadFile;
+    private string description = "";
+    [ObservableProperty]
+    private KeyValue iWadFile = Settings.IWads.First();
+    [ObservableProperty]
+    private bool uniqueConfig = false;
 
     public string Id { get; set; }
 

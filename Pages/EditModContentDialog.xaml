@@ -19,8 +19,14 @@
             HorizontalAlignment="Stretch"
             Margin="0,8,0,8"
             Text="{x:Bind ModName, Mode=TwoWay}"
-            AcceptsReturn="False"
-            PlaceholderText="Введите название сборки"
+            PlaceholderText="Введите название"
+        />
+        <TextBlock>Описание</TextBlock>
+        <TextBox
+            HorizontalAlignment="Stretch"
+            Margin="0,8,0,8"
+            Text="{x:Bind ModDescription, Mode=TwoWay}"
+            PlaceholderText="Введите краткое описание"
         />
         <TextBlock>Игра</TextBlock>
         <ComboBox HorizontalAlignment="Stretch" ItemsSource="{x:Bind FilteredIWads}" Margin="0,8,0,8" SelectedItem="{x:Bind IWadFile, Mode=TwoWay}">
@@ -30,5 +36,8 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
+        <CheckBox
+            IsChecked="{x:Bind UniqueConfig, Mode=TwoWay}"
+        >Использовать уникальный файл настроек</CheckBox>
     </StackPanel>
 </ContentDialog>

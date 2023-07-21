@@ -41,7 +41,7 @@
                     x:Name="gridPane"
                     Background="{ThemeResource SystemControlPageBackgroundChromeLowBrush}"
                     CornerRadius="8"
-                    RowDefinitions="48,Auto,*"
+                    RowDefinitions="48,Auto,*,Auto"
                 >
                     <Button Grid.Row="1" Click="Button_Click" HorizontalAlignment="Stretch" Margin="8">
                         <StackPanel Orientation="Horizontal">
@@ -62,8 +62,11 @@
                     >
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="local:DoomEntry">
-                                <TextBlock Text="{x:Bind Name, Mode=OneWay}" VerticalAlignment="Center" FontSize="16">
-                                    <TextBlock.ContextFlyout>
+                                <StackPanel
+                                    Orientation="Vertical"
+                                    Padding="0,8"
+                                >
+                                    <StackPanel.ContextFlyout>
                                         <MenuFlyout>
                                             <MenuFlyoutItem Text="Настроить сборку" Click="EditMod_Click">
                                                 <MenuFlyoutItem.Icon>
@@ -76,30 +79,37 @@
                                                 </MenuFlyoutItem.Icon>
                                             </MenuFlyoutItem>
                                         </MenuFlyout>
-                                    </TextBlock.ContextFlyout>
-                                </TextBlock>
+                                    </StackPanel.ContextFlyout>
+                                    <TextBlock Text="{x:Bind Name, Mode=OneWay}" VerticalAlignment="Center" FontSize="16"/>
+                                    <TextBlock
+                                        Text="{x:Bind Description, Mode=OneWay}"
+                                        Visibility="{x:Bind local:RootPage.HasText(Description), Mode=OneWay}"
+                                        VerticalAlignment="Center"
+                                        FontSize="12"
+                                        TextWrapping="WrapWholeWords"
+                                    />
+                                </StackPanel>
                             </DataTemplate>
                         </ListView.ItemTemplate>
-                        <ListView.Footer>
-                            <Button
-                                Click="SettingsButton_Click"
-                                Margin="8"
-                                HorizontalAlignment="Stretch"
-                            >
-                                <StackPanel Orientation="Horizontal">
-                                    <AnimatedIcon Height="18" Margin="0,0,4,0">
-                                        <AnimatedIcon.Source>
-                                            <animatedvisuals:AnimatedSettingsVisualSource />
-                                        </AnimatedIcon.Source>
-                                        <AnimatedIcon.FallbackIconSource>
-                                            <SymbolIconSource Symbol="Setting"/>
-                                        </AnimatedIcon.FallbackIconSource>
-                                    </AnimatedIcon>
-                                    <TextBlock>Настройки</TextBlock>
-                                </StackPanel>
-                            </Button>
-                        </ListView.Footer>
                     </ListView>
+                    <Button
+                        Grid.Row="3"
+                        Click="SettingsButton_Click"
+                        Margin="8"
+                        HorizontalAlignment="Stretch"
+                    >
+                        <StackPanel Orientation="Horizontal">
+                            <AnimatedIcon Height="18" Margin="0,0,4,0">
+                                <AnimatedIcon.Source>
+                                    <animatedvisuals:AnimatedSettingsVisualSource />
+                                </AnimatedIcon.Source>
+                                <AnimatedIcon.FallbackIconSource>
+                                    <SymbolIconSource Symbol="Setting"/>
+                                </AnimatedIcon.FallbackIconSource>
+                            </AnimatedIcon>
+                            <TextBlock>Настройки</TextBlock>
+                        </StackPanel>
+                    </Button>
                 </Grid>
             </SplitView.Pane>
             <Frame

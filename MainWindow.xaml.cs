@@ -50,6 +50,8 @@ public sealed partial class MainWindow : Window
         {
             var text = File.ReadAllText(configFilePath);
             settings = JsonSerializer.Deserialize<Settings>(text, jsonOptions);
+            var backupConfigFilePath = Path.Combine(dataFolderPath, "config.old.json");
+            File.Copy(configFilePath, backupConfigFilePath, true);
         }
         else
         {
