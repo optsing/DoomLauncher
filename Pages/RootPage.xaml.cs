@@ -109,7 +109,7 @@ public sealed partial class RootPage : Page
 
     private void Page_OnProgress(object sender, bool e)
     {
-        progressIndicator.IsLoading = e;
+        progressIndicator.Visibility = e ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private async void Page_OnRemove(object sender, DoomEntry entry)

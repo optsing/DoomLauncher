@@ -6,9 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
-    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
     mc:Ignorable="d"
-    Loaded="Page_Loaded"
 >
     <Grid RowDefinitions="Auto,*">
         <VisualStateManager.VisualStateGroups>
@@ -144,15 +142,16 @@
                 Style="{ThemeResource BaseTextBlockStyle}"
             />
         </Grid>
-        <controls:Loading
+        <Border
             x:Name="progressIndicator"
             Background="{ThemeResource CustomBackdropColor}"
             Grid.RowSpan="2"
+            Visibility="Collapsed"
         >
             <ProgressRing
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
             />
-        </controls:Loading>
+        </Border>
     </Grid>
 </Page>
