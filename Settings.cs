@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -52,6 +51,9 @@ public class Settings
         new () { Key = "freedm.wad", Value = "FreeDM" },
     };
 
+    public static readonly string[] SupportedModExtensions = new[] { ".pk3", ".wad", ".zip" };
+    public static readonly string[] SupportedImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif", ".svg" };
+
     public static readonly JsonSerializerOptions jsonOptions = new()
     {
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
@@ -62,12 +64,6 @@ public class Settings
         },
     };
 
-    public static async Task<bool> ShowAskDialog(XamlRoot xamlRoot, string title, string text, string primaryButton, string closeButton)
-    {
-        var dialog = new AskDialog(xamlRoot, title, text, primaryButton, closeButton);
-        return ContentDialogResult.Primary == await dialog.ShowAsync();
-    }
-
     public static async Task<string> CopyFileWithConfirmation(XamlRoot xamlRoot, StorageFile file, string targetFolder)
     {
         var targetPath = Path.Combine(targetFolder, file.Name);
@@ -77,7 +73,7 @@ public class Settings
             {
                 Directory.CreateDirectory(targetFolder);
             }
-            if (!File.Exists(targetPath) || await ShowAskDialog(
+            if (!File.Exists(targetPath) || await AskDialog.ShowAsync(
                 xamlRoot,
                 "Добавление с заменой",
                 $"Файл '{file.Name}' уже существует в папке лаунчера.\nЗаменить?",
@@ -100,7 +96,7 @@ public class Settings
         {
             Directory.CreateDirectory(targetFolder);
         }
-        if (!File.Exists(targetPath) || await ShowAskDialog(
+        if (!File.Exists(targetPath) || await AskDialog.ShowAsync(
             xamlRoot,
             "Добавление с заменой",
             $"Файл '{fileName}' уже существует в папке лаунчера.\nЗаменить?",
@@ -119,7 +115,7 @@ public class Settings
 public partial class DoomEntry: ObservableObject
 {
     [ObservableProperty]
-    private string name;
+    private string name = "";
     [ObservableProperty]
     private string description = "";
     [ObservableProperty]

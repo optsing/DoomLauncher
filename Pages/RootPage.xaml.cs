@@ -153,8 +153,7 @@ public sealed partial class RootPage : Page
 
     private async Task RemoveMod(DoomEntry entry)
     {
-        var dialog = new AskDialog(XamlRoot, "Удаление сборки", $"Вы уверены, что хотите удалить сборку '{entry.Name}'?", "Удалить", "Отмена");
-        if (ContentDialogResult.Primary == await dialog.ShowAsync())
+        if (await AskDialog.ShowAsync(XamlRoot, "Удаление сборки", $"Вы уверены, что хотите удалить сборку '{entry.Name}'?", "Удалить", "Отмена"))
         {
             settings.Entries.Remove(entry);
         }
@@ -417,8 +416,7 @@ public sealed partial class RootPage : Page
         else
         {
             progressIndicator.Visibility = Visibility.Collapsed;
-            var dialog = new AskDialog(XamlRoot, "Ошибка импорта", "Некорректный формат сборки", "Закрыть", "");
-            await dialog.ShowAsync();
+            await AskDialog.ShowAsync(XamlRoot, "Ошибка импорта", "Некорректный формат сборки", "Закрыть", "");
             return null;
         }
     }

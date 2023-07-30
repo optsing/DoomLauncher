@@ -111,7 +111,7 @@ public sealed partial class DoomPage : Page
         WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
 
         // Now we can use the picker object as normal
-        foreach (var fileExtension in MainWindow.SupportedModExtensions)
+        foreach (var fileExtension in Settings.SupportedModExtensions)
         {
             picker.FileTypeFilter.Add(fileExtension);
         }
@@ -131,7 +131,7 @@ public sealed partial class DoomPage : Page
         WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
 
         // Now we can use the picker object as normal
-        foreach (var fileExtension in MainWindow.SupportedImageExtensions)
+        foreach (var fileExtension in Settings.SupportedImageExtensions)
         {
             picker.FileTypeFilter.Add(fileExtension);
         }
@@ -210,11 +210,11 @@ public sealed partial class DoomPage : Page
                 if (item is StorageFile file)
                 {
                     var ext = Path.GetExtension(file.Name).ToLowerInvariant();
-                    if (MainWindow.SupportedModExtensions.Contains(ext))
+                    if (Settings.SupportedModExtensions.Contains(ext))
                     {
                         return true;
                     }
-                    else if (MainWindow.SupportedImageExtensions.Contains(ext))
+                    else if (Settings.SupportedImageExtensions.Contains(ext))
                     {
                         return true;
                     }
@@ -236,11 +236,11 @@ public sealed partial class DoomPage : Page
                 if (item is StorageFile file)
                 {
                     var ext = Path.GetExtension(file.Name).ToLowerInvariant();
-                    if (MainWindow.SupportedModExtensions.Contains(ext))
+                    if (Settings.SupportedModExtensions.Contains(ext))
                     {
                         modResult.Add(file);
                     }
-                    else if (MainWindow.SupportedImageExtensions.Contains(ext))
+                    else if (Settings.SupportedImageExtensions.Contains(ext))
                     {
                         imageResult.Add(file);
                     }
@@ -284,7 +284,7 @@ public sealed partial class DoomPage : Page
     {
         var button = sender as Button;
         var file = button.DataContext as NamePath;
-        if (await Settings.ShowAskDialog(XamlRoot, "Удаление ссылки на файл", $"Вы уверены, что хотите удалить ссылку на файл '{file.Name}'?", "Удалить", "Отмена"))
+        if (await AskDialog.ShowAsync(XamlRoot, "Удаление ссылки на файл", $"Вы уверены, что хотите удалить ссылку на файл '{file.Name}'?", "Удалить", "Отмена"))
         {
             entry.ModFiles.Remove(file);
             RefillFileMenu();

@@ -2,7 +2,6 @@
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using System.IO;
-using System.Text.Encodings.Web;
 using System.Text.Json;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -99,9 +98,6 @@ public sealed partial class MainWindow : Window
             }
         }
     }
-
-    public static readonly string[] SupportedModExtensions = new[] { ".pk3", ".wad", ".zip" };
-    public static readonly string[] SupportedImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif",  ".svg" };
 
     private readonly string dataFolderPath;
     private readonly string configFilePath;
