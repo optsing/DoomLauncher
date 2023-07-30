@@ -5,8 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -93,6 +95,7 @@ public sealed partial class RootPage : Page
             DoomPage page = new(item, hWnd, dataFolderPath, settings);
             page.OnStart += Page_OnStart;
             page.OnEdit += Page_OnEdit;
+            page.OnExport += Page_OnExport;
             page.OnRemove += Page_OnRemove;
             page.OnProgress += Page_OnProgress;
             frameMain.Content = page;
@@ -134,6 +137,18 @@ public sealed partial class RootPage : Page
         var el = sender as FrameworkElement;
         var entry = el.DataContext as DoomEntry;
         await EditMod(entry);
+    }
+
+    private async void Page_OnExport(object sender, DoomEntry entry)
+    {
+        await ExportMod(entry);
+    }
+
+    private async void ExportMod_Click(object sender, RoutedEventArgs e)
+    {
+        var el = sender as FrameworkElement;
+        var entry = el.DataContext as DoomEntry;
+        await ExportMod(entry);
     }
 
     private async Task RemoveMod(DoomEntry entry)
@@ -218,12 +233,13 @@ public sealed partial class RootPage : Page
     {
         if (await AddOrEditModDialogShow(new EditModDialogResult("", "", Settings.IWads.First(), false), false) is EditModDialogResult result)
         {
-            DoomEntry entry = new()
+            var entry = new DoomEntry()
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = result.name,
+                Description = result.description,
                 IWadFile = result.iWadFile,
-                ModFiles = new(),
+                UniqueConfig = result.uniqueConfig,
             };
             settings.Entries.Add(entry);
             DoomList.SelectedItem = entry;
@@ -279,8 +295,131 @@ public sealed partial class RootPage : Page
         await OpenSettings(forceGZDoomPathSetup);
     }
 
+    private async void ImportButton_Click(object sender, RoutedEventArgs e)
+    {
+        var entry = await ImportMod();
+        if (entry != null)
+        {
+            settings.Entries.Add(entry);
+            DoomList.SelectedItem = entry;
+        }
+    }
+
+
     public static Visibility HasText(string text)
     {
         return string.IsNullOrEmpty(text) ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    private async Task ExportMod(DoomEntry entry)
+    {
+        var picker = new Windows.Storage.Pickers.FileSavePicker();
+
+        // Need to initialize the picker object with the hwnd / IInitializeWithWindow
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
+
+        // Now we can use the picker object as normal
+        picker.FileTypeChoices.Add("Zip archive", new List<string>() { ".zip" });
+        picker.SuggestedFileName = entry.Name;
+
+        var file = await picker.PickSaveFileAsync();
+
+        if (file == null)
+        {
+            return;
+        }
+
+        progressIndicator.Visibility = Visibility.Visible;
+        var zipToCreate = await file.OpenStreamForWriteAsync();
+        using var archive = new ZipArchive(zipToCreate, ZipArchiveMode.Create);
+
+        foreach (var modFile in entry.ModFiles)
+        {
+            var filePath = modFile.Path;
+            var zipEntry = archive.CreateEntry(Path.Combine("mods", Path.GetFileName(filePath)));
+            using var stream = zipEntry.Open();
+            await File.OpenRead(filePath).CopyToAsync(stream);
+        }
+        if (entry.ImageFiles.Any())
+        {
+            var filePath = entry.ImageFiles.First();
+            var zipEntry = archive.CreateEntry(Path.Combine("images", Path.GetFileName(filePath)));
+            using var stream = zipEntry.Open();
+            await File.OpenRead(filePath).CopyToAsync(stream);
+        }
+        {
+            var newEntry = new DoomEntry()
+            {
+                Id = entry.Id,
+                Name = entry.Name,
+                Description = entry.Description,
+                UniqueConfig = entry.UniqueConfig,
+                IWadFile = entry.IWadFile,
+                ModFiles = new(entry.ModFiles.Select(mod => new NamePath(Path.Combine("mods", Path.GetFileName(mod.Path))))),
+                ImageFiles = new(entry.ImageFiles.Select(path => Path.Combine("images", Path.GetFileName(path)))),
+            };
+            var zipEntry = archive.CreateEntry(Path.Combine("entry.json"));
+            using var stream = zipEntry.Open();
+            await JsonSerializer.SerializeAsync(stream, newEntry, Settings.jsonOptions);
+        }
+        progressIndicator.Visibility = Visibility.Collapsed;
+    }
+
+    private async Task<DoomEntry?> ImportMod()
+    {
+        var picker = new Windows.Storage.Pickers.FileOpenPicker();
+
+        // Need to initialize the picker object with the hwnd / IInitializeWithWindow
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
+
+        // Now we can use the picker object as normal
+        picker.FileTypeFilter.Add(".zip");
+
+        var file = await picker.PickSingleFileAsync();
+
+        if (file == null)
+        {
+            return null;
+        }
+
+        progressIndicator.Visibility = Visibility.Visible;
+        using var zipToRead = await file.OpenStreamForReadAsync();
+        using var archive = new ZipArchive(zipToRead, ZipArchiveMode.Read);
+
+        if (archive.Entries.FirstOrDefault(entry => entry.FullName == "entry.json") is ZipArchiveEntry zipEntry)
+        {
+            using var stream = zipEntry.Open();
+            var newEntry = await JsonSerializer.DeserializeAsync<DoomEntry>(stream, Settings.jsonOptions);
+            var entry = new DoomEntry()
+            {
+                Id = newEntry.Id,
+                Name = newEntry.Name,
+                Description = newEntry.Description,
+                UniqueConfig = newEntry.UniqueConfig,
+                IWadFile = newEntry.IWadFile,
+                ModFiles = new(newEntry.ModFiles.Select(mod => new NamePath(Path.Combine(dataFolderPath, mod.Path)))),
+                ImageFiles = new(newEntry.ImageFiles.Select(path => Path.Combine(dataFolderPath, path))),
+            };
+
+            foreach (var zipFileEntry in archive.Entries)
+            {
+                var zipEntryFolder = Path.GetDirectoryName(zipFileEntry.FullName);
+                if (zipEntryFolder == "mods" || zipEntryFolder == "images")
+                {
+                    using var fileStream = zipFileEntry.Open();
+                    await Settings.CopyFileWithConfirmation(XamlRoot, fileStream, zipFileEntry.Name, Path.Combine(dataFolderPath, zipEntryFolder));
+                }
+            }
+
+            progressIndicator.Visibility = Visibility.Collapsed;
+            return entry;
+        }
+        else
+        {
+            progressIndicator.Visibility = Visibility.Collapsed;
+            var dialog = new AskDialog(XamlRoot, "Ошибка импорта", "Некорректный формат сборки", "Закрыть", "");
+            await dialog.ShowAsync();
+            return null;
+        }
     }
 }

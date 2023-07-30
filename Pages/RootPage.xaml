@@ -39,7 +39,7 @@
                     x:Name="gridPane"
                     Background="{ThemeResource SystemControlPageBackgroundChromeLowBrush}"
                     CornerRadius="8"
-                    RowDefinitions="48,Auto,*,Auto"
+                    RowDefinitions="48,Auto,*,Auto, Auto"
                 >
                     <Button Grid.Row="1" Click="Button_Click" HorizontalAlignment="Stretch" Margin="8">
                         <StackPanel Orientation="Horizontal">
@@ -71,6 +71,11 @@
                                                     <SymbolIcon Symbol="Edit" />
                                                 </MenuFlyoutItem.Icon>
                                             </MenuFlyoutItem>
+                                            <MenuFlyoutItem Text="Экспорт сборки" Click="ExportMod_Click">
+                                                <MenuFlyoutItem.Icon>
+                                                    <SymbolIcon Symbol="Download" />
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
                                             <MenuFlyoutItem Text="Удалить сборку" Click="RemoveMod_Click">
                                                 <MenuFlyoutItem.Icon>
                                                     <SymbolIcon Symbol="Delete" />
@@ -95,8 +100,19 @@
                     </ListView>
                     <Button
                         Grid.Row="3"
+                        Click="ImportButton_Click"
+                        Margin="8,8,8,4"
+                        HorizontalAlignment="Stretch"
+                    >
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon Glyph="&#xE898;" FontSize="16" />
+                            <TextBlock>Импорт сборки</TextBlock>
+                        </StackPanel>
+                    </Button>
+                    <Button
+                        Grid.Row="4"
                         Click="SettingsButton_Click"
-                        Margin="8"
+                        Margin="8,4,8,8"
                         HorizontalAlignment="Stretch"
                     >
                         <StackPanel Orientation="Horizontal">

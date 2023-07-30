@@ -1,11 +1,16 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+using Windows.Storage;
 
 namespace DoomLauncher;
 
@@ -46,6 +51,68 @@ public class Settings
         new () { Key = "freedoom2.wad", Value = "Freedoom: Phase 2" },
         new () { Key = "freedm.wad", Value = "FreeDM" },
     };
+
+    public static readonly JsonSerializerOptions jsonOptions = new()
+    {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        WriteIndented = true,
+        Converters = {
+            new NamePathConverter(),
+            new KeyValueConverter(),
+        },
+    };
+
+    public static async Task<bool> ShowAskDialog(XamlRoot xamlRoot, string title, string text, string primaryButton, string closeButton)
+    {
+        var dialog = new AskDialog(xamlRoot, title, text, primaryButton, closeButton);
+        return ContentDialogResult.Primary == await dialog.ShowAsync();
+    }
+
+    public static async Task<string> CopyFileWithConfirmation(XamlRoot xamlRoot, StorageFile file, string targetFolder)
+    {
+        var targetPath = Path.Combine(targetFolder, file.Name);
+        if (targetPath != file.Path)
+        {
+            if (!Directory.Exists(targetFolder))
+            {
+                Directory.CreateDirectory(targetFolder);
+            }
+            if (!File.Exists(targetPath) || await ShowAskDialog(
+                xamlRoot,
+                "Добавление с заменой",
+                $"Файл '{file.Name}' уже существует в папке лаунчера.\nЗаменить?",
+                "Заменить",
+                "Не заменять"
+            ))
+            {
+                using var sourceStream = await file.OpenStreamForReadAsync();
+                using var destinationStream = new FileStream(targetPath, FileMode.Create, FileAccess.Write);
+                await sourceStream.CopyToAsync(destinationStream);
+            }
+        }
+        return targetPath;
+    }
+
+    public static async Task<string> CopyFileWithConfirmation(XamlRoot xamlRoot, Stream sourceStream, string fileName, string targetFolder)
+    {
+        var targetPath = Path.Combine(targetFolder, fileName);
+        if (!Directory.Exists(targetFolder))
+        {
+            Directory.CreateDirectory(targetFolder);
+        }
+        if (!File.Exists(targetPath) || await ShowAskDialog(
+            xamlRoot,
+            "Добавление с заменой",
+            $"Файл '{fileName}' уже существует в папке лаунчера.\nЗаменить?",
+            "Заменить",
+            "Не заменять"
+        ))
+        {
+            using var destinationStream = new FileStream(targetPath, FileMode.Create, FileAccess.Write);
+            await sourceStream.CopyToAsync(destinationStream);
+        }
+        return targetPath;
+    }
 }
 
 

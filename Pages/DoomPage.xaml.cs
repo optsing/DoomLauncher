@@ -79,6 +79,7 @@ public sealed partial class DoomPage : Page
 
     public event EventHandler<DoomEntry> OnStart;
     public event EventHandler<DoomEntry> OnEdit;
+    public event EventHandler<DoomEntry> OnExport;
     public event EventHandler<DoomEntry> OnRemove;
     public event EventHandler<bool> OnProgress;
 
@@ -90,6 +91,11 @@ public sealed partial class DoomPage : Page
     private void EditMod_Click(object sender, RoutedEventArgs e)
     {
         OnEdit?.Invoke(this, entry);
+    }
+
+    private void ExportMod_Click(object sender, RoutedEventArgs e)
+    {
+        OnExport?.Invoke(this, entry);
     }
 
     private void RemoveMod_Click(object sender, RoutedEventArgs e)
@@ -137,43 +143,13 @@ public sealed partial class DoomPage : Page
         }
     }
 
-    private async Task<bool> ShowAskDialog(string title, string text, string primaryButton, string closeButton)
-    {
-        var dialog = new AskDialog(XamlRoot, title, text, primaryButton, closeButton);
-        return ContentDialogResult.Primary == await dialog.ShowAsync();
-    }
-
-    private async Task<string> CopyFileWithConfirmation(StorageFile file, string targetFolder)
-    {
-        var targetPath = Path.Combine(targetFolder, file.Name);
-        if (targetPath != file.Path)
-        {
-            if (!Directory.Exists(targetFolder))
-            {
-                Directory.CreateDirectory(targetFolder);
-            }
-            if (!File.Exists(targetPath) || await ShowAskDialog(
-                "Добавление с заменой",
-                $"Файл '{file.Name}' уже существует в папке лаунчера.\nЗаменить?",
-                "Заменить",
-                "Не заменять"
-            ))
-            {
-                OnProgress?.Invoke(this, true);
-                using var sourceStream = await file.OpenStreamForReadAsync();
-                using var destinationStream = new FileStream(targetPath, FileMode.Create, FileAccess.Write);
-                await sourceStream.CopyToAsync(destinationStream);
-                OnProgress?.Invoke(this, false);
-            }
-        }
-        return targetPath;
-    }
-
     private async Task AddFiles(IEnumerable<StorageFile> files)
     {
         foreach (var file in files)
         {
-            var targetPath = await CopyFileWithConfirmation(file, modsFolderPath);
+            OnProgress?.Invoke(this, true);
+            var targetPath = await Settings.CopyFileWithConfirmation(XamlRoot, file, modsFolderPath);
+            OnProgress?.Invoke(this, false);
             if (!string.IsNullOrEmpty(targetPath))
             {
                 var newModFile = new NamePath(targetPath);
@@ -193,7 +169,9 @@ public sealed partial class DoomPage : Page
 
     private async Task SetImage(StorageFile file)
     {
-        var targetPath = await CopyFileWithConfirmation(file, imagesFolderPath);
+        OnProgress?.Invoke(this, true);
+        var targetPath = await Settings.CopyFileWithConfirmation(XamlRoot, file, imagesFolderPath);
+        OnProgress?.Invoke(this, false);
         if (!string.IsNullOrEmpty(targetPath))
         {
             entry.ImageFiles.Clear();
@@ -306,7 +284,7 @@ public sealed partial class DoomPage : Page
     {
         var button = sender as Button;
         var file = button.DataContext as NamePath;
-        if (await ShowAskDialog("Удаление ссылки на файл", $"Вы уверены, что хотите удалить ссылку на файл '{file.Name}'?", "Удалить", "Отмена"))
+        if (await Settings.ShowAskDialog(XamlRoot, "Удаление ссылки на файл", $"Вы уверены, что хотите удалить ссылку на файл '{file.Name}'?", "Удалить", "Отмена"))
         {
             entry.ModFiles.Remove(file);
             RefillFileMenu();
