@@ -79,6 +79,7 @@ public sealed partial class DoomPage : Page
 
     public event EventHandler<DoomEntry> OnStart;
     public event EventHandler<DoomEntry> OnEdit;
+    public event EventHandler<DoomEntry> OnCopy;
     public event EventHandler<DoomEntry> OnExport;
     public event EventHandler<DoomEntry> OnRemove;
     public event EventHandler<bool> OnProgress;
@@ -91,6 +92,11 @@ public sealed partial class DoomPage : Page
     private void EditMod_Click(object sender, RoutedEventArgs e)
     {
         OnEdit?.Invoke(this, entry);
+    }
+
+    private void CopyMod_Click(object sender, RoutedEventArgs e)
+    {
+        OnCopy?.Invoke(this, entry);
     }
 
     private void ExportMod_Click(object sender, RoutedEventArgs e)

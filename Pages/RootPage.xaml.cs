@@ -10,6 +10,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -95,6 +97,7 @@ public sealed partial class RootPage : Page
             DoomPage page = new(item, hWnd, dataFolderPath, settings);
             page.OnStart += Page_OnStart;
             page.OnEdit += Page_OnEdit;
+            page.OnCopy += Page_OnCopy;
             page.OnExport += Page_OnExport;
             page.OnRemove += Page_OnRemove;
             page.OnProgress += Page_OnProgress;
@@ -139,6 +142,18 @@ public sealed partial class RootPage : Page
         await EditMod(entry);
     }
 
+    private void Page_OnCopy(object sender, DoomEntry entry)
+    {
+        CopyMod(entry);
+    }
+
+    private void CopyMod_Click(object sender, RoutedEventArgs e)
+    {
+        var el = sender as FrameworkElement;
+        var entry = el.DataContext as DoomEntry;
+        CopyMod(entry);
+    }
+
     private async void Page_OnExport(object sender, DoomEntry entry)
     {
         await ExportMod(entry);
@@ -168,6 +183,22 @@ public sealed partial class RootPage : Page
             entry.IWadFile = result.iWadFile;
             entry.UniqueConfig = result.uniqueConfig;
         }
+    }
+
+    private void CopyMod(DoomEntry entry)
+    {
+        var newEntry = new DoomEntry()
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = entry.Name,
+            Description = entry.Description,
+            IWadFile = entry.IWadFile,
+            UniqueConfig = entry.UniqueConfig,
+            ModFiles = new(entry.ModFiles.Select(file => new NamePath(file.Path))),
+            ImageFiles = new(entry.ImageFiles.Select(path => path)),
+        };
+        settings.Entries.Add(newEntry);
+        DoomList.SelectedItem = newEntry;
     }
 
     private void Page_OnStart(object sender, DoomEntry entry)
@@ -296,7 +327,23 @@ public sealed partial class RootPage : Page
 
     private async void ImportButton_Click(object sender, RoutedEventArgs e)
     {
-        var entry = await ImportMod();
+        var picker = new Windows.Storage.Pickers.FileOpenPicker();
+
+        // Need to initialize the picker object with the hwnd / IInitializeWithWindow
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
+
+        // Now we can use the picker object as normal
+        picker.FileTypeFilter.Add(".zip");
+
+        var file = await picker.PickSingleFileAsync();
+
+        if (file == null)
+        {
+            return;
+        }
+
+        var entry = await ImportModFile(file);
+
         if (entry != null)
         {
             settings.Entries.Add(entry);
@@ -364,23 +411,8 @@ public sealed partial class RootPage : Page
         progressIndicator.Visibility = Visibility.Collapsed;
     }
 
-    private async Task<DoomEntry?> ImportMod()
+    private async Task<DoomEntry> ImportModFile(StorageFile file)
     {
-        var picker = new Windows.Storage.Pickers.FileOpenPicker();
-
-        // Need to initialize the picker object with the hwnd / IInitializeWithWindow
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
-
-        // Now we can use the picker object as normal
-        picker.FileTypeFilter.Add(".zip");
-
-        var file = await picker.PickSingleFileAsync();
-
-        if (file == null)
-        {
-            return null;
-        }
-
         progressIndicator.Visibility = Visibility.Visible;
         using var zipToRead = await file.OpenStreamForReadAsync();
         using var archive = new ZipArchive(zipToRead, ZipArchiveMode.Read);
@@ -415,9 +447,59 @@ public sealed partial class RootPage : Page
         }
         else
         {
+            await AskDialog.ShowAsync(XamlRoot, "Ошибка импорта", $"Некорректный формат файла '{file.Name}'", "Закрыть", "");
             progressIndicator.Visibility = Visibility.Collapsed;
-            await AskDialog.ShowAsync(XamlRoot, "Ошибка импорта", "Некорректный формат сборки", "Закрыть", "");
             return null;
+        }
+    }
+
+    private async void DoomList_DragOver(object sender, DragEventArgs e)
+    {
+        var deferral = e.GetDeferral();
+        if (e.DataView.Contains(StandardDataFormats.StorageItems))
+        {
+            var items = await e.DataView.GetStorageItemsAsync();
+            foreach (var item in items)
+            {
+                if (item is StorageFile file)
+                {
+                    var ext = Path.GetExtension(file.Name).ToLowerInvariant();
+                    if (ext == ".zip")
+                    {
+                        e.AcceptedOperation = DataPackageOperation.Copy;
+                    }
+                }
+            }
+        }
+        deferral.Complete();
+    }
+
+    private async void DoomList_Drop(object sender, DragEventArgs e)
+    {
+        if (e.DataView.Contains(StandardDataFormats.StorageItems))
+        {
+            var items = await e.DataView.GetStorageItemsAsync();
+            DoomEntry lastEntry = null;
+            foreach (var item in items)
+            {
+                if (item is StorageFile file)
+                {
+                    var ext = Path.GetExtension(file.Name).ToLowerInvariant();
+                    if (ext == ".zip")
+                    {
+                        var entry = await ImportModFile(file);
+                        if (entry != null)
+                        {
+                            settings.Entries.Add(entry);
+                            lastEntry = entry;
+                        }
+                    }
+                }
+            }
+            if (lastEntry != null)
+            {
+                DoomList.SelectedItem = lastEntry;
+            }
         }
     }
 }
