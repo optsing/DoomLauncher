@@ -1,6 +1,5 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.Collections.Generic;
@@ -223,6 +222,30 @@ public sealed partial class DoomPage : Page
         return itemsCount == 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
+    private static async Task<bool> CheckDraggedFiles(DataPackageView data)
+    {
+        if (data.Contains(StandardDataFormats.StorageItems))
+        {
+            var items = await data.GetStorageItemsAsync();
+            foreach (var item in items)
+            {
+                if (item is StorageFile file)
+                {
+                    var ext = Path.GetExtension(file.Name).ToLowerInvariant();
+                    if (MainWindow.SupportedModExtensions.Contains(ext))
+                    {
+                        return true;
+                    }
+                    else if (MainWindow.SupportedImageExtensions.Contains(ext))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     private static async Task<(List<StorageFile>, List<StorageFile>)> GetDraggedFiles(DataPackageView data)
     {
         var modResult = new List<StorageFile>();
@@ -252,8 +275,7 @@ public sealed partial class DoomPage : Page
     private async void LwModFiles_DragOver(object sender, DragEventArgs e)
     {
         var deferral = e.GetDeferral();
-        var (files, images) = await GetDraggedFiles(e.DataView);
-        if (files.Count + images.Count > 0)
+        if (await CheckDraggedFiles(e.DataView))
         {
             e.AcceptedOperation = DataPackageOperation.Copy;
         }

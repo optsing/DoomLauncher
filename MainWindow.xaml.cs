@@ -101,7 +101,7 @@ public sealed partial class MainWindow : Window
     }
 
     public static readonly string[] SupportedModExtensions = new[] { ".pk3", ".wad", ".zip" };
-    public static readonly string[] SupportedImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+    public static readonly string[] SupportedImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif",  ".svg" };
 
     private readonly string dataFolderPath;
     private readonly string configFilePath;

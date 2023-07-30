@@ -230,7 +230,6 @@ public sealed partial class RootPage : Page
         }
     }
 
-
     private async Task OpenSettings(bool forceGZDoomPathSetup)
     {
         var dialog = new SettingsContentDialog(XamlRoot, hWnd, new() {
