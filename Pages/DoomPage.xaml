@@ -115,10 +115,10 @@
             Drop="LwModFiles_Drop"
         >
             <ListView.ItemTemplate>
-                <DataTemplate x:DataType="local:NamePath">
+                <DataTemplate x:DataType="x:String">
                     <Grid ColumnDefinitions="*,Auto,Auto">
                         <TextBlock
-                            Text="{x:Bind Name}"
+                            Text="{x:Bind local:DoomPage.GetFileTitle((x:String))}"
                             VerticalAlignment="Center"
                         />
                         <Button

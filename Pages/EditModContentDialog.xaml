@@ -29,7 +29,12 @@
             PlaceholderText="Введите краткое описание"
         />
         <TextBlock>Игра</TextBlock>
-        <ComboBox HorizontalAlignment="Stretch" ItemsSource="{x:Bind FilteredIWads}" Margin="0,8,0,8" SelectedItem="{x:Bind IWadFile, Mode=TwoWay}">
+        <ComboBox
+            HorizontalAlignment="Stretch"
+            Margin="0,8,0,8"
+            SelectedItem="{x:Bind IWadFile, Mode=TwoWay}"
+            ItemsSource="{x:Bind FilteredIWads}"
+        >
             <ComboBox.ItemTemplate>
                 <DataTemplate x:DataType="local:KeyValue">
                     <TextBlock Text="{x:Bind Value}"/>

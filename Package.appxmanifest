@@ -51,6 +51,13 @@
 			 <desktop:ExecutionAlias Alias="doom.exe" />
 		  </uap3:AppExecutionAlias>
 		</uap3:Extension>
+		<!--<uap:Extension Category="windows.fileTypeAssociation">
+			<uap:FileTypeAssociation Name="modsets">
+				<uap:SupportedFileTypes>
+					<uap:FileType>.gzdl</uap:FileType>
+				</uap:SupportedFileTypes>
+			</uap:FileTypeAssociation>
+		</uap:Extension>-->
 	  </Extensions>
     </Application>
   </Applications>

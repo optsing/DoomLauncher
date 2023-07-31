@@ -67,10 +67,15 @@ public sealed partial class SettingsContentDialog : ContentDialog
     }
 }
 
-public partial class SettingsDialogState: ObservableObject
+public class SettingsDialogState: ObservableObject
 {
-    [ObservableProperty]
-    private string gZDoomPath;
-    [ObservableProperty]
-    private bool closeOnLaunch;
+    private string gZDoomPath = "";
+    
+    public string GZDoomPath
+    {
+        get => gZDoomPath;
+        set => SetProperty(ref gZDoomPath, value);
+    }
+
+    public bool CloseOnLaunch { get; set; } = false;
 }

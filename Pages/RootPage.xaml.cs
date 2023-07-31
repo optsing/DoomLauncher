@@ -61,7 +61,6 @@ public sealed partial class RootPage : Page
     {
         SetDragRegion();
     }
-
     private void SetDragRegion()
     {
         var scaleAdjustment = DPIHelper.GetScaleAdjustment(hWnd);
@@ -113,57 +112,86 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private void Page_OnProgress(object sender, bool e)
+    private void SetProgress(string? text)
     {
-        progressIndicator.Visibility = e ? Visibility.Visible : Visibility.Collapsed;
+        if (string.IsNullOrEmpty(text))
+        {
+            progressIndicator.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            progressIndicator.Visibility = Visibility.Visible;
+            progressIndicatorText.Text = text;
+        }
     }
 
-    private async void Page_OnRemove(object sender, DoomEntry entry)
+    private void Page_OnProgress(object? sender, string? e)
+    {
+        SetProgress(e);
+    }
+
+    private async void Page_OnRemove(object? sender, DoomEntry entry)
     {
         await RemoveMod(entry);
     }
 
     private async void RemoveMod_Click(object sender, RoutedEventArgs e)
     {
-        var el = sender as FrameworkElement;
-        var entry = el.DataContext as DoomEntry;
-        await RemoveMod(entry);
+        if (sender is FrameworkElement el)
+        {
+            if (el.DataContext is DoomEntry entry)
+            {
+                await RemoveMod(entry);
+            }
+        }
     }
 
-    private async void Page_OnEdit(object sender, DoomEntry entry)
+    private async void Page_OnEdit(object? sender, DoomEntry entry)
     {
         await EditMod(entry);
     }
 
-    private async void EditMod_Click(object sender, RoutedEventArgs e)
+    private async void EditMod_Click(object? sender, RoutedEventArgs e)
     {
-        var el = sender as FrameworkElement;
-        var entry = el.DataContext as DoomEntry;
-        await EditMod(entry);
+        if (sender is FrameworkElement el)
+        {
+            if (el.DataContext is DoomEntry entry)
+            {
+                await EditMod(entry);
+            }
+        }
     }
 
-    private void Page_OnCopy(object sender, DoomEntry entry)
+    private void Page_OnCopy(object? sender, DoomEntry entry)
     {
         CopyMod(entry);
     }
 
-    private void CopyMod_Click(object sender, RoutedEventArgs e)
+    private void CopyMod_Click(object? sender, RoutedEventArgs e)
     {
-        var el = sender as FrameworkElement;
-        var entry = el.DataContext as DoomEntry;
-        CopyMod(entry);
+        if (sender is FrameworkElement el)
+        {
+            if (el.DataContext is DoomEntry entry)
+            {
+                CopyMod(entry);
+            }
+        }
     }
 
-    private async void Page_OnExport(object sender, DoomEntry entry)
+    private async void Page_OnExport(object? sender, DoomEntry entry)
     {
         await ExportMod(entry);
     }
 
-    private async void ExportMod_Click(object sender, RoutedEventArgs e)
+    private async void ExportMod_Click(object? sender, RoutedEventArgs e)
     {
-        var el = sender as FrameworkElement;
-        var entry = el.DataContext as DoomEntry;
-        await ExportMod(entry);
+        if (sender is FrameworkElement el)
+        {
+            if (el.DataContext is DoomEntry entry)
+            {
+                await ExportMod(entry);
+            }
+        }
     }
 
     private async Task RemoveMod(DoomEntry entry)
@@ -194,14 +222,14 @@ public sealed partial class RootPage : Page
             Description = entry.Description,
             IWadFile = entry.IWadFile,
             UniqueConfig = entry.UniqueConfig,
-            ModFiles = new(entry.ModFiles.Select(file => new NamePath(file.Path))),
+            ModFiles = new(entry.ModFiles.Select(path => path)),
             ImageFiles = new(entry.ImageFiles.Select(path => path)),
         };
         settings.Entries.Add(newEntry);
         DoomList.SelectedItem = newEntry;
     }
 
-    private void Page_OnStart(object sender, DoomEntry entry)
+    private void Page_OnStart(object? sender, DoomEntry entry)
     {
         Start(entry);
     }
@@ -229,39 +257,41 @@ public sealed partial class RootPage : Page
             processInfo.ArgumentList.Add("-config");
             processInfo.ArgumentList.Add(configPath);
         }
-        if (!string.IsNullOrEmpty(entry.IWadFile.Key))
+        if (!string.IsNullOrEmpty(entry.IWadFile))
         {
             processInfo.ArgumentList.Add("-iwad");
-            processInfo.ArgumentList.Add(entry.IWadFile.Key);
+            processInfo.ArgumentList.Add(entry.IWadFile);
         }
         if (entry.ModFiles.Count > 0)
         {
             processInfo.ArgumentList.Add("-file");
-            foreach (var modFile in entry.ModFiles)
+            foreach (var filePath in entry.ModFiles)
             {
-                processInfo.ArgumentList.Add(modFile.Path);
+                processInfo.ArgumentList.Add(filePath);
             }
         }
         var process = Process.Start(processInfo);
-
-        SetForegroundWindow(process.MainWindowHandle);
-
-        if (settings.CloseOnLaunch)
+        if (process != null)
         {
-            Application.Current.Exit();
-        }
-        else if (appWindow.Presenter is OverlappedPresenter presenter)
-        {
-            presenter.Minimize();
-            await process.WaitForExitAsync();
-            presenter.Restore();
-            SetForegroundWindow(hWnd);
+            SetForegroundWindow(process.MainWindowHandle);
+
+            if (settings.CloseOnLaunch)
+            {
+                Application.Current.Exit();
+            }
+            else if (appWindow.Presenter is OverlappedPresenter presenter)
+            {
+                presenter.Minimize();
+                await process.WaitForExitAsync();
+                presenter.Restore();
+                SetForegroundWindow(hWnd);
+            }
         }
     }
 
     private async void Button_Click(object sender, RoutedEventArgs e)
     {
-        if (await AddOrEditModDialogShow(new EditModDialogResult("", "", Settings.IWads.First(), false), false) is EditModDialogResult result)
+        if (await AddOrEditModDialogShow(new EditModDialogResult("", "", "", false), false) is EditModDialogResult result)
         {
             var entry = new DoomEntry()
             {
@@ -296,20 +326,20 @@ public sealed partial class RootPage : Page
             await OpenSettings(true);
             return null;
         }
-        List<KeyValue> filteredIWads = new() { Settings.IWads.First() };
-        var gzDoomFolderPath = Path.GetDirectoryName(settings.GZDoomPath);
-        foreach (var iwad in Settings.IWads)
+        var filteredIWads = new List<KeyValue>() { new KeyValue("", Settings.IWads[""]) };
+        var gzDoomFolderPath = Path.GetDirectoryName(settings.GZDoomPath) ?? "";
+        foreach (var iWad in Settings.IWads.Keys)
         {
-            if (iwad.Key != "" && File.Exists(Path.Combine(gzDoomFolderPath, iwad.Key)))
+            if (iWad != "" && File.Exists(Path.Combine(gzDoomFolderPath, iWad)))
             {
-                filteredIWads.Add(iwad);
+                filteredIWads.Add(new KeyValue(iWad, Settings.IWads[iWad]));
             }
         }
 
         var dialog = new EditModContentDialog(XamlRoot, initial, filteredIWads, isEditMode);
         if (ContentDialogResult.Primary == await dialog.ShowAsync())
         {
-            return new(dialog.ModName, dialog.ModDescription, dialog.IWadFile, dialog.UniqueConfig);
+            return new(dialog.ModName, dialog.ModDescription, dialog.IWadFile.Key, dialog.UniqueConfig);
         }
         return null;
     }
@@ -333,10 +363,9 @@ public sealed partial class RootPage : Page
         WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
 
         // Now we can use the picker object as normal
-        picker.FileTypeFilter.Add(".zip");
+        picker.FileTypeFilter.Add(".gzdl");
 
         var file = await picker.PickSingleFileAsync();
-
         if (file == null)
         {
             return;
@@ -365,35 +394,21 @@ public sealed partial class RootPage : Page
         WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
 
         // Now we can use the picker object as normal
-        picker.FileTypeChoices.Add("Zip archive", new List<string>() { ".zip" });
+        picker.FileTypeChoices.Add("Сборка GZDoomLauncher", new List<string>() { ".gzdl" });
         picker.SuggestedFileName = entry.Name;
 
         var file = await picker.PickSaveFileAsync();
-
         if (file == null)
         {
             return;
         }
 
-        progressIndicator.Visibility = Visibility.Visible;
+        SetProgress($"Экспорт: {file.Name}");
         var zipToCreate = await file.OpenStreamForWriteAsync();
         using var archive = new ZipArchive(zipToCreate, ZipArchiveMode.Create);
-
-        foreach (var modFile in entry.ModFiles)
         {
-            var filePath = modFile.Path;
-            var zipEntry = archive.CreateEntry(Path.Combine("mods", Path.GetFileName(filePath)));
-            using var stream = zipEntry.Open();
-            await File.OpenRead(filePath).CopyToAsync(stream);
-        }
-        if (entry.ImageFiles.Any())
-        {
-            var filePath = entry.ImageFiles.First();
-            var zipEntry = archive.CreateEntry(Path.Combine("images", Path.GetFileName(filePath)));
-            using var stream = zipEntry.Open();
-            await File.OpenRead(filePath).CopyToAsync(stream);
-        }
-        {
+            var fileName = "entry.json";
+            SetProgress($"Экспорт: {fileName}");
             var newEntry = new DoomEntry()
             {
                 Id = entry.Id,
@@ -401,54 +416,78 @@ public sealed partial class RootPage : Page
                 Description = entry.Description,
                 UniqueConfig = entry.UniqueConfig,
                 IWadFile = entry.IWadFile,
-                ModFiles = new(entry.ModFiles.Select(mod => new NamePath(Path.Combine("mods", Path.GetFileName(mod.Path))))),
+                ModFiles = new(entry.ModFiles.Select(path => Path.Combine("mods", Path.GetFileName(path)))),
                 ImageFiles = new(entry.ImageFiles.Select(path => Path.Combine("images", Path.GetFileName(path)))),
             };
             var zipEntry = archive.CreateEntry(Path.Combine("entry.json"));
             using var stream = zipEntry.Open();
-            await JsonSerializer.SerializeAsync(stream, newEntry, Settings.jsonOptions);
+            await JsonSerializer.SerializeAsync(stream, newEntry, JsonSettingsContext.Default.DoomEntry);
         }
-        progressIndicator.Visibility = Visibility.Collapsed;
+        
+        foreach (var filePath in entry.ModFiles)
+        {
+            var fileName = Path.GetFileName(filePath);
+            SetProgress($"Экспорт: {fileName}");
+            var zipEntry = archive.CreateEntry(Path.Combine("mods", fileName));
+            using var stream = zipEntry.Open();
+            await File.OpenRead(filePath).CopyToAsync(stream);
+        }
+        if (entry.ImageFiles.Any())
+        {
+            var filePath = entry.ImageFiles.First();
+            var fileName = Path.GetFileName(filePath);
+            SetProgress($"Экспорт: {fileName}");
+            var zipEntry = archive.CreateEntry(Path.Combine("images", fileName));
+            using var stream = zipEntry.Open();
+            await File.OpenRead(filePath).CopyToAsync(stream);
+        }
+        SetProgress(null);
     }
 
-    private async Task<DoomEntry> ImportModFile(StorageFile file)
+    private async Task<DoomEntry?> ImportModFile(StorageFile file)
     {
-        progressIndicator.Visibility = Visibility.Visible;
+        SetProgress($"Импорт: {file.Name}");
         using var zipToRead = await file.OpenStreamForReadAsync();
         using var archive = new ZipArchive(zipToRead, ZipArchiveMode.Read);
 
         if (archive.Entries.FirstOrDefault(entry => entry.FullName == "entry.json") is ZipArchiveEntry zipEntry)
         {
+            DoomEntry? entry = null;
+            SetProgress($"Импорт: {zipEntry.Name}");
             using var stream = zipEntry.Open();
-            var newEntry = await JsonSerializer.DeserializeAsync<DoomEntry>(stream, Settings.jsonOptions);
-            var entry = new DoomEntry()
+            var newEntry = await JsonSerializer.DeserializeAsync<DoomEntry>(stream, JsonSettingsContext.Default.DoomEntry);
+            if (newEntry != null)
             {
-                Id = newEntry.Id,
-                Name = newEntry.Name,
-                Description = newEntry.Description,
-                UniqueConfig = newEntry.UniqueConfig,
-                IWadFile = newEntry.IWadFile,
-                ModFiles = new(newEntry.ModFiles.Select(mod => new NamePath(Path.Combine(dataFolderPath, mod.Path)))),
-                ImageFiles = new(newEntry.ImageFiles.Select(path => Path.Combine(dataFolderPath, path))),
-            };
-
-            foreach (var zipFileEntry in archive.Entries)
-            {
-                var zipEntryFolder = Path.GetDirectoryName(zipFileEntry.FullName);
-                if (zipEntryFolder == "mods" || zipEntryFolder == "images")
+                entry = new DoomEntry()
                 {
-                    using var fileStream = zipFileEntry.Open();
-                    await Settings.CopyFileWithConfirmation(XamlRoot, fileStream, zipFileEntry.Name, Path.Combine(dataFolderPath, zipEntryFolder));
+                    Id = newEntry.Id,
+                    Name = newEntry.Name,
+                    Description = newEntry.Description,
+                    UniqueConfig = newEntry.UniqueConfig,
+                    IWadFile = newEntry.IWadFile,
+                    ModFiles = new(newEntry.ModFiles.Select(path => Path.Combine(dataFolderPath, path))),
+                    ImageFiles = new(newEntry.ImageFiles.Select(path => Path.Combine(dataFolderPath, path))),
+                };
+
+                foreach (var zipEntryFile in archive.Entries)
+                {
+                    var zipEntryFolder = Path.GetDirectoryName(zipEntryFile.FullName);
+                    if (zipEntryFolder == "mods" || zipEntryFolder == "images")
+                    {
+                        SetProgress($"Импорт: {zipEntryFile.Name}");
+                        using var fileStream = zipEntryFile.Open();
+                        await Settings.CopyFileWithConfirmation(XamlRoot, fileStream, zipEntryFile.Name, Path.Combine(dataFolderPath, zipEntryFolder));
+                    }
                 }
             }
 
-            progressIndicator.Visibility = Visibility.Collapsed;
+            SetProgress(null);
             return entry;
         }
         else
         {
             await AskDialog.ShowAsync(XamlRoot, "Ошибка импорта", $"Некорректный формат файла '{file.Name}'", "Закрыть", "");
-            progressIndicator.Visibility = Visibility.Collapsed;
+            SetProgress(null);
             return null;
         }
     }
@@ -464,7 +503,7 @@ public sealed partial class RootPage : Page
                 if (item is StorageFile file)
                 {
                     var ext = Path.GetExtension(file.Name).ToLowerInvariant();
-                    if (ext == ".zip")
+                    if (ext == ".gzdl")
                     {
                         e.AcceptedOperation = DataPackageOperation.Copy;
                     }
@@ -474,18 +513,18 @@ public sealed partial class RootPage : Page
         deferral.Complete();
     }
 
-    private async void DoomList_Drop(object sender, DragEventArgs e)
+    private async void DoomList_Drop(object? sender, DragEventArgs e)
     {
         if (e.DataView.Contains(StandardDataFormats.StorageItems))
         {
             var items = await e.DataView.GetStorageItemsAsync();
-            DoomEntry lastEntry = null;
+            DoomEntry? lastEntry = null;
             foreach (var item in items)
             {
                 if (item is StorageFile file)
                 {
                     var ext = Path.GetExtension(file.Name).ToLowerInvariant();
-                    if (ext == ".zip")
+                    if (ext == ".gzdl")
                     {
                         var entry = await ImportModFile(file);
                         if (entry != null)

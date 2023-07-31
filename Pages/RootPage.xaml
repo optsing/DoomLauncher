@@ -171,10 +171,19 @@
             Grid.RowSpan="2"
             Visibility="Collapsed"
         >
-            <ProgressRing
+            <StackPanel
+                Orientation="Horizontal"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
-            />
+            >
+                <ProgressRing />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Margin="8,0,0,0"
+                    x:Name="progressIndicatorText"
+                    FontSize="16"
+                />
+            </StackPanel>
         </Border>
     </Grid>
 </Page>

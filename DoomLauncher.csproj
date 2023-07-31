@@ -27,6 +27,7 @@
 		<PublishTrimmed>true</PublishTrimmed>
 		<TrimMode>partial</TrimMode>
 		<DefaultLanguage>ru-RU</DefaultLanguage>
+		<Nullable>enable</Nullable>
 		<!--<WindowsPackageType>None</WindowsPackageType>-->
 	</PropertyGroup>
 	<ItemGroup>

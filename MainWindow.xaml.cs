@@ -48,7 +48,7 @@ public sealed partial class MainWindow : Window
         if (File.Exists(configFilePath))
         {
             var text = File.ReadAllText(configFilePath);
-            settings = JsonSerializer.Deserialize<Settings>(text, Settings.jsonOptions);
+            settings = JsonSerializer.Deserialize<Settings>(text, JsonSettingsContext.Default.Settings) ?? new();
             var backupConfigFilePath = Path.Combine(dataFolderPath, "config.old.json");
             File.Copy(configFilePath, backupConfigFilePath, true);
         }
@@ -111,7 +111,7 @@ public sealed partial class MainWindow : Window
 
     public void Save()
     {
-        var text = JsonSerializer.Serialize<Settings>(settings, Settings.jsonOptions);
+        var text = JsonSerializer.Serialize<Settings>(settings, JsonSettingsContext.Default.Settings);
         File.WriteAllText(configFilePath, text);
     }
 }

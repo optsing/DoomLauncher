@@ -55,17 +55,16 @@ public sealed partial class DoomPage : Page
         {
             var folder = await StorageFolder.GetFolderFromPathAsync(modsFolderPath);
             var files = (await folder.GetFilesAsync())
-                .Where(file => !entry.ModFiles.Any(modFile => modFile.Path == file.Path));
+                .Where(file => !entry.ModFiles.Any(path => path == file.Path));
 
             if (files.Any())
             { 
                 mfAppendFile.Items.Add(new MenuFlyoutSeparator());
                 foreach (var file in files)
                 {
-                    var fileItem = new NamePath(file.Path);
                     var item = new MenuFlyoutItem()
                     {
-                        Text = fileItem.Name,
+                        Text = GetFileTitle(file.Path),
                     };
                     item.Click += async (object sender, RoutedEventArgs e) =>
                     {
@@ -77,12 +76,12 @@ public sealed partial class DoomPage : Page
         }
     }
 
-    public event EventHandler<DoomEntry> OnStart;
-    public event EventHandler<DoomEntry> OnEdit;
-    public event EventHandler<DoomEntry> OnCopy;
-    public event EventHandler<DoomEntry> OnExport;
-    public event EventHandler<DoomEntry> OnRemove;
-    public event EventHandler<bool> OnProgress;
+    public event EventHandler<DoomEntry>? OnStart;
+    public event EventHandler<DoomEntry>? OnEdit;
+    public event EventHandler<DoomEntry>? OnCopy;
+    public event EventHandler<DoomEntry>? OnExport;
+    public event EventHandler<DoomEntry>? OnRemove;
+    public event EventHandler<string?>? OnProgress;
 
     private void Start_Click(object sender, RoutedEventArgs e)
     {
@@ -153,20 +152,25 @@ public sealed partial class DoomPage : Page
     {
         foreach (var file in files)
         {
-            OnProgress?.Invoke(this, true);
+            OnProgress?.Invoke(this, $"Копирование: {file.Name}");
             var targetPath = await Settings.CopyFileWithConfirmation(XamlRoot, file, modsFolderPath);
-            OnProgress?.Invoke(this, false);
+            OnProgress?.Invoke(this, null);
             if (!string.IsNullOrEmpty(targetPath))
             {
-                var newModFile = new NamePath(targetPath);
-                var existModFile = entry.ModFiles.FirstOrDefault(item => item.Name == newModFile.Name);
-                if (existModFile == null)
+                var fileName = GetFileTitle(targetPath);
+                var isInList = false;
+                for (var i = 0; i  < entry.ModFiles.Count; i += 1)
                 {
-                    entry.ModFiles.Add(newModFile);
+                    if (GetFileTitle(entry.ModFiles[i]) == fileName)
+                    {
+                        entry.ModFiles[i] = targetPath;
+                        isInList = true;
+                        break;
+                    }
                 }
-                else
+                if (!isInList)
                 {
-                    existModFile.Path = newModFile.Path;
+                    entry.ModFiles.Add(targetPath);
                 }
             }
         }
@@ -175,9 +179,9 @@ public sealed partial class DoomPage : Page
 
     private async Task SetImage(StorageFile file)
     {
-        OnProgress?.Invoke(this, true);
+        OnProgress?.Invoke(this, $"Копирование: {file.Name}");
         var targetPath = await Settings.CopyFileWithConfirmation(XamlRoot, file, imagesFolderPath);
-        OnProgress?.Invoke(this, false);
+        OnProgress?.Invoke(this, "");
         if (!string.IsNullOrEmpty(targetPath))
         {
             entry.ImageFiles.Clear();
@@ -185,7 +189,7 @@ public sealed partial class DoomPage : Page
         }
     }
 
-    public static BitmapImage GetCurrentBackground(IEnumerable<string> list)
+    public static BitmapImage? GetCurrentBackground(IEnumerable<string> list)
     {
         if (list.Any())
         {
@@ -281,24 +285,38 @@ public sealed partial class DoomPage : Page
 
     private void OpenContainFolder_Click(object sender, RoutedEventArgs e)
     {
-        var button = sender as Button;
-        var file = button.DataContext as NamePath;
-        Process.Start("explorer.exe", "/select," + file.Path);
+        if (sender is FrameworkElement el)
+        {
+            if (el.DataContext is string filePath)
+            {
+                Process.Start("explorer.exe", "/select," + filePath);
+            }
+        }
     }
 
     private async void RemoveFile_Click(object sender, RoutedEventArgs e)
     {
-        var button = sender as Button;
-        var file = button.DataContext as NamePath;
-        if (await AskDialog.ShowAsync(XamlRoot, "Удаление ссылки на файл", $"Вы уверены, что хотите удалить ссылку на файл '{file.Name}'?", "Удалить", "Отмена"))
+        if (sender is FrameworkElement el)
         {
-            entry.ModFiles.Remove(file);
-            RefillFileMenu();
+            if (el.DataContext is string filePath)
+            {
+                var fileName = GetFileTitle(filePath);
+                if (await AskDialog.ShowAsync(XamlRoot, "Удаление ссылки на файл", $"Вы уверены, что хотите удалить ссылку на файл '{fileName}'?", "Удалить", "Отмена"))
+                {
+                    entry.ModFiles.Remove(filePath);
+                    RefillFileMenu();
+                }
+            }
         }
     }
 
     private void RemoveBackground_Click(object sender, RoutedEventArgs e)
     {
         entry.ImageFiles.Clear();
+    }
+
+    public static string GetFileTitle(string filePath)
+    {
+        return Path.GetFileName(filePath);
     }
 }
