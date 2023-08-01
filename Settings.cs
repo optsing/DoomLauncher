@@ -130,6 +130,14 @@ public partial class DoomEntry: ObservableObject
 
     public string Id { get; set; } = "";
 
+    public int selectedImageIndex = 0;
+
+    public int SelectedImageIndex
+    {
+        get => selectedImageIndex;
+        set => SetProperty(ref selectedImageIndex, value);
+    }
+
     public ObservableCollection<string> ImageFiles { get; set; } = new();
     public ObservableCollection<string> ModFiles { get; set; } = new();
 }
