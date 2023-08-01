@@ -78,7 +78,7 @@
                                 <SymbolIcon Symbol="Copy" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
-                        <MenuFlyoutItem Text="Экспорт сборки" Click="ExportMod_Click">
+                        <MenuFlyoutItem Text="Экспортировать сборку" Click="ExportMod_Click">
                             <MenuFlyoutItem.Icon>
                                 <SymbolIcon Symbol="Download" />
                             </MenuFlyoutItem.Icon>
