@@ -10,9 +10,9 @@
     mc:Ignorable="d"
     Background="Transparent"
 >
-    <Grid RowDefinitions="Auto,*">
+    <Grid RowDefinitions="Auto,*,Auto">
         <Image
-            Grid.RowSpan="2"
+            Grid.RowSpan="3"
             Source="{x:Bind local:DoomPage.GetCurrentBackground(entry.ImageFiles, entry.SelectedImageIndex), Mode=OneWay}"
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
@@ -20,7 +20,7 @@
             Stretch="UniformToFill"
         />
         <StackPanel
-            Grid.RowSpan="2"
+            Grid.RowSpan="3"
             Orientation="Horizontal"
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
@@ -56,18 +56,6 @@
             <DropDownButton Grid.Column="2" Margin="4,8" VerticalAlignment="Center">
                 <DropDownButton.Flyout>
                     <MenuFlyout Placement="Bottom">
-                        <MenuFlyoutItem Text="Добавить фон" Click="AddBackground_Click">
-                            <MenuFlyoutItem.Icon>
-                                <SymbolIcon Symbol="Pictures" />
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
-                        <MenuFlyoutItem Text="Следующий фон" Click="NextBackground_Click" IsEnabled="{x:Bind local:DoomPage.HasMoreItems(entry.ImageFiles.Count, 1), Mode=OneWay}">
-                            <MenuFlyoutItem.Icon>
-                                <SymbolIcon Symbol="Next" />
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
-                        <MenuFlyoutItem Text="Удалить фон" Click="RemoveBackground_Click" IsEnabled="{x:Bind local:DoomPage.HasMoreItems(entry.ImageFiles.Count, 0), Mode=OneWay}"/>
-                        <MenuFlyoutSeparator />
                         <MenuFlyoutItem Text="Настроить сборку" Click="EditMod_Click">
                             <MenuFlyoutItem.Icon>
                                 <SymbolIcon Symbol="Edit" />
@@ -90,10 +78,7 @@
                         </MenuFlyoutItem>
                     </MenuFlyout>
                 </DropDownButton.Flyout>
-                <StackPanel Orientation="Horizontal">
-                    <SymbolIcon Symbol="More" Margin="0,0,4,0"/>
-                    <TextBlock>Меню</TextBlock>
-                </StackPanel>
+                <SymbolIcon Symbol="More"/>
             </DropDownButton>
             <Button Grid.Column="3" Width="180" Margin="4,8,8,8" VerticalAlignment="Center" Click="Start_Click" Style="{ThemeResource AccentButtonStyle}">
                 <StackPanel Orientation="Horizontal">
@@ -145,5 +130,50 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
+        <StackPanel
+            Grid.Row="2"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right"
+        >
+            <Button
+                ToolTipService.ToolTip="Добавить фон"
+                Click="AddBackground_Click"
+                Style="{ThemeResource EllipsisButton}"
+                Height="40"
+                Width="40"
+            >
+                <FontIcon Glyph="&#xE7C5;" FontSize="16" />
+            </Button>
+            <Button
+                ToolTipService.ToolTip="Предыдущий фон"
+                Click="PreviousBackground_Click" 
+                Style="{ThemeResource EllipsisButton}"
+                Height="40"
+                Width="40"
+                IsEnabled="{x:Bind local:DoomPage.HasMoreItems(entry.ImageFiles.Count, 1), Mode=OneWay}"
+            >
+                <FontIcon Glyph="&#xE892;" FontSize="16" />
+            </Button>
+            <Button
+                ToolTipService.ToolTip="Следующий фон"
+                Click="NextBackground_Click" 
+                Style="{ThemeResource EllipsisButton}"
+                Height="40"
+                Width="40"
+                IsEnabled="{x:Bind local:DoomPage.HasMoreItems(entry.ImageFiles.Count, 1), Mode=OneWay}"
+            >
+                <FontIcon Glyph="&#xE893;" FontSize="16" />
+            </Button>
+            <Button
+                ToolTipService.ToolTip="Удалить фон"
+                Style="{ThemeResource EllipsisButton}"
+                Click="RemoveBackground_Click"
+                Height="40"
+                Width="40"
+                IsEnabled="{x:Bind local:DoomPage.HasMoreItems(entry.ImageFiles.Count, 0), Mode=OneWay}"
+            >
+                <FontIcon Glyph="&#xE74D;" FontSize="16" />
+            </Button>
+        </StackPanel>
     </Grid>
 </Page>

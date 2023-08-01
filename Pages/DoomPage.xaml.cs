@@ -151,6 +151,18 @@ public sealed partial class DoomPage : Page
         }
     }
 
+    private void PreviousBackground_Click(object sender, RoutedEventArgs e)
+    {
+        if (entry.SelectedImageIndex > 0)
+        {
+            entry.SelectedImageIndex -= 1;
+        }
+        else
+        {
+            entry.SelectedImageIndex = entry.ImageFiles.Count - 1;
+        }
+    }
+
     private void NextBackground_Click(object sender, RoutedEventArgs e)
     {
         if (entry.SelectedImageIndex < entry.ImageFiles.Count - 1)
