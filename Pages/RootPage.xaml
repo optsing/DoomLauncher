@@ -47,7 +47,7 @@
                                 <MenuFlyoutItem
                                     Click="ImportButton_Click"
                                     HorizontalAlignment="Stretch"
-                                    Text="Импортировать сборку"
+                                    Text="Импортировать сборки"
                                 >
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE898;" FontSize="16" />

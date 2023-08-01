@@ -222,6 +222,7 @@ public sealed partial class RootPage : Page
             Description = entry.Description,
             IWadFile = entry.IWadFile,
             UniqueConfig = entry.UniqueConfig,
+            SelectedImageIndex = entry.SelectedImageIndex,
             ModFiles = new(entry.ModFiles.Select(path => path)),
             ImageFiles = new(entry.ImageFiles.Select(path => path)),
         };
@@ -300,6 +301,7 @@ public sealed partial class RootPage : Page
                 Description = result.description,
                 IWadFile = result.iWadFile,
                 UniqueConfig = result.uniqueConfig,
+                SelectedImageIndex = 0,
             };
             settings.Entries.Add(entry);
             DoomList.SelectedItem = entry;
@@ -365,18 +367,11 @@ public sealed partial class RootPage : Page
         // Now we can use the picker object as normal
         picker.FileTypeFilter.Add(".gzdl");
 
-        var file = await picker.PickSingleFileAsync();
-        if (file == null)
-        {
-            return;
-        }
+        var files = await picker.PickMultipleFilesAsync();
 
-        var entry = await ImportModFile(file);
-
-        if (entry != null)
+        if (files.Any())
         {
-            settings.Entries.Add(entry);
-            DoomList.SelectedItem = entry;
+            await AddEntries(files);
         }
     }
 
@@ -404,11 +399,11 @@ public sealed partial class RootPage : Page
         }
 
         SetProgress($"Экспорт: {file.Name}");
-        var zipToCreate = await file.OpenStreamForWriteAsync();
-        using var archive = new ZipArchive(zipToCreate, ZipArchiveMode.Create);
+        var zipToWrite = await file.OpenStreamForWriteAsync();
+        using var archive = new ZipArchive(zipToWrite, ZipArchiveMode.Create);
 
-        var zipEntry = archive.CreateEntry(Path.Combine("entry.json"));
-        using (var stream = zipEntry.Open())
+        var zipConfigEntry = archive.CreateEntry(Path.Combine("entry.json"));
+        using (var configStream = zipConfigEntry.Open())
         {
             var fileName = "entry.json";
             SetProgress($"Экспорт: {fileName}");
@@ -417,12 +412,13 @@ public sealed partial class RootPage : Page
                 Id = entry.Id,
                 Name = entry.Name,
                 Description = entry.Description,
-                UniqueConfig = entry.UniqueConfig,
                 IWadFile = entry.IWadFile,
+                UniqueConfig = entry.UniqueConfig,
+                SelectedImageIndex = entry.SelectedImageIndex,
                 ModFiles = new(entry.ModFiles.Select(path => Path.Combine("mods", Path.GetFileName(path)))),
                 ImageFiles = new(entry.ImageFiles.Select(path => Path.Combine("images", Path.GetFileName(path)))),
             };
-            await JsonSerializer.SerializeAsync(stream, newEntry, JsonSettingsContext.Default.DoomEntry);
+            await JsonSerializer.SerializeAsync(configStream, newEntry, JsonSettingsContext.Default.DoomEntry);
         }
 
         foreach (var filePath in entry.ModFiles)
@@ -450,21 +446,22 @@ public sealed partial class RootPage : Page
         using var zipToRead = await file.OpenStreamForReadAsync();
         using var archive = new ZipArchive(zipToRead, ZipArchiveMode.Read);
 
-        if (archive.Entries.FirstOrDefault(entry => entry.FullName == "entry.json") is ZipArchiveEntry zipEntry)
+        if (archive.Entries.FirstOrDefault(entry => entry.FullName == "entry.json") is ZipArchiveEntry zipConfigEntry)
         {
             DoomEntry? entry = null;
-            SetProgress($"Импорт: {zipEntry.Name}");
-            using var stream = zipEntry.Open();
-            var newEntry = await JsonSerializer.DeserializeAsync<DoomEntry>(stream, JsonSettingsContext.Default.DoomEntry);
+            SetProgress($"Импорт: {zipConfigEntry.Name}");
+            using var configStream = zipConfigEntry.Open();
+            var newEntry = await JsonSerializer.DeserializeAsync(configStream, JsonSettingsContext.Default.DoomEntry);
             if (newEntry != null)
             {
                 entry = new DoomEntry()
                 {
-                    Id = newEntry.Id,
+                    Id = Guid.NewGuid().ToString(),
                     Name = newEntry.Name,
                     Description = newEntry.Description,
-                    UniqueConfig = newEntry.UniqueConfig,
                     IWadFile = newEntry.IWadFile,
+                    UniqueConfig = newEntry.UniqueConfig,
+                    SelectedImageIndex = newEntry.SelectedImageIndex,
                     ModFiles = new(newEntry.ModFiles.Select(path => Path.Combine(dataFolderPath, path))),
                     ImageFiles = new(newEntry.ImageFiles.Select(path => Path.Combine(dataFolderPath, path))),
                 };
@@ -479,6 +476,9 @@ public sealed partial class RootPage : Page
                         await Settings.CopyFileWithConfirmation(XamlRoot, fileStream, zipFileEntry.Name, Path.Combine(dataFolderPath, zipEntryFolder));
                     }
                 }
+
+                SetProgress(null);
+                return entry;
             }
         }
         await AskDialog.ShowAsync(XamlRoot, "Ошибка импорта", $"Некорректный формат файла '{file.Name}'", "Закрыть", "");
@@ -500,6 +500,7 @@ public sealed partial class RootPage : Page
                     if (ext == ".gzdl")
                     {
                         e.AcceptedOperation = DataPackageOperation.Copy;
+                        break;
                     }
                 }
             }
@@ -512,7 +513,7 @@ public sealed partial class RootPage : Page
         if (e.DataView.Contains(StandardDataFormats.StorageItems))
         {
             var items = await e.DataView.GetStorageItemsAsync();
-            DoomEntry? lastEntry = null;
+            var entries = new List<StorageFile>();
             foreach (var item in items)
             {
                 if (item is StorageFile file)
@@ -520,19 +521,32 @@ public sealed partial class RootPage : Page
                     var ext = Path.GetExtension(file.Name).ToLowerInvariant();
                     if (ext == ".gzdl")
                     {
-                        var entry = await ImportModFile(file);
-                        if (entry != null)
-                        {
-                            settings.Entries.Add(entry);
-                            lastEntry = entry;
-                        }
+                        entries.Add(file);
                     }
                 }
             }
-            if (lastEntry != null)
+            if (entries.Any())
             {
-                DoomList.SelectedItem = lastEntry;
+                await AddEntries(entries);
             }
+        }
+    }
+
+    private async Task AddEntries(IEnumerable<StorageFile> files)
+    {
+        DoomEntry? lastEntry = null;
+        foreach (var file in files)
+        { 
+            var entry = await ImportModFile(file);
+            if (entry != null)
+            {
+                settings.Entries.Add(entry);
+                lastEntry = entry;
+            }
+        }
+        if (lastEntry != null)
+        {
+            DoomList.SelectedItem = lastEntry;
         }
     }
 }
