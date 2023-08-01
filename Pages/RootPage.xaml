@@ -39,14 +39,27 @@
                     x:Name="gridPane"
                     Background="{ThemeResource SystemControlPageBackgroundChromeLowBrush}"
                     CornerRadius="8"
-                    RowDefinitions="48,Auto,*,Auto, Auto"
+                    RowDefinitions="48,Auto,*,Auto"
                 >
-                    <Button Grid.Row="1" Click="Button_Click" HorizontalAlignment="Stretch" Margin="8">
+                    <SplitButton Grid.Row="1" Click="Button_Click" HorizontalAlignment="Stretch" Margin="8">
+                        <SplitButton.Flyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem
+                                    Click="ImportButton_Click"
+                                    HorizontalAlignment="Stretch"
+                                    Text="Импортировать сборку"
+                                >
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE898;" FontSize="16" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                            </MenuFlyout>
+                        </SplitButton.Flyout>
                         <StackPanel Orientation="Horizontal">
                             <SymbolIcon Symbol="Add" Margin="0,0,4,0" />
                             <TextBlock>Создать сборку</TextBlock>
                         </StackPanel>
-                    </Button>
+                    </SplitButton>
                     <ListView
                         x:Name="DoomList"
                         SelectionMode="Single"
@@ -106,20 +119,9 @@
                         </ListView.ItemTemplate>
                     </ListView>
                     <Button
-                        Grid.Row="3"
-                        Click="ImportButton_Click"
-                        Margin="8,8,8,4"
-                        HorizontalAlignment="Stretch"
-                    >
-                        <StackPanel Orientation="Horizontal">
-                            <FontIcon Glyph="&#xE898;" FontSize="16" />
-                            <TextBlock>Импорт сборки</TextBlock>
-                        </StackPanel>
-                    </Button>
-                    <Button
                         Grid.Row="4"
                         Click="SettingsButton_Click"
-                        Margin="8,4,8,8"
+                        Margin="8"
                         HorizontalAlignment="Stretch"
                     >
                         <StackPanel Orientation="Horizontal">

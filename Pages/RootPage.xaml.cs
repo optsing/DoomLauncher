@@ -289,7 +289,7 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private async void Button_Click(object sender, RoutedEventArgs e)
+    private async void Button_Click(object sender, SplitButtonClickEventArgs e)
     {
         if (await AddOrEditModDialogShow(new EditModDialogResult("", "", "", false), false) is EditModDialogResult result)
         {
@@ -406,6 +406,9 @@ public sealed partial class RootPage : Page
         SetProgress($"Экспорт: {file.Name}");
         var zipToCreate = await file.OpenStreamForWriteAsync();
         using var archive = new ZipArchive(zipToCreate, ZipArchiveMode.Create);
+
+        var zipEntry = archive.CreateEntry(Path.Combine("entry.json"));
+        using (var stream = zipEntry.Open())
         {
             var fileName = "entry.json";
             SetProgress($"Экспорт: {fileName}");
@@ -419,27 +422,24 @@ public sealed partial class RootPage : Page
                 ModFiles = new(entry.ModFiles.Select(path => Path.Combine("mods", Path.GetFileName(path)))),
                 ImageFiles = new(entry.ImageFiles.Select(path => Path.Combine("images", Path.GetFileName(path)))),
             };
-            var zipEntry = archive.CreateEntry(Path.Combine("entry.json"));
-            using var stream = zipEntry.Open();
             await JsonSerializer.SerializeAsync(stream, newEntry, JsonSettingsContext.Default.DoomEntry);
         }
-        
+
         foreach (var filePath in entry.ModFiles)
         {
             var fileName = Path.GetFileName(filePath);
             SetProgress($"Экспорт: {fileName}");
-            var zipEntry = archive.CreateEntry(Path.Combine("mods", fileName));
-            using var stream = zipEntry.Open();
-            await File.OpenRead(filePath).CopyToAsync(stream);
+            var zipFileEntry = archive.CreateEntry(Path.Combine("mods", fileName));
+            using var fileStream = zipFileEntry.Open();
+            await File.OpenRead(filePath).CopyToAsync(fileStream);
         }
-        if (entry.ImageFiles.Any())
+        foreach (var filePath in entry.ImageFiles)
         {
-            var filePath = entry.ImageFiles.First();
             var fileName = Path.GetFileName(filePath);
             SetProgress($"Экспорт: {fileName}");
-            var zipEntry = archive.CreateEntry(Path.Combine("images", fileName));
-            using var stream = zipEntry.Open();
-            await File.OpenRead(filePath).CopyToAsync(stream);
+            var zipFileEntry = archive.CreateEntry(Path.Combine("images", fileName));
+            using var fileStream = zipFileEntry.Open();
+            await File.OpenRead(filePath).CopyToAsync(fileStream);
         }
         SetProgress(null);
     }
@@ -469,27 +469,21 @@ public sealed partial class RootPage : Page
                     ImageFiles = new(newEntry.ImageFiles.Select(path => Path.Combine(dataFolderPath, path))),
                 };
 
-                foreach (var zipEntryFile in archive.Entries)
+                foreach (var zipFileEntry in archive.Entries)
                 {
-                    var zipEntryFolder = Path.GetDirectoryName(zipEntryFile.FullName);
+                    var zipEntryFolder = Path.GetDirectoryName(zipFileEntry.FullName);
                     if (zipEntryFolder == "mods" || zipEntryFolder == "images")
                     {
-                        SetProgress($"Импорт: {zipEntryFile.Name}");
-                        using var fileStream = zipEntryFile.Open();
-                        await Settings.CopyFileWithConfirmation(XamlRoot, fileStream, zipEntryFile.Name, Path.Combine(dataFolderPath, zipEntryFolder));
+                        SetProgress($"Импорт: {zipFileEntry.Name}");
+                        using var fileStream = zipFileEntry.Open();
+                        await Settings.CopyFileWithConfirmation(XamlRoot, fileStream, zipFileEntry.Name, Path.Combine(dataFolderPath, zipEntryFolder));
                     }
                 }
             }
-
-            SetProgress(null);
-            return entry;
         }
-        else
-        {
-            await AskDialog.ShowAsync(XamlRoot, "Ошибка импорта", $"Некорректный формат файла '{file.Name}'", "Закрыть", "");
-            SetProgress(null);
-            return null;
-        }
+        await AskDialog.ShowAsync(XamlRoot, "Ошибка импорта", $"Некорректный формат файла '{file.Name}'", "Закрыть", "");
+        SetProgress(null);
+        return null;
     }
 
     private async void DoomList_DragOver(object sender, DragEventArgs e)

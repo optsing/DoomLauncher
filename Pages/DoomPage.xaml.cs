@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
+using static System.Net.WebRequestMethods;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -128,7 +129,7 @@ public sealed partial class DoomPage : Page
         }
     }
 
-    private async void Background_Click(object sender, RoutedEventArgs e)
+    private async void AddBackground_Click(object sender, RoutedEventArgs e)
     {
         var picker = new Windows.Storage.Pickers.FileOpenPicker();
 
@@ -141,10 +142,21 @@ public sealed partial class DoomPage : Page
             picker.FileTypeFilter.Add(fileExtension);
         }
 
-        var file = await picker.PickSingleFileAsync();
-        if (file != null)
+        var files = await picker.PickMultipleFilesAsync();
+        if (files.Any())
         {
-            await SetImage(file);
+            await AddImages(files);
+        }
+    }
+
+    private void NextBackground_Click(object sender, RoutedEventArgs e)
+    {
+        if (entry.SelectedImageIndex < entry.ImageFiles.Count - 1)
+        {
+            entry.SelectedImageIndex += 1;
+        } else
+        {
+            entry.SelectedImageIndex = 0;
         }
     }
 
@@ -154,7 +166,6 @@ public sealed partial class DoomPage : Page
         {
             OnProgress?.Invoke(this, $"Копирование: {file.Name}");
             var targetPath = await Settings.CopyFileWithConfirmation(XamlRoot, file, modsFolderPath);
-            OnProgress?.Invoke(this, null);
             if (!string.IsNullOrEmpty(targetPath))
             {
                 var fileName = GetFileTitle(targetPath);
@@ -174,35 +185,42 @@ public sealed partial class DoomPage : Page
                 }
             }
         }
+        OnProgress?.Invoke(this, null);
         RefillFileMenu();
     }
 
-    private async Task SetImage(StorageFile file)
+    private async Task AddImages(IEnumerable<StorageFile> files)
     {
-        OnProgress?.Invoke(this, $"Копирование: {file.Name}");
-        var targetPath = await Settings.CopyFileWithConfirmation(XamlRoot, file, imagesFolderPath);
-        OnProgress?.Invoke(this, "");
-        if (!string.IsNullOrEmpty(targetPath))
+        bool hasAddedImages = false;
+        foreach (var file in files)
         {
-            entry.ImageFiles.Clear();
-            entry.ImageFiles.Add(targetPath);
+            OnProgress?.Invoke(this, $"Копирование: {file.Name}");
+            var targetPath = await Settings.CopyFileWithConfirmation(XamlRoot, file, imagesFolderPath);
+            if (!string.IsNullOrEmpty(targetPath))
+            {
+                entry.ImageFiles.Add(targetPath);
+                hasAddedImages = true;
+            }
+        }
+        OnProgress?.Invoke(this, "");
+        if (hasAddedImages)
+        {
+            entry.SelectedImageIndex = entry.ImageFiles.Count - 1;
         }
     }
 
-    public static BitmapImage? GetCurrentBackground(IEnumerable<string> list)
+    public static BitmapImage? GetCurrentBackground(IList<string> list, int selectedImageIndex)
     {
-        if (list.Any())
+        if (list.Any() && selectedImageIndex < list.Count)
         {
-            return new BitmapImage(new Uri(list.First()));
+            return new BitmapImage(new Uri(list[selectedImageIndex]));
         }
-        //var path = Path.GetFullPath("Assets/DefaultCover.jpg");
-        //return new BitmapImage(new Uri(path));
         return null;
     }
 
-    public static bool HasItems(int itemsCount)
+    public static bool HasMoreItems(int itemsCount, int count)
     {
-        return itemsCount > 0;
+        return itemsCount > count;
     }
 
     public static Visibility HasNoItems(int itemsCount)
@@ -279,7 +297,7 @@ public sealed partial class DoomPage : Page
         }
         if (images.Count > 0)
         {
-            await SetImage(images[0]);
+            await AddImages(images);
         }
     }
 
@@ -310,9 +328,15 @@ public sealed partial class DoomPage : Page
         }
     }
 
-    private void RemoveBackground_Click(object sender, RoutedEventArgs e)
+    private async void RemoveBackground_Click(object sender, RoutedEventArgs e)
     {
-        entry.ImageFiles.Clear();
+        if (entry.SelectedImageIndex < entry.ImageFiles.Count)
+        {
+            if (await AskDialog.ShowAsync(XamlRoot, "Удаление фона", $"Вы уверены, что хотите удалить текущий фон?", "Удалить", "Отмена"))
+            {
+                entry.ImageFiles.RemoveAt(entry.SelectedImageIndex);
+            }
+        }
     }
 
     public static string GetFileTitle(string filePath)

@@ -13,7 +13,7 @@
     <Grid RowDefinitions="Auto,*">
         <Image
             Grid.RowSpan="2"
-            Source="{x:Bind local:DoomPage.GetCurrentBackground(entry.ImageFiles), Mode=OneWay}"
+            Source="{x:Bind local:DoomPage.GetCurrentBackground(entry.ImageFiles, entry.SelectedImageIndex), Mode=OneWay}"
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
             Opacity="0.25"
@@ -41,27 +41,32 @@
                 Style="{ThemeResource BaseTextBlockStyle}"
                 TextWrapping="NoWrap"
             />
-            <Button Grid.Column="1" Margin="4,8">
-                <Button.Flyout>
+            <DropDownButton Grid.Column="1" Margin="4,8">
+                <DropDownButton.Flyout>
                     <MenuFlyout
                         Placement="Bottom"
                         x:Name="mfAppendFile"
                     />
-                </Button.Flyout>
+                </DropDownButton.Flyout>
                 <StackPanel Orientation="Horizontal">
                     <SymbolIcon Symbol="Add" Height="18" Margin="0,0,4,0"/>
                     <TextBlock>Добавить</TextBlock>
                 </StackPanel>
-            </Button>
-            <Button Grid.Column="2" Margin="4,8" VerticalAlignment="Center">
-                <Button.Flyout>
+            </DropDownButton>
+            <DropDownButton Grid.Column="2" Margin="4,8" VerticalAlignment="Center">
+                <DropDownButton.Flyout>
                     <MenuFlyout Placement="Bottom">
-                        <MenuFlyoutItem Text="Изменить фон" Click="Background_Click">
+                        <MenuFlyoutItem Text="Добавить фон" Click="AddBackground_Click">
                             <MenuFlyoutItem.Icon>
                                 <SymbolIcon Symbol="Pictures" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
-                        <MenuFlyoutItem Text="Убрать фон" Click="RemoveBackground_Click" IsEnabled="{x:Bind local:DoomPage.HasItems(entry.ImageFiles.Count), Mode=OneWay}"/>
+                        <MenuFlyoutItem Text="Следующий фон" Click="NextBackground_Click" IsEnabled="{x:Bind local:DoomPage.HasMoreItems(entry.ImageFiles.Count, 1), Mode=OneWay}">
+                            <MenuFlyoutItem.Icon>
+                                <SymbolIcon Symbol="Next" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="Удалить фон" Click="RemoveBackground_Click" IsEnabled="{x:Bind local:DoomPage.HasMoreItems(entry.ImageFiles.Count, 0), Mode=OneWay}"/>
                         <MenuFlyoutSeparator />
                         <MenuFlyoutItem Text="Настроить сборку" Click="EditMod_Click">
                             <MenuFlyoutItem.Icon>
@@ -84,19 +89,12 @@
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
                     </MenuFlyout>
-                </Button.Flyout>
+                </DropDownButton.Flyout>
                 <StackPanel Orientation="Horizontal">
-                    <AnimatedIcon Height="18" Margin="0,0,4,0">
-                        <AnimatedIcon.Source>
-                            <animatedvisuals:AnimatedSettingsVisualSource />
-                        </AnimatedIcon.Source>
-                        <AnimatedIcon.FallbackIconSource>
-                            <SymbolIconSource Symbol="Setting"/>
-                        </AnimatedIcon.FallbackIconSource>
-                    </AnimatedIcon>
-                    <TextBlock>Параметры</TextBlock>
+                    <SymbolIcon Symbol="More" Margin="0,0,4,0"/>
+                    <TextBlock>Меню</TextBlock>
                 </StackPanel>
-            </Button>
+            </DropDownButton>
             <Button Grid.Column="3" Width="180" Margin="4,8,8,8" VerticalAlignment="Center" Click="Start_Click" Style="{ThemeResource AccentButtonStyle}">
                 <StackPanel Orientation="Horizontal">
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7FC;" Margin="0,0,4,0" />
