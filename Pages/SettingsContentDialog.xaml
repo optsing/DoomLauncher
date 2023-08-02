@@ -6,11 +6,12 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    DefaultButton="Primary"    
+    DefaultButton="Primary"
     PrimaryButtonText="Сохранить"
+    CloseButtonText="Отмена"
     Style="{ThemeResource DefaultContentDialogStyle}"
     Title="Настройки"
-    Closing="ContentDialog_Closing"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
 >
 
     <StackPanel Width="420">

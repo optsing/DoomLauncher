@@ -44,14 +44,6 @@ public sealed partial class RootPage : Page
         DoomList.SelectedIndex = settings.SelectedModIndex;
     }
 
-    private async void Page_Loaded(object sender, RoutedEventArgs e)
-    {
-        if (!Settings.ValidateGZDoomPath(settings.GZDoomPath))
-        {
-            await OpenSettings(true);
-        }
-    }
-
     private void TitleBar_SizeChanged(object sender, SizeChangedEventArgs e)
     {
         SetDragRegion();
@@ -239,8 +231,11 @@ public sealed partial class RootPage : Page
     {
         if (!Settings.ValidateGZDoomPath(settings.GZDoomPath))
         {
-            await OpenSettings(true);
-            return;
+            var success = await OpenSettings();
+            if (!success)
+            {
+                return;
+            }
         }
         ProcessStartInfo processInfo = new()
         {
@@ -308,25 +303,30 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private async Task OpenSettings(bool forceGZDoomPathSetup)
+    private async Task<bool> OpenSettings()
     {
         var dialog = new SettingsContentDialog(XamlRoot, hWnd, new() {
             GZDoomPath = settings.GZDoomPath,
             CloseOnLaunch = settings.CloseOnLaunch,
-        }, forceGZDoomPathSetup);
+        });
         if (ContentDialogResult.Primary == await dialog.ShowAsync())
         {
             settings.GZDoomPath = dialog.State.GZDoomPath;
             settings.CloseOnLaunch = dialog.State.CloseOnLaunch;
+            return true;
         }
+        return false;
     }
 
     public async Task<EditModDialogResult?> AddOrEditModDialogShow(EditModDialogResult initial, bool isEditMode)
     {
         if (!Settings.ValidateGZDoomPath(settings.GZDoomPath))
         {
-            await OpenSettings(true);
-            return null;
+            var success = await OpenSettings();
+            if (!success)
+            {
+                return null;
+            }
         }
         var filteredIWads = new List<KeyValue>() { new KeyValue("", Settings.IWads[""]) };
         var gzDoomFolderPath = Path.GetDirectoryName(settings.GZDoomPath) ?? "";
@@ -353,8 +353,7 @@ public sealed partial class RootPage : Page
 
     private async void SettingsButton_Click(object sender, RoutedEventArgs e)
     {
-        bool forceGZDoomPathSetup = !Settings.ValidateGZDoomPath(settings.GZDoomPath);
-        await OpenSettings(forceGZDoomPathSetup);
+        await OpenSettings();
     }
 
     private async void ImportButton_Click(object sender, RoutedEventArgs e)
