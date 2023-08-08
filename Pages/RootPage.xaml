@@ -41,7 +41,7 @@
                     CornerRadius="8"
                     RowDefinitions="48,Auto,*,Auto"
                 >
-                    <SplitButton Grid.Row="1" Click="Button_Click" HorizontalAlignment="Stretch" Margin="8">
+                    <SplitButton Grid.Row="1" Click="CreateMod_Click" HorizontalAlignment="Stretch" Margin="8">
                         <SplitButton.Flyout>
                             <MenuFlyout>
                                 <MenuFlyoutItem

@@ -44,6 +44,8 @@ public sealed partial class RootPage : Page
         DoomList.SelectedIndex = settings.SelectedModIndex;
     }
 
+    public event EventHandler? OnSave;
+
     private void TitleBar_SizeChanged(object sender, SizeChangedEventArgs e)
     {
         SetDragRegion();
@@ -82,10 +84,10 @@ public sealed partial class RootPage : Page
 
     private void DoomList_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (DoomList.SelectedItem is DoomEntry item)
+        if (DoomList.SelectedItem is DoomEntry entry)
         {
             settings.SelectedModIndex = DoomList.SelectedIndex;
-            DoomPage page = new(item, hWnd, dataFolderPath, settings);
+            DoomPage page = new(entry, hWnd, dataFolderPath);
             page.OnStart += Page_OnStart;
             page.OnEdit += Page_OnEdit;
             page.OnCopy += Page_OnCopy;
@@ -191,6 +193,7 @@ public sealed partial class RootPage : Page
         if (await AskDialog.ShowAsync(XamlRoot, "Удаление сборки", $"Вы уверены, что хотите удалить сборку '{entry.Name}'?", "Удалить", "Отмена"))
         {
             settings.Entries.Remove(entry);
+            OnSave?.Invoke(this, new EventArgs());
         }
     }
 
@@ -202,6 +205,7 @@ public sealed partial class RootPage : Page
             entry.Description = result.description;
             entry.IWadFile = result.iWadFile;
             entry.UniqueConfig = result.uniqueConfig;
+            OnSave?.Invoke(this, new EventArgs());
         }
     }
 
@@ -220,6 +224,7 @@ public sealed partial class RootPage : Page
         };
         settings.Entries.Add(newEntry);
         DoomList.SelectedItem = newEntry;
+        OnSave?.Invoke(this, new EventArgs());
     }
 
     private void Page_OnStart(object? sender, DoomEntry entry)
@@ -285,7 +290,7 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private async void Button_Click(object sender, SplitButtonClickEventArgs e)
+    private async void CreateMod_Click(object sender, SplitButtonClickEventArgs e)
     {
         if (await AddOrEditModDialogShow(new EditModDialogResult("", "", "", false), false) is EditModDialogResult result)
         {
@@ -300,6 +305,7 @@ public sealed partial class RootPage : Page
             };
             settings.Entries.Add(entry);
             DoomList.SelectedItem = entry;
+            OnSave?.Invoke(this, new EventArgs());
         }
     }
 
@@ -353,7 +359,10 @@ public sealed partial class RootPage : Page
 
     private async void SettingsButton_Click(object sender, RoutedEventArgs e)
     {
-        await OpenSettings();
+        if (await OpenSettings())
+        {
+            OnSave?.Invoke(this, new EventArgs());
+        }
     }
 
     private async void ImportButton_Click(object sender, RoutedEventArgs e)
@@ -488,64 +497,79 @@ public sealed partial class RootPage : Page
     private async void DoomList_DragOver(object sender, DragEventArgs e)
     {
         var deferral = e.GetDeferral();
-        if (e.DataView.Contains(StandardDataFormats.StorageItems))
+        try
         {
-            var items = await e.DataView.GetStorageItemsAsync();
-            foreach (var item in items)
+            if (e.DataView.Contains(StandardDataFormats.StorageItems))
             {
-                if (item is StorageFile file)
+                var items = await e.DataView.GetStorageItemsAsync();
+                foreach (var item in items)
                 {
-                    var ext = Path.GetExtension(file.Name).ToLowerInvariant();
-                    if (ext == ".gzdl")
+                    if (item is StorageFile file)
                     {
-                        e.AcceptedOperation = DataPackageOperation.Copy;
-                        break;
+                        var ext = Path.GetExtension(file.Name).ToLowerInvariant();
+                        if (ext == ".gzdl")
+                        {
+                            e.AcceptedOperation = DataPackageOperation.Copy;
+                            break;
+                        }
                     }
                 }
             }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex.ToString());
         }
         deferral.Complete();
     }
 
     private async void DoomList_Drop(object? sender, DragEventArgs e)
     {
-        if (e.DataView.Contains(StandardDataFormats.StorageItems))
+        try
         {
-            var items = await e.DataView.GetStorageItemsAsync();
-            var entries = new List<StorageFile>();
-            foreach (var item in items)
+            if (e.DataView.Contains(StandardDataFormats.StorageItems))
             {
-                if (item is StorageFile file)
+                var items = await e.DataView.GetStorageItemsAsync();
+                var entries = new List<StorageFile>();
+                foreach (var item in items)
                 {
-                    var ext = Path.GetExtension(file.Name).ToLowerInvariant();
-                    if (ext == ".gzdl")
+                    if (item is StorageFile file)
                     {
-                        entries.Add(file);
+                        var ext = Path.GetExtension(file.Name).ToLowerInvariant();
+                        if (ext == ".gzdl")
+                        {
+                            entries.Add(file);
+                        }
                     }
                 }
+                if (entries.Any())
+                {
+                    await AddEntries(entries);
+                }
             }
-            if (entries.Any())
-            {
-                await AddEntries(entries);
-            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex.ToString());
         }
     }
 
     private async Task AddEntries(IEnumerable<StorageFile> files)
     {
-        DoomEntry? lastEntry = null;
+        DoomEntry? lastAddedEntry = null;
         foreach (var file in files)
         { 
             var entry = await ImportModFile(file);
             if (entry != null)
             {
                 settings.Entries.Add(entry);
-                lastEntry = entry;
+                lastAddedEntry = entry;
             }
         }
-        if (lastEntry != null)
+        if (lastAddedEntry != null)
         {
-            DoomList.SelectedItem = lastEntry;
+            DoomList.SelectedItem = lastAddedEntry;
+            OnSave?.Invoke(this, new EventArgs());
         }
     }
 }

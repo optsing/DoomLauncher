@@ -77,7 +77,14 @@ public sealed partial class MainWindow : Window
 
         AppWindow.Changed += AppWindow_Changed;
 
-        frameRoot.Content = new RootPage(AppWindow, settings, HWND, dataFolderPath);
+        var rootPage = new RootPage(AppWindow, settings, HWND, dataFolderPath);
+        rootPage.OnSave += RootPage_OnSave;
+        frameRoot.Content = rootPage;
+    }
+
+    private void RootPage_OnSave(object? sender, System.EventArgs e)
+    {
+        Save();
     }
 
     private void AppWindow_Changed(AppWindow sender, AppWindowChangedEventArgs args)
