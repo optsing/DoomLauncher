@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
@@ -22,8 +21,9 @@ namespace DoomLauncher;
 /// </summary>
 public sealed partial class RootPage : Page
 {
-    [DllImport("User32.dll")]
-    private static extern bool SetForegroundWindow(IntPtr handle);
+    public GridLength LeftInset { get; } = new GridLength(0);
+    public GridLength RightInset { get; } = new GridLength(0);
+    public GridLength TitleBarHeight { get; } = new GridLength(48);
 
     public RootPage(AppWindow appWindow, Settings settings, IntPtr hWnd, string dataFolderPath)
     {
@@ -38,6 +38,20 @@ public sealed partial class RootPage : Page
         {
             titleBar.Loaded += TitleBar_Loaded;
             titleBar.SizeChanged += TitleBar_SizeChanged;
+
+            var scaleAdjustment = DPIHelper.GetScaleAdjustment(hWnd);
+            if (appWindow.TitleBar.LeftInset > 0)
+            {
+                LeftInset = new GridLength(appWindow.TitleBar.LeftInset / scaleAdjustment);
+            }
+            if (appWindow.TitleBar.RightInset > 0)
+            {
+                RightInset = new GridLength(appWindow.TitleBar.RightInset / scaleAdjustment);
+            } 
+            if (appWindow.TitleBar.Height > 0)
+            {
+                TitleBarHeight = new GridLength(appWindow.TitleBar.Height / scaleAdjustment);
+            }
         }
 
         frameMain.Content = notSelectedPage;
@@ -57,16 +71,14 @@ public sealed partial class RootPage : Page
     }
     private void SetDragRegion()
     {
-        var scaleAdjustment = DPIHelper.GetScaleAdjustment(hWnd);
-
-        var x = (int)(48 * scaleAdjustment);
+        var scaleAdjustment = XamlRoot.RasterizationScale;
 
         var dragRect = new Windows.Graphics.RectInt32()
         {
-            X = x,
-            Y = 0,
-            Width = (int)(titleBar.ActualWidth * scaleAdjustment) - x,
-            Height = 48,
+            X = (int)(titleBar.ActualOffset.X * scaleAdjustment),
+            Y = (int)(titleBar.ActualOffset.Y * scaleAdjustment),
+            Width = (int)(titleBar.ActualWidth * scaleAdjustment),
+            Height = (int)(titleBar.ActualHeight * scaleAdjustment),
         };
 
         appWindow.TitleBar.SetDragRectangles(new[] { dragRect });
@@ -274,7 +286,7 @@ public sealed partial class RootPage : Page
         var process = Process.Start(processInfo);
         if (process != null)
         {
-            SetForegroundWindow(process.MainWindowHandle);
+            WindowHelper.SetForegroundWindow(process.MainWindowHandle);
 
             if (settings.CloseOnLaunch)
             {
@@ -285,7 +297,7 @@ public sealed partial class RootPage : Page
                 presenter.Minimize();
                 await process.WaitForExitAsync();
                 presenter.Restore();
-                SetForegroundWindow(hWnd);
+                WindowHelper.SetForegroundWindow(hWnd);
             }
         }
     }

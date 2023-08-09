@@ -8,7 +8,11 @@
     xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
     mc:Ignorable="d"
 >
-    <Grid RowDefinitions="Auto,*">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{x:Bind TitleBarHeight}" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
                 <VisualState>
@@ -29,7 +33,6 @@
             x:Name="swMain"
             IsPaneOpen="True"
             OpenPaneLength="256"
-            CompactPaneLength="48"
             Grid.RowSpan="2"
             DisplayMode="Overlay"
             PaneBackground="Transparent"
@@ -39,8 +42,13 @@
                     x:Name="gridPane"
                     Background="{ThemeResource SystemControlPageBackgroundChromeLowBrush}"
                     CornerRadius="8"
-                    RowDefinitions="48,Auto,*,Auto"
                 >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="{x:Bind TitleBarHeight}" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
                     <SplitButton Grid.Row="1" Click="CreateMod_Click" HorizontalAlignment="Stretch" Margin="8">
                         <SplitButton.Flyout>
                             <MenuFlyout>
@@ -138,34 +146,47 @@
                     </Button>
                 </Grid>
             </SplitView.Pane>
-            <Frame
-                Margin="0,48,0,0"
-                CornerRadius="8"
-                x:Name="frameMain"
-                Background="{ThemeResource CustomColor}"
-            />
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="{x:Bind TitleBarHeight}" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Frame
+                    Grid.Row="1"
+                    CornerRadius="8"
+                    x:Name="frameMain"
+                    Background="{ThemeResource CustomColor}"
+                />
+            </Grid>
         </SplitView>
-        <Grid
-            x:Name="titleBar"
-            Height="48"
-            Grid.Row="0"
-            ColumnDefinitions="Auto,*"
-        >
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="{x:Bind LeftInset}" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="{x:Bind RightInset}" />
+            </Grid.ColumnDefinitions>
             <Button
                 x:Name="buttonMenu"
-                Grid.Column="0"
+                Grid.Column="1"
                 Width="48"
-                Height="48"
+                VerticalAlignment="Stretch"
                 Margin="4,0,0,0"
                 Click="ButtonMenu_Click"
                 Style="{ThemeResource PaneToggleButtonStyle}" />
-            <TextBlock
-                Grid.Column="1"
-                Text="GZDoom Launcher"
-                Margin="8,0,0,0"
-                VerticalAlignment="Center"
-                Style="{ThemeResource BaseTextBlockStyle}"
-            />
+            <Border
+                Grid.Column="2"
+                x:Name="titleBar"
+
+            >
+                <TextBlock
+                    Text="GZDoom Launcher"
+                    TextWrapping="NoWrap"
+                    Margin="8,0,0,0"
+                    VerticalAlignment="Center"
+                    Style="{ThemeResource BaseTextBlockStyle}"
+                />
+            </Border>
         </Grid>
         <Border
             x:Name="progressIndicator"

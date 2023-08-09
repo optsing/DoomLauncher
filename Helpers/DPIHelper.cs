@@ -4,10 +4,10 @@ using Microsoft.UI;
 using Microsoft.UI.Windowing;
 
 namespace DoomLauncher;
-public class DPIHelper
+public partial class DPIHelper
 {
-    [DllImport("Shcore.dll")]
-    internal static extern int GetDpiForMonitor(IntPtr hmonitor, Monitor_DPI_Type dpiType, out uint dpiX, out uint dpiY);
+    [LibraryImport("Shcore.dll")]
+    internal static partial int GetDpiForMonitor(IntPtr hmonitor, Monitor_DPI_Type dpiType, out uint dpiX, out uint dpiY);
 
     internal enum Monitor_DPI_Type : int
     {
