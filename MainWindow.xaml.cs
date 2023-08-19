@@ -1,8 +1,12 @@
 ﻿using Microsoft.UI;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using Windows.Storage;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -14,11 +18,16 @@ namespace DoomLauncher;
 /// </summary>
 public sealed partial class MainWindow : Window
 {
-    public MainWindow()
+    public readonly IntPtr hWnd;
+    public readonly RootPage rootPage;
+    public readonly DispatcherQueue dispatcher;
+
+    public MainWindow(List<StorageFile> initialFiles)
     {
         InitializeComponent();
 
-        var HWND = WinRT.Interop.WindowNative.GetWindowHandle(this);
+        hWnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+        dispatcher = DispatcherQueue.GetForCurrentThread();
 
         AppWindow.Title = "GZDoom Launcher";
         AppWindow.SetIcon("Assets/app.ico");
@@ -67,17 +76,14 @@ public sealed partial class MainWindow : Window
                 Height = (int)settings.WindowHeight,
             });
         }
-        if (settings.WindowMaximized)
+        if (settings.WindowMaximized && AppWindow.Presenter is OverlappedPresenter presenter)
         {
-            if (AppWindow.Presenter is OverlappedPresenter presenter)
-            {
-                presenter.Maximize();
-            }
+            presenter.Maximize();
         }
 
         AppWindow.Changed += AppWindow_Changed;
 
-        var rootPage = new RootPage(AppWindow, settings, HWND, dataFolderPath);
+        rootPage = new RootPage(AppWindow, settings, hWnd, dataFolderPath, initialFiles);
         rootPage.OnSave += RootPage_OnSave;
         frameRoot.Content = rootPage;
     }

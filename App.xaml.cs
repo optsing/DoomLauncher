@@ -1,6 +1,9 @@
-﻿using System;
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppLifecycle;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using Windows.Storage;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -31,23 +34,70 @@ public partial class App : Application
         // Get or register the main instance
         var mainInstance = AppInstance.FindOrRegisterForKey("GZDoomLauncher");
 
-        // If the main instance isn't this current instance
-        if (!mainInstance.IsCurrent)
-        {
-            // Get the activation args
-            var appArgs = AppInstance.GetCurrent().GetActivatedEventArgs();
+        // Get the activation args
+        var appArgs = AppInstance.GetCurrent().GetActivatedEventArgs();
 
-            // Redirect activation to that instance
-            await mainInstance.RedirectActivationToAsync(appArgs);
+        if (mainInstance.IsCurrent)
+        {
+            mainInstance.Activated += MainInstance_Activated;
+            var initialFiles = ParseAppArgs(appArgs);
+            m_window = new MainWindow(initialFiles);
+            m_window.Activate();
+        }
+        // If the main instance isn't this current instance
+        else
+        {
+            try
+            {
+                // Redirect activation to that instance
+                await mainInstance.RedirectActivationToAsync(appArgs);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex);
+            }
 
             // And exit our instance and stop
             System.Diagnostics.Process.GetCurrentProcess().Kill();
             return;
         }
-
-        m_window = new MainWindow();
-        m_window.Activate();
     }
 
-    private Window? m_window;
+    private void MainInstance_Activated(object? sender, AppActivationArguments e)
+    {
+        if (m_window != null)
+        {
+            WindowHelper.SetForegroundWindow(m_window.hWnd);
+            var files = ParseAppArgs(e);
+            if (files.Count > 0)
+            {
+                m_window.dispatcher.TryEnqueue(
+                    () => m_window.rootPage.ImportEntriesFromFiles(files, withConfirm: true)
+                );
+            }
+        }
+    }
+
+    private static List<StorageFile> ParseAppArgs(AppActivationArguments appArgs)
+    {
+        var files = new List<StorageFile>();
+        if (appArgs.Data is Windows.ApplicationModel.Activation.IFileActivatedEventArgs fileArgs)
+        {
+            
+            foreach (var item in fileArgs.Files)
+            {
+                if (item is StorageFile file)
+                {
+                    var ext = Path.GetExtension(file.Name).ToLowerInvariant();
+                    if (ext == ".gzdl")
+                    {
+                        files.Add(file);
+                    }
+                }
+            }
+        }
+        return files;
+    }
+
+    private MainWindow? m_window;
 }

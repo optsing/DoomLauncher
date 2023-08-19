@@ -25,7 +25,9 @@ public sealed partial class RootPage : Page
     public GridLength RightInset { get; } = new GridLength(0);
     public GridLength TitleBarHeight { get; } = new GridLength(48);
 
-    public RootPage(AppWindow appWindow, Settings settings, IntPtr hWnd, string dataFolderPath)
+    private readonly List<StorageFile> initialFiles;
+
+    public RootPage(AppWindow appWindow, Settings settings, IntPtr hWnd, string dataFolderPath, List<StorageFile> initialFiles)
     {
         InitializeComponent();
 
@@ -56,6 +58,15 @@ public sealed partial class RootPage : Page
 
         frameMain.Content = notSelectedPage;
         DoomList.SelectedIndex = settings.SelectedModIndex;
+        this.initialFiles = initialFiles;
+    }
+    private async void Page_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (initialFiles.Any())
+        {
+            await ImportEntriesFromFiles(initialFiles, withConfirm: true);
+            initialFiles.Clear();
+        }
     }
 
     public event EventHandler? OnSave;
@@ -391,7 +402,7 @@ public sealed partial class RootPage : Page
 
         if (files.Any())
         {
-            await AddEntries(files);
+            await ImportEntriesFromFiles(files, withConfirm: false);
         }
     }
 
@@ -542,7 +553,7 @@ public sealed partial class RootPage : Page
             if (e.DataView.Contains(StandardDataFormats.StorageItems))
             {
                 var items = await e.DataView.GetStorageItemsAsync();
-                var entries = new List<StorageFile>();
+                var files = new List<StorageFile>();
                 foreach (var item in items)
                 {
                     if (item is StorageFile file)
@@ -550,13 +561,13 @@ public sealed partial class RootPage : Page
                         var ext = Path.GetExtension(file.Name).ToLowerInvariant();
                         if (ext == ".gzdl")
                         {
-                            entries.Add(file);
+                            files.Add(file);
                         }
                     }
                 }
-                if (entries.Any())
+                if (files.Any())
                 {
-                    await AddEntries(entries);
+                    await ImportEntriesFromFiles(files, withConfirm: true);
                 }
             }
         }
@@ -566,16 +577,19 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private async Task AddEntries(IEnumerable<StorageFile> files)
+    public async Task ImportEntriesFromFiles(IReadOnlyList<StorageFile> files, bool withConfirm)
     {
         DoomEntry? lastAddedEntry = null;
         foreach (var file in files)
         { 
-            var entry = await ImportModFile(file);
-            if (entry != null)
+            if (!withConfirm || await AskDialog.ShowAsync(XamlRoot, "Импорт сборки", $"Вы уверены, что хотите импортировать файл '{file.Name}'?", "Импорт", "Отмена"))
             {
-                settings.Entries.Add(entry);
-                lastAddedEntry = entry;
+                var entry = await ImportModFile(file);
+                if (entry != null)
+                {
+                    settings.Entries.Add(entry);
+                    lastAddedEntry = entry;
+                }
             }
         }
         if (lastAddedEntry != null)

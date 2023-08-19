@@ -12,7 +12,7 @@
   <Identity
     Name="optsi.GZDoomLauncher"
     Publisher="CN=optsi"
-    Version="1.0.35.0" />
+    Version="1.0.36.0" />
 
   <!--<mp:PhoneIdentity
 	PhoneProductId="1bcbad53-0b76-4d23-96a8-5c1882ca8b8e"
@@ -51,13 +51,13 @@
 			 <desktop:ExecutionAlias Alias="doom.exe" />
 		  </uap3:AppExecutionAlias>
 		</uap3:Extension>
-		<!--<uap:Extension Category="windows.fileTypeAssociation">
-			<uap:FileTypeAssociation Name="modsets">
-				<uap:SupportedFileTypes>
-					<uap:FileType>.gzdl</uap:FileType>
-				</uap:SupportedFileTypes>
-			</uap:FileTypeAssociation>
-		</uap:Extension>-->
+		  <uap:Extension Category="windows.fileTypeAssociation">
+			  <uap:FileTypeAssociation Name="modsets">
+				  <uap:SupportedFileTypes>
+					  <uap:FileType>.gzdl</uap:FileType>
+				  </uap:SupportedFileTypes>
+			  </uap:FileTypeAssociation>
+		  </uap:Extension>
 	  </Extensions>
     </Application>
   </Applications>
