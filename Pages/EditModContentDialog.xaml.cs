@@ -12,7 +12,7 @@ namespace DoomLauncher;
 /// </summary>
 public sealed partial class EditModContentDialog : ContentDialog
 {
-    public EditModContentDialog(XamlRoot root, EditModDialogResult initial, List<KeyValue> filteredIWads, bool isEditMode)
+    public EditModContentDialog(XamlRoot root, EditModDialogResult initial, List<KeyValue> filteredIWads, EditDialogMode mode)
     {
         InitializeComponent();
         XamlRoot = root;
@@ -21,8 +21,22 @@ public sealed partial class EditModContentDialog : ContentDialog
         IWadFile = filteredIWads.FirstOrDefault(kv => kv.Key == initial.iWadFile, filteredIWads.First());
         UniqueConfig = initial.uniqueConfig;
         FilteredIWads = filteredIWads;
-        PrimaryButtonText = isEditMode ? "Сохранить" : "Создать";
-        this.Title = isEditMode ? "Настройка сборки" : "Создание сборки";
+        PrimaryButtonText = mode switch
+        {
+            EditDialogMode.Create => "Создать",
+            EditDialogMode.Edit => "Сохранить",
+            EditDialogMode.Import => "Импортировать",
+            _ => throw new System.NotImplementedException(),
+        };
+        Title = mode switch
+        {
+            EditDialogMode.Create => "Создание сборки",
+            EditDialogMode.Edit => "Настройка сборки",
+            EditDialogMode.Import => "Импорт сборки",
+            _ => throw new System.NotImplementedException(),
+        };
+        ModFiles = initial.modFiles.Select(file => new TitleChecked(file)).ToList();
+        ImageFiles = initial.imageFiles.Select(file => new TitleChecked(file)).ToList();
     }
 
     private void EditModContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
@@ -58,21 +72,50 @@ public sealed partial class EditModContentDialog : ContentDialog
     {
         get; private set;
     }
+
+    public List<TitleChecked> ModFiles { get; private set; }
+    public List<TitleChecked> ImageFiles { get; private set; }
+
+    public static Visibility HasItems (List<TitleChecked> list)
+    {
+        return list.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+    }
 }
 
-public readonly struct EditModDialogResult
+public enum EditDialogMode
+{
+    Create, Edit, Import
+}
+
+public class EditModDialogResult
 {
     public readonly string name;
     public readonly string description;
     public readonly string iWadFile;
     public readonly bool uniqueConfig;
+    public readonly List<string> modFiles;
+    public readonly List<string> imageFiles;
 
-    public EditModDialogResult(string name, string description, string iWadFile, bool uniqueConfig)
+    public EditModDialogResult(string name, string description, string iWadFile, bool uniqueConfig, List<string>? modFiles = null, List<string>? imageFiles = null)
     {
         this.name = name;
         this.description = description;
         this.iWadFile = iWadFile;
         this.uniqueConfig = uniqueConfig;
+        this.modFiles = modFiles ?? new List<string>();
+        this.imageFiles = imageFiles ?? new List<string>();
+    }
+}
+
+public class TitleChecked
+{
+    public string Title { get; set; }
+    public bool IsChecked { get; set; }
+
+    public TitleChecked(string title)
+    {
+        Title = title;
+        IsChecked = true;
     }
 }
 

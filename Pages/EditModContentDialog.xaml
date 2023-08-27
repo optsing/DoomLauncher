@@ -11,38 +11,87 @@
     Style="{ThemeResource DefaultContentDialogStyle}"
     PrimaryButtonClick="EditModContentDialog_PrimaryButtonClick"
 >
-
-    <StackPanel>
-        <TextBlock>Название</TextBlock>
-        <TextBox
-            x:Name="tbModName"
-            HorizontalAlignment="Stretch"
-            Margin="0,8,0,8"
-            Text="{x:Bind ModName, Mode=TwoWay}"
-            PlaceholderText="Введите название"
-        />
-        <TextBlock>Описание</TextBlock>
-        <TextBox
-            HorizontalAlignment="Stretch"
-            Margin="0,8,0,8"
-            Text="{x:Bind ModDescription, Mode=TwoWay}"
-            PlaceholderText="Введите краткое описание"
-        />
-        <TextBlock>Игра</TextBlock>
-        <ComboBox
-            HorizontalAlignment="Stretch"
-            Margin="0,8,0,8"
-            SelectedItem="{x:Bind IWadFile, Mode=TwoWay}"
-            ItemsSource="{x:Bind FilteredIWads}"
-        >
-            <ComboBox.ItemTemplate>
-                <DataTemplate x:DataType="local:KeyValue">
-                    <TextBlock Text="{x:Bind Value}"/>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
-        <CheckBox
-            IsChecked="{x:Bind UniqueConfig, Mode=TwoWay}"
-        >Использовать уникальный файл настроек</CheckBox>
-    </StackPanel>
+    <ScrollViewer
+        VerticalAlignment="Center"
+        HorizontalAlignment="Center"
+        VerticalScrollBarVisibility="Auto"
+        VerticalScrollMode="Enabled"
+    >
+        <StackPanel>
+            <TextBlock>Название</TextBlock>
+            <TextBox
+                x:Name="tbModName"
+                HorizontalAlignment="Stretch"
+                Margin="0,8,0,8"
+                Text="{x:Bind ModName, Mode=TwoWay}"
+                PlaceholderText="Введите название"
+            />
+            <TextBlock>Описание</TextBlock>
+            <TextBox
+                HorizontalAlignment="Stretch"
+                Margin="0,8,0,8"
+                Text="{x:Bind ModDescription, Mode=TwoWay}"
+                PlaceholderText="Введите краткое описание"
+            />
+            <TextBlock>Игра</TextBlock>
+            <ComboBox
+                HorizontalAlignment="Stretch"
+                Margin="0,8,0,8"
+                SelectedItem="{x:Bind IWadFile, Mode=TwoWay}"
+                ItemsSource="{x:Bind FilteredIWads}"
+            >
+                <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="local:KeyValue">
+                        <TextBlock Text="{x:Bind Value}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <CheckBox
+                Content="Использовать уникальный файл настроек"
+                IsChecked="{x:Bind UniqueConfig, Mode=TwoWay}"
+            />
+            <TextBlock Visibility="{x:Bind local:EditModContentDialog.HasItems(ModFiles)}">Файлы</TextBlock>
+            <ListView
+                ItemsSource="{x:Bind ModFiles}"
+                SelectionMode="None"
+                Visibility="{x:Bind local:EditModContentDialog.HasItems(ModFiles)}"
+            >
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="Padding" Value="0"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="local:TitleChecked">
+                        <CheckBox
+                            HorizontalAlignment="Stretch"
+                            Content="{x:Bind Title}"
+                            IsChecked="{x:Bind IsChecked, Mode=TwoWay}"
+                        />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <TextBlock Visibility="{x:Bind local:EditModContentDialog.HasItems(ImageFiles)}">Изображения</TextBlock>
+            <ListView
+                ItemsSource="{x:Bind ImageFiles}"
+                SelectionMode="None"
+                Visibility="{x:Bind local:EditModContentDialog.HasItems(ImageFiles)}"
+            >
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="Padding" Value="0"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="local:TitleChecked">
+                        <CheckBox
+                            HorizontalAlignment="Stretch"
+                            Content="{x:Bind Title}"
+                            IsChecked="{x:Bind IsChecked, Mode=TwoWay}"
+                        />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackPanel>
+    </ScrollViewer>
 </ContentDialog>

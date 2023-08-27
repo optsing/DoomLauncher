@@ -40,8 +40,22 @@ public partial class App : Application
         if (mainInstance.IsCurrent)
         {
             mainInstance.Activated += MainInstance_Activated;
-            var initialFiles = ParseAppArgs(appArgs);
-            m_window = new MainWindow(initialFiles);
+            m_window = new MainWindow();
+            m_window.rootPage.Loaded += async (object sender, RoutedEventArgs e) =>
+            {
+                if (appArgs.Data is Windows.ApplicationModel.Activation.ProtocolActivatedEventArgs protocolArgs)
+                {
+                    await m_window.rootPage.ImportEntryFromDoomWorldId(protocolArgs.Uri.Host, withConfirm: true);
+                }
+                else
+                {
+                    var files = ParseAppArgs(appArgs);
+                    if (files.Count > 0)
+                    {
+                        await m_window.rootPage.ImportEntriesFromFiles(files, withConfirm: true);
+                    }
+                }
+            };
             m_window.Activate();
         }
         // If the main instance isn't this current instance
@@ -59,7 +73,6 @@ public partial class App : Application
 
             // And exit our instance and stop
             System.Diagnostics.Process.GetCurrentProcess().Kill();
-            return;
         }
     }
 
@@ -68,12 +81,21 @@ public partial class App : Application
         if (m_window != null)
         {
             WindowHelper.SetForegroundWindow(m_window.hWnd);
-            var files = ParseAppArgs(e);
-            if (files.Count > 0)
+            if (e.Data is Windows.ApplicationModel.Activation.ProtocolActivatedEventArgs protocolArgs)
             {
                 m_window.dispatcher.TryEnqueue(
-                    () => m_window.rootPage.ImportEntriesFromFiles(files, withConfirm: true)
+                    async () => await m_window.rootPage.ImportEntryFromDoomWorldId(protocolArgs.Uri.Host, withConfirm: true)
                 );
+            }
+            else
+            {
+                var files = ParseAppArgs(e);
+                if (files.Count > 0)
+                {
+                    m_window.dispatcher.TryEnqueue(
+                        async () => await m_window.rootPage.ImportEntriesFromFiles(files, withConfirm: true)
+                    );
+                }
             }
         }
     }

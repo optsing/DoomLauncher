@@ -7,7 +7,6 @@
     xmlns:local="using:DoomLauncher"
     xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
     mc:Ignorable="d"
-    Loaded="Page_Loaded"
 >
     <Grid>
         <Grid.RowDefinitions>

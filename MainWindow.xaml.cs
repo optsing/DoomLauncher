@@ -3,10 +3,8 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using Windows.Storage;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -22,7 +20,7 @@ public sealed partial class MainWindow : Window
     public readonly RootPage rootPage;
     public readonly DispatcherQueue dispatcher;
 
-    public MainWindow(List<StorageFile> initialFiles)
+    public MainWindow()
     {
         InitializeComponent();
 
@@ -83,7 +81,7 @@ public sealed partial class MainWindow : Window
 
         AppWindow.Changed += AppWindow_Changed;
 
-        rootPage = new RootPage(AppWindow, settings, hWnd, dataFolderPath, initialFiles);
+        rootPage = new RootPage(AppWindow, settings, hWnd, dataFolderPath);
         rootPage.OnSave += RootPage_OnSave;
         frameRoot.Content = rootPage;
     }
