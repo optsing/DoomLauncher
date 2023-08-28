@@ -109,6 +109,7 @@ public partial class DoomEntry: ObservableObject
 {
     private string name = "";
     private string description = "";
+    private string longDescription = "";
 
     public string Name
     {
@@ -120,6 +121,12 @@ public partial class DoomEntry: ObservableObject
     {
         get => description;
         set => SetProperty(ref description, value);
+    }
+
+    public string LongDescription
+    {
+        get => longDescription;
+        set => SetProperty(ref longDescription, value);
     }
 
     public string IWadFile { get; set; } = "";

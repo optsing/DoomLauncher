@@ -18,6 +18,7 @@ public sealed partial class EditModContentDialog : ContentDialog
         XamlRoot = root;
         ModName = initial.name;
         ModDescription = initial.description;
+        ModLongDescription = initial.longDescription;
         IWadFile = filteredIWads.FirstOrDefault(kv => kv.Key == initial.iWadFile, filteredIWads.First());
         UniqueConfig = initial.uniqueConfig;
         FilteredIWads = filteredIWads;
@@ -63,6 +64,11 @@ public sealed partial class EditModContentDialog : ContentDialog
         get; private set;
     }
 
+    public string ModLongDescription
+    {
+        get; private set;
+    }
+
     public KeyValue IWadFile
     {
         get; private set;
@@ -91,15 +97,17 @@ public class EditModDialogResult
 {
     public readonly string name;
     public readonly string description;
+    public readonly string longDescription;
     public readonly string iWadFile;
     public readonly bool uniqueConfig;
     public readonly List<string> modFiles;
     public readonly List<string> imageFiles;
 
-    public EditModDialogResult(string name, string description, string iWadFile, bool uniqueConfig, List<string>? modFiles = null, List<string>? imageFiles = null)
+    public EditModDialogResult(string name, string description, string longDescription, string iWadFile, bool uniqueConfig, List<string>? modFiles = null, List<string>? imageFiles = null)
     {
         this.name = name;
         this.description = description;
+        this.longDescription = longDescription;
         this.iWadFile = iWadFile;
         this.uniqueConfig = uniqueConfig;
         this.modFiles = modFiles ?? new List<string>();

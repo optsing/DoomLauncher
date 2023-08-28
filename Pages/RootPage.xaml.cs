@@ -8,6 +8,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
@@ -211,11 +212,12 @@ public sealed partial class RootPage : Page
 
     private async Task EditMod(DoomEntry entry)
     {
-        var initial = new EditModDialogResult(entry.Name, entry.Description, entry.IWadFile, entry.UniqueConfig);
+        var initial = new EditModDialogResult(entry.Name, entry.Description, entry.LongDescription, entry.IWadFile, entry.UniqueConfig);
         if (await AddOrEditModDialogShow(initial, EditDialogMode.Edit) is EditModDialogResult result)
         {
             entry.Name = result.name;
             entry.Description = result.description;
+            entry.LongDescription = result.longDescription;
             entry.IWadFile = result.iWadFile;
             entry.UniqueConfig = result.uniqueConfig;
             OnSave?.Invoke(this, new EventArgs());
@@ -229,6 +231,7 @@ public sealed partial class RootPage : Page
             Id = Guid.NewGuid().ToString(),
             Name = entry.Name,
             Description = entry.Description,
+            LongDescription = entry.LongDescription,
             IWadFile = entry.IWadFile,
             UniqueConfig = entry.UniqueConfig,
             SelectedImageIndex = entry.SelectedImageIndex,
@@ -305,7 +308,7 @@ public sealed partial class RootPage : Page
 
     private async void CreateMod_Click(object sender, SplitButtonClickEventArgs e)
     {
-        var initial = new EditModDialogResult("", "", "", false);
+        var initial = new EditModDialogResult("", "", "", "", false);
         if (await AddOrEditModDialogShow(initial, EditDialogMode.Create) is EditModDialogResult result)
         {
             var entry = new DoomEntry()
@@ -313,6 +316,7 @@ public sealed partial class RootPage : Page
                 Id = Guid.NewGuid().ToString(),
                 Name = result.name,
                 Description = result.description,
+                LongDescription = result.longDescription,
                 IWadFile = result.iWadFile,
                 UniqueConfig = result.uniqueConfig,
                 SelectedImageIndex = 0,
@@ -365,7 +369,7 @@ public sealed partial class RootPage : Page
         {
             var modFiles = dialog.ModFiles.Where(tc => tc.IsChecked).Select(tc => tc.Title).ToList();
             var imageFiles = dialog.ImageFiles.Where(tc => tc.IsChecked).Select(tc => tc.Title).ToList();
-            return new EditModDialogResult(dialog.ModName, dialog.ModDescription, dialog.IWadFile.Key, dialog.UniqueConfig, modFiles, imageFiles);
+            return new EditModDialogResult(dialog.ModName, dialog.ModDescription, dialog.ModLongDescription, dialog.IWadFile.Key, dialog.UniqueConfig, modFiles, imageFiles);
         }
         return null;
     }
@@ -438,6 +442,7 @@ public sealed partial class RootPage : Page
                 Id = entry.Id,
                 Name = entry.Name,
                 Description = entry.Description,
+                LongDescription = entry.LongDescription,
                 IWadFile = entry.IWadFile,
                 UniqueConfig = entry.UniqueConfig,
                 SelectedImageIndex = entry.SelectedImageIndex,
@@ -580,6 +585,7 @@ public sealed partial class RootPage : Page
                     var entryProperties = new EditModDialogResult(
                         name: newEntry.Name,
                         description: newEntry.Description,
+                        longDescription: newEntry.LongDescription,
                         iWadFile: newEntry.IWadFile,
                         uniqueConfig: newEntry.UniqueConfig
                     );
@@ -639,6 +645,7 @@ public sealed partial class RootPage : Page
                             Id = Guid.NewGuid().ToString(),
                             Name = entryProperties.name,
                             Description = entryProperties.description,
+                            LongDescription = entryProperties.longDescription,
                             IWadFile = entryProperties.iWadFile,
                             UniqueConfig = entryProperties.uniqueConfig,
                             SelectedImageIndex = newEntry.SelectedImageIndex,
@@ -658,6 +665,10 @@ public sealed partial class RootPage : Page
         return null;
     }
 
+
+    [GeneratedRegex(@"\s*<br>\s*")]
+    private static partial Regex reLineBreak();
+
     private async Task<DoomEntry?> ImportModFileFromDoomWorld(DoomWorldFileEntry wadInfo, bool withConfirm)
     {
         try
@@ -669,6 +680,7 @@ public sealed partial class RootPage : Page
             var entryProperties = new EditModDialogResult(
                 name: wadInfo.Title,
                 description: "",
+                longDescription: reLineBreak().Replace(wadInfo.Description, "\n"),
                 iWadFile: "",
                 uniqueConfig: false
             );
@@ -722,6 +734,7 @@ public sealed partial class RootPage : Page
                     Id = Guid.NewGuid().ToString(),
                     Name = entryProperties.name,
                     Description = entryProperties.description,
+                    LongDescription = entryProperties.longDescription,
                     IWadFile = entryProperties.iWadFile,
                     UniqueConfig = entryProperties.uniqueConfig,
                     SelectedImageIndex = 0,

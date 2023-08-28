@@ -240,6 +240,7 @@ public sealed partial class DoomPage : Page
     private async void LwModFiles_DragOver(object sender, DragEventArgs e)
     {
         var deferral = e.GetDeferral();
+        e.AcceptedOperation = DataPackageOperation.None;
         try
         {
             if (e.DataView.Contains(StandardDataFormats.StorageItems))

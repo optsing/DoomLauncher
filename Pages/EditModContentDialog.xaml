@@ -33,6 +33,16 @@
                 Text="{x:Bind ModDescription, Mode=TwoWay}"
                 PlaceholderText="Введите краткое описание"
             />
+            <TextBlock>Подробное описание</TextBlock>
+            <TextBox
+                Height="64"
+                AcceptsReturn="True"
+                TextWrapping="Wrap" 
+                HorizontalAlignment="Stretch"
+                Margin="0,8,0,8"
+                Text="{x:Bind ModLongDescription, Mode=TwoWay}"
+                PlaceholderText="Введите подробное описание"
+            />
             <TextBlock>Игра</TextBlock>
             <ComboBox
                 HorizontalAlignment="Stretch"

@@ -9,9 +9,14 @@
     mc:Ignorable="d"
     Background="Transparent"
 >
-    <Grid RowDefinitions="Auto,*,Auto">
+    <Grid
+        RowDefinitions="Auto,*,Auto,Auto"
+        AllowDrop="True"
+        DragOver="LwModFiles_DragOver"
+        Drop="LwModFiles_Drop"
+    >
         <Image
-            Grid.RowSpan="3"
+            Grid.RowSpan="4"
             Source="{x:Bind local:DoomPage.GetCurrentBackground(entry.ImageFiles, entry.SelectedImageIndex), Mode=OneWay}"
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
@@ -19,7 +24,7 @@
             Stretch="UniformToFill"
         />
         <StackPanel
-            Grid.RowSpan="3"
+            Grid.RowSpan="4"
             Orientation="Horizontal"
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
@@ -93,8 +98,6 @@
             AllowDrop="True"
             ItemsSource="{x:Bind entry.ModFiles}"
             IsMultiSelectCheckBoxEnabled="False"
-            DragOver="LwModFiles_DragOver"
-            Drop="LwModFiles_Drop"
         >
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="x:String">
@@ -129,8 +132,19 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <StackPanel
+        <ScrollViewer
             Grid.Row="2"
+            MaxHeight="256"
+        >
+            <TextBlock
+                Margin="8"
+                FontSize="16"
+                Text="{x:Bind entry.LongDescription, Mode=OneWay}"
+                TextWrapping="WrapWholeWords"
+            />
+        </ScrollViewer>
+        <StackPanel
+            Grid.Row="3"
             Orientation="Horizontal"
             HorizontalAlignment="Right"
         >
