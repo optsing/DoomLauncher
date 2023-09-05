@@ -51,7 +51,6 @@ public sealed partial class EditModContentDialog : ContentDialog
 
     public List<KeyValue> FilteredIWads {
         get;
-        private set;
     }
 
     public string ModName

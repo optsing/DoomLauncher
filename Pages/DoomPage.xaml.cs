@@ -262,7 +262,7 @@ public sealed partial class DoomPage : Page
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine(ex.ToString());
+            Console.Error.WriteLine(ex);
         }
         deferral.Complete();
     }
@@ -303,7 +303,7 @@ public sealed partial class DoomPage : Page
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine(ex.ToString());
+            Console.Error.WriteLine(ex);
         }
     }
 

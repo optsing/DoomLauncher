@@ -72,7 +72,7 @@ public partial class App : Application
             }
 
             // And exit our instance and stop
-            System.Diagnostics.Process.GetCurrentProcess().Kill();
+            Exit();
         }
     }
 
