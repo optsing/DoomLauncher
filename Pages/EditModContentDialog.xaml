@@ -60,6 +60,10 @@
                 Content="Использовать уникальный файл настроек"
                 IsChecked="{x:Bind UniqueConfig, Mode=TwoWay}"
             />
+            <CheckBox
+                Content="Использовать уникальную папку сохранений"
+                IsChecked="{x:Bind UniqueSavesFolder, Mode=TwoWay}"
+            />
             <TextBlock Visibility="{x:Bind local:EditModContentDialog.HasItems(ModFiles)}">Файлы</TextBlock>
             <ListView
                 ItemsSource="{x:Bind ModFiles}"

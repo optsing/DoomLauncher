@@ -218,95 +218,6 @@ public sealed partial class DoomPage : Page
         }
     }
 
-    public static BitmapImage? GetCurrentBackground(IList<string> list, int selectedImageIndex)
-    {
-        if (list.Any() && selectedImageIndex < list.Count)
-        {
-            return new BitmapImage(new Uri(list[selectedImageIndex]));
-        }
-        return null;
-    }
-
-    public static bool HasMoreItems(int itemsCount, int count)
-    {
-        return itemsCount > count;
-    }
-
-    public static Visibility HasNoItems(int itemsCount)
-    {
-        return itemsCount == 0 ? Visibility.Visible : Visibility.Collapsed;
-    }
-
-    private async void LwModFiles_DragOver(object sender, DragEventArgs e)
-    {
-        var deferral = e.GetDeferral();
-        e.AcceptedOperation = DataPackageOperation.None;
-        try
-        {
-            if (e.DataView.Contains(StandardDataFormats.StorageItems))
-            {
-                var items = await e.DataView.GetStorageItemsAsync();
-                foreach (var item in items)
-                {
-                    if (item is StorageFile file)
-                    {
-                        var ext = Path.GetExtension(file.Name).ToLowerInvariant();
-                        if (Settings.SupportedModExtensions.Contains(ext) || Settings.SupportedImageExtensions.Contains(ext))
-                        {
-                            e.AcceptedOperation = DataPackageOperation.Copy;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine(ex);
-        }
-        deferral.Complete();
-    }
-
-    private async void LwModFiles_Drop(object sender, DragEventArgs e)
-    {
-        try
-        {
-            if (e.DataView.Contains(StandardDataFormats.StorageItems))
-            {
-                var items = await e.DataView.GetStorageItemsAsync();
-                var mods = new List<StorageFile>();
-                var images = new List<StorageFile>();
-                foreach (var item in items)
-                {
-                    if (item is StorageFile file)
-                    {
-                        var ext = Path.GetExtension(file.Name).ToLowerInvariant();
-                        if (Settings.SupportedModExtensions.Contains(ext))
-                        {
-                            mods.Add(file);
-                        }
-                        else if (Settings.SupportedImageExtensions.Contains(ext))
-                        {
-                            images.Add(file);
-                        }
-                    }
-                }
-                if (mods.Any())
-                {
-                    await AddFiles(mods);
-                }
-                if (images.Any())
-                {
-                    await AddImages(images);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine(ex);
-        }
-    }
-
     private void OpenContainFolder_Click(object sender, RoutedEventArgs e)
     {
         if (sender is FrameworkElement el)
@@ -348,5 +259,102 @@ public sealed partial class DoomPage : Page
     public static string GetFileTitle(string filePath)
     {
         return Path.GetFileName(filePath);
+    }
+
+    public static BitmapImage? GetCurrentBackground(IList<string> list, int selectedImageIndex)
+    {
+        if (list.Any() && selectedImageIndex < list.Count)
+        {
+            return new BitmapImage(new Uri(list[selectedImageIndex]));
+        }
+        return null;
+    }
+
+    public static bool HasMoreItems(int itemsCount, int count)
+    {
+        return itemsCount > count;
+    }
+
+    public static Visibility HasNoItems(int itemsCount)
+    {
+        return itemsCount == 0 ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private async void Root_DragEnter(object sender, DragEventArgs e)
+    {
+        try
+        {
+            if (e.DataView.Contains(StandardDataFormats.StorageItems))
+            {
+                var items = await e.DataView.GetStorageItemsAsync();
+                foreach (var item in items)
+                {
+                    if (item is StorageFile file)
+                    {
+                        var ext = Path.GetExtension(file.Name).ToLowerInvariant();
+                        if (Settings.SupportedModExtensions.Contains(ext) || Settings.SupportedImageExtensions.Contains(ext))
+                        {
+                            DropHelper.Visibility = Visibility.Visible;
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
+        }
+    }
+
+    private void Root_DragLeave(object sender, DragEventArgs e)
+    {
+        DropHelper.Visibility = Visibility.Collapsed;
+    }
+
+    private void DropHelper_DragOver(object sender, DragEventArgs e)
+    {
+        e.AcceptedOperation = DataPackageOperation.Copy;
+    }
+
+    private async void DropHelper_Drop(object sender, DragEventArgs e)
+    {
+        DropHelper.Visibility = Visibility.Collapsed;
+        try
+        {
+            if (e.DataView.Contains(StandardDataFormats.StorageItems))
+            {
+                var items = await e.DataView.GetStorageItemsAsync();
+                var mods = new List<StorageFile>();
+                var images = new List<StorageFile>();
+                foreach (var item in items)
+                {
+                    if (item is StorageFile file)
+                    {
+                        var ext = Path.GetExtension(file.Name).ToLowerInvariant();
+                        if (Settings.SupportedModExtensions.Contains(ext))
+                        {
+                            mods.Add(file);
+                        }
+                        else if (Settings.SupportedImageExtensions.Contains(ext))
+                        {
+                            images.Add(file);
+                        }
+                    }
+                }
+                if (mods.Any())
+                {
+                    await AddFiles(mods);
+                }
+                if (images.Any())
+                {
+                    await AddImages(images);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
+        }
     }
 }

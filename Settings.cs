@@ -133,6 +133,8 @@ public partial class DoomEntry: ObservableObject
 
     public bool UniqueConfig { get; set; } = false;
 
+    public bool UniqueSavesFolder { get; set; } = false;
+
     public string Id { get; set; } = "";
 
     public int selectedImageIndex = 0;

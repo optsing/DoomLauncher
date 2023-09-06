@@ -21,6 +21,7 @@ public sealed partial class EditModContentDialog : ContentDialog
         ModLongDescription = initial.longDescription;
         IWadFile = filteredIWads.FirstOrDefault(kv => kv.Key == initial.iWadFile, filteredIWads.First());
         UniqueConfig = initial.uniqueConfig;
+        UniqueSavesFolder = initial.uniqueSavesFolder;
         FilteredIWads = filteredIWads;
         PrimaryButtonText = mode switch
         {
@@ -78,6 +79,11 @@ public sealed partial class EditModContentDialog : ContentDialog
         get; private set;
     }
 
+    public bool UniqueSavesFolder
+    {
+        get; private set;
+    }
+
     public List<TitleChecked> ModFiles { get; private set; }
     public List<TitleChecked> ImageFiles { get; private set; }
 
@@ -99,16 +105,18 @@ public class EditModDialogResult
     public readonly string longDescription;
     public readonly string iWadFile;
     public readonly bool uniqueConfig;
+    public readonly bool uniqueSavesFolder;
     public readonly List<string> modFiles;
     public readonly List<string> imageFiles;
 
-    public EditModDialogResult(string name, string description, string longDescription, string iWadFile, bool uniqueConfig, List<string>? modFiles = null, List<string>? imageFiles = null)
+    public EditModDialogResult(DoomEntry entry, List<string>? modFiles = null, List<string>? imageFiles = null)
     {
-        this.name = name;
-        this.description = description;
-        this.longDescription = longDescription;
-        this.iWadFile = iWadFile;
-        this.uniqueConfig = uniqueConfig;
+        name = entry.Name;
+        description = entry.Description;
+        longDescription = entry.LongDescription;
+        iWadFile = entry.IWadFile;
+        uniqueConfig = entry.UniqueConfig;
+        uniqueSavesFolder = entry.UniqueSavesFolder;
         this.modFiles = modFiles ?? new List<string>();
         this.imageFiles = imageFiles ?? new List<string>();
     }

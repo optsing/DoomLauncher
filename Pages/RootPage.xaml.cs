@@ -212,7 +212,7 @@ public sealed partial class RootPage : Page
 
     private async Task EditMod(DoomEntry entry)
     {
-        var initial = new EditModDialogResult(entry.Name, entry.Description, entry.LongDescription, entry.IWadFile, entry.UniqueConfig);
+        var initial = new EditModDialogResult(entry);
         if (await AddOrEditModDialogShow(initial, EditDialogMode.Edit) is EditModDialogResult result)
         {
             entry.Name = result.name;
@@ -220,6 +220,7 @@ public sealed partial class RootPage : Page
             entry.LongDescription = result.longDescription;
             entry.IWadFile = result.iWadFile;
             entry.UniqueConfig = result.uniqueConfig;
+            entry.UniqueSavesFolder = result.uniqueSavesFolder;
             OnSave?.Invoke(this, new EventArgs());
         }
     }
@@ -234,6 +235,7 @@ public sealed partial class RootPage : Page
             LongDescription = entry.LongDescription,
             IWadFile = entry.IWadFile,
             UniqueConfig = entry.UniqueConfig,
+            UniqueSavesFolder = entry.UniqueSavesFolder,
             SelectedImageIndex = entry.SelectedImageIndex,
             ModFiles = new(entry.ModFiles.Select(path => path)),
             ImageFiles = new(entry.ImageFiles.Select(path => path)),
@@ -274,6 +276,16 @@ public sealed partial class RootPage : Page
             processInfo.ArgumentList.Add("-config");
             processInfo.ArgumentList.Add(configPath);
         }
+        if (entry.UniqueSavesFolder)
+        {
+            var entrySavesFolderPath = Path.Combine(dataFolderPath, "saves", entry.Id);
+            if (!Directory.Exists(entrySavesFolderPath))
+            {
+                Directory.CreateDirectory(entrySavesFolderPath);
+            }
+            processInfo.ArgumentList.Add("-savedir");
+            processInfo.ArgumentList.Add(entrySavesFolderPath);
+        }
         if (!string.IsNullOrEmpty(entry.IWadFile))
         {
             processInfo.ArgumentList.Add("-iwad");
@@ -308,7 +320,7 @@ public sealed partial class RootPage : Page
 
     private async void CreateMod_Click(object sender, SplitButtonClickEventArgs e)
     {
-        var initial = new EditModDialogResult("", "", "", "", false);
+        var initial = new EditModDialogResult(new DoomEntry());
         if (await AddOrEditModDialogShow(initial, EditDialogMode.Create) is EditModDialogResult result)
         {
             var entry = new DoomEntry()
@@ -319,6 +331,7 @@ public sealed partial class RootPage : Page
                 LongDescription = result.longDescription,
                 IWadFile = result.iWadFile,
                 UniqueConfig = result.uniqueConfig,
+                UniqueSavesFolder = result.uniqueSavesFolder,
                 SelectedImageIndex = 0,
             };
             settings.Entries.Add(entry);
@@ -369,7 +382,16 @@ public sealed partial class RootPage : Page
         {
             var modFiles = dialog.ModFiles.Where(tc => tc.IsChecked).Select(tc => tc.Title).ToList();
             var imageFiles = dialog.ImageFiles.Where(tc => tc.IsChecked).Select(tc => tc.Title).ToList();
-            return new EditModDialogResult(dialog.ModName, dialog.ModDescription, dialog.ModLongDescription, dialog.IWadFile.Key, dialog.UniqueConfig, modFiles, imageFiles);
+            return new EditModDialogResult(
+                new DoomEntry()
+                {
+                    Name = dialog.ModName,
+                    Description = dialog.ModDescription,
+                    LongDescription = dialog.ModLongDescription,
+                    IWadFile = dialog.IWadFile.Key,
+                    UniqueConfig = dialog.UniqueConfig,
+                    UniqueSavesFolder = dialog.UniqueSavesFolder,
+                }, modFiles, imageFiles);
         }
         return null;
     }
@@ -396,6 +418,7 @@ public sealed partial class RootPage : Page
 
         // Now we can use the picker object as normal
         picker.FileTypeFilter.Add(".gzdl");
+        picker.FileTypeFilter.Add(".zip");
 
         var files = await picker.PickMultipleFilesAsync();
 
@@ -445,6 +468,7 @@ public sealed partial class RootPage : Page
                 LongDescription = entry.LongDescription,
                 IWadFile = entry.IWadFile,
                 UniqueConfig = entry.UniqueConfig,
+                UniqueSavesFolder = entry.UniqueSavesFolder,
                 SelectedImageIndex = entry.SelectedImageIndex,
                 ModFiles = new(entry.ModFiles.Select(path => Path.GetFileName(path))),
                 ImageFiles = new(entry.ImageFiles.Select(path => Path.GetFileName(path))),
@@ -470,67 +494,6 @@ public sealed partial class RootPage : Page
         }
         SetProgress(null);
     }
-
-    private async void DoomList_DragOver(object sender, DragEventArgs e)
-    {
-        var deferral = e.GetDeferral();
-        try
-        {
-            if (e.DataView.Contains(StandardDataFormats.StorageItems))
-            {
-                var items = await e.DataView.GetStorageItemsAsync();
-                foreach (var item in items)
-                {
-                    if (item is StorageFile file)
-                    {
-                        var ext = Path.GetExtension(file.Name).ToLowerInvariant();
-                        if (ext == ".gzdl")
-                        {
-                            e.AcceptedOperation = DataPackageOperation.Copy;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine(ex);
-        }
-        deferral.Complete();
-    }
-
-    private async void DoomList_Drop(object? sender, DragEventArgs e)
-    {
-        try
-        {
-            if (e.DataView.Contains(StandardDataFormats.StorageItems))
-            {
-                var items = await e.DataView.GetStorageItemsAsync();
-                var files = new List<StorageFile>();
-                foreach (var item in items)
-                {
-                    if (item is StorageFile file)
-                    {
-                        var ext = Path.GetExtension(file.Name).ToLowerInvariant();
-                        if (ext == ".gzdl")
-                        {
-                            files.Add(file);
-                        }
-                    }
-                }
-                if (files.Any())
-                {
-                    await ImportEntriesFromFiles(files, withConfirm: true);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine(ex);
-        }
-    }
-
     public async Task ImportEntriesFromFiles(IReadOnlyList<StorageFile> files, bool withConfirm)
     {
         DoomEntry? lastAddedEntry = null;
@@ -574,86 +537,82 @@ public sealed partial class RootPage : Page
             SetProgress($"Чтение файла: {file.Name}");
             using var zipToRead = await file.OpenStreamForReadAsync();
             using var archive = new ZipArchive(zipToRead, ZipArchiveMode.Read);
-
+            DoomEntry? newEntry = null;
             if (archive.Entries.FirstOrDefault(entry => entry.FullName == "entry.json") is ZipArchiveEntry zipConfigEntry)
             {
                 SetProgress($"Извлечение: {zipConfigEntry.Name}");
                 using var configStream = zipConfigEntry.Open();
-                var newEntry = await JsonSerializer.DeserializeAsync(configStream, JsonSettingsContext.Default.DoomEntry);
-                if (newEntry != null)
+                newEntry = await JsonSerializer.DeserializeAsync(configStream, JsonSettingsContext.Default.DoomEntry);
+            }
+            newEntry ??= new DoomEntry()
+            {
+                Name = Path.GetFileNameWithoutExtension(file.Name),
+            };
+            var entryProperties = new EditModDialogResult(newEntry);
+            if (withConfirm)
+            {
+                foreach (var zipFileEntry in archive.Entries)
                 {
-                    var entryProperties = new EditModDialogResult(
-                        name: newEntry.Name,
-                        description: newEntry.Description,
-                        longDescription: newEntry.LongDescription,
-                        iWadFile: newEntry.IWadFile,
-                        uniqueConfig: newEntry.UniqueConfig
-                    );
-                    if (withConfirm)
+                    var ext = Path.GetExtension(zipFileEntry.Name).ToLowerInvariant();
+                    if (Settings.SupportedModExtensions.Contains(ext))
                     {
-                        foreach (var zipFileEntry in archive.Entries)
-                        {
-                            var ext = Path.GetExtension(zipFileEntry.Name).ToLowerInvariant();
-                            if (Settings.SupportedModExtensions.Contains(ext))
-                            {
-                                entryProperties.modFiles.Add(zipFileEntry.Name);
-                            }
-                            else if (Settings.SupportedImageExtensions.Contains(ext))
-                            {
-                                entryProperties.imageFiles.Add(zipFileEntry.Name);
-                            }
-                        }
-                        entryProperties = await AddOrEditModDialogShow(entryProperties, EditDialogMode.Import);
+                        entryProperties.modFiles.Add(zipFileEntry.Name);
                     }
-                    if (entryProperties != null)
+                    else if (Settings.SupportedImageExtensions.Contains(ext))
                     {
-                        var modsCopied = new List<string>();
-                        var imagesCopied = new List<string>();
-                        foreach (var zipFileEntry in archive.Entries)
-                        {
-                            var ext = Path.GetExtension(zipFileEntry.Name).ToLowerInvariant();
-                            if (Settings.SupportedModExtensions.Contains(ext) && (!withConfirm || entryProperties.modFiles.Contains(zipFileEntry.Name)))
-                            {
-                                SetProgress($"Извлечение: {zipFileEntry.Name}");
-                                using var fileStream = zipFileEntry.Open();
-                                await Settings.CopyFileWithConfirmation(XamlRoot, fileStream, zipFileEntry.Name, Path.Combine(dataFolderPath, "mods"));
-                                modsCopied.Add(zipFileEntry.Name);
-                            }
-                            else if (Settings.SupportedImageExtensions.Contains(ext) && (!withConfirm || entryProperties.imageFiles.Contains(zipFileEntry.Name)))
-                            {
-                                SetProgress($"Извлечение: {zipFileEntry.Name}");
-                                using var fileStream = zipFileEntry.Open();
-                                await Settings.CopyFileWithConfirmation(XamlRoot, fileStream, zipFileEntry.Name, Path.Combine(dataFolderPath, "images"));
-                                imagesCopied.Add(zipFileEntry.Name);
-                            }
-                        }
-
-                        var finalModFiles = newEntry.ModFiles
-                            .Where(modsCopied.Contains)
-                            .Concat(modsCopied
-                                .Where(fileName => !newEntry.ModFiles.Contains(fileName)))
-                            .Select(fileName => Path.Combine(dataFolderPath, "mods", fileName));
-                        var finalImageFiles = newEntry.ImageFiles
-                            .Where(imagesCopied.Contains)
-                            .Concat(imagesCopied
-                                .Where(fileName => !newEntry.ImageFiles.Contains(fileName)))
-                            .Select(fileName => Path.Combine(dataFolderPath, "images", fileName));
-
-                        SetProgress(null);
-                        return new DoomEntry()
-                        {
-                            Id = Guid.NewGuid().ToString(),
-                            Name = entryProperties.name,
-                            Description = entryProperties.description,
-                            LongDescription = entryProperties.longDescription,
-                            IWadFile = entryProperties.iWadFile,
-                            UniqueConfig = entryProperties.uniqueConfig,
-                            SelectedImageIndex = newEntry.SelectedImageIndex,
-                            ModFiles = new(finalModFiles),
-                            ImageFiles = new(finalImageFiles),
-                        };
+                        entryProperties.imageFiles.Add(zipFileEntry.Name);
                     }
                 }
+                entryProperties = await AddOrEditModDialogShow(entryProperties, EditDialogMode.Import);
+            }
+            if (entryProperties != null)
+            {
+                var modsCopied = new List<string>();
+                var imagesCopied = new List<string>();
+                foreach (var zipFileEntry in archive.Entries)
+                {
+                    var ext = Path.GetExtension(zipFileEntry.Name).ToLowerInvariant();
+                    if (Settings.SupportedModExtensions.Contains(ext) && (!withConfirm || entryProperties.modFiles.Contains(zipFileEntry.Name)))
+                    {
+                        SetProgress($"Извлечение: {zipFileEntry.Name}");
+                        using var fileStream = zipFileEntry.Open();
+                        await Settings.CopyFileWithConfirmation(XamlRoot, fileStream, zipFileEntry.Name, Path.Combine(dataFolderPath, "mods"));
+                        modsCopied.Add(zipFileEntry.Name);
+                    }
+                    else if (Settings.SupportedImageExtensions.Contains(ext) && (!withConfirm || entryProperties.imageFiles.Contains(zipFileEntry.Name)))
+                    {
+                        SetProgress($"Извлечение: {zipFileEntry.Name}");
+                        using var fileStream = zipFileEntry.Open();
+                        await Settings.CopyFileWithConfirmation(XamlRoot, fileStream, zipFileEntry.Name, Path.Combine(dataFolderPath, "images"));
+                        imagesCopied.Add(zipFileEntry.Name);
+                    }
+                }
+
+                var finalModFiles = newEntry.ModFiles
+                    .Where(modsCopied.Contains)
+                    .Concat(modsCopied
+                        .Where(fileName => !newEntry.ModFiles.Contains(fileName)))
+                    .Select(fileName => Path.Combine(dataFolderPath, "mods", fileName));
+                var finalImageFiles = newEntry.ImageFiles
+                    .Where(imagesCopied.Contains)
+                    .Concat(imagesCopied
+                        .Where(fileName => !newEntry.ImageFiles.Contains(fileName)))
+                    .Select(fileName => Path.Combine(dataFolderPath, "images", fileName));
+
+                SetProgress(null);
+                return new DoomEntry()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = entryProperties.name,
+                    Description = entryProperties.description,
+                    LongDescription = entryProperties.longDescription,
+                    IWadFile = entryProperties.iWadFile,
+                    UniqueConfig = entryProperties.uniqueConfig,
+                    UniqueSavesFolder = entryProperties.uniqueSavesFolder,
+                    SelectedImageIndex = newEntry.SelectedImageIndex,
+                    ModFiles = new(finalModFiles),
+                    ImageFiles = new(finalImageFiles),
+                };
             }
         }
         catch (Exception ex)
@@ -677,13 +636,11 @@ public sealed partial class RootPage : Page
             var zipToRead = await DoomWorldAPI.DownloadWadArchive(wadInfo);
             using var archive = new ZipArchive(zipToRead, ZipArchiveMode.Read);
 
-            var entryProperties = new EditModDialogResult(
-                name: wadInfo.Title,
-                description: "",
-                longDescription: reLineBreak().Replace(wadInfo.Description, "\n"),
-                iWadFile: "",
-                uniqueConfig: false
-            );
+            var entryProperties = new EditModDialogResult(new DoomEntry()
+            {
+                Name = wadInfo.Title,
+                LongDescription = reLineBreak().Replace(wadInfo.Description, "\n"),
+            });
             if (withConfirm)
             {
                 foreach (var zipFileEntry in archive.Entries)
@@ -737,6 +694,7 @@ public sealed partial class RootPage : Page
                     LongDescription = entryProperties.longDescription,
                     IWadFile = entryProperties.iWadFile,
                     UniqueConfig = entryProperties.uniqueConfig,
+                    UniqueSavesFolder = entryProperties.uniqueSavesFolder,
                     SelectedImageIndex = 0,
                     ModFiles = new(finalModFiles),
                     ImageFiles = new(finalImageFiles),
@@ -749,5 +707,83 @@ public sealed partial class RootPage : Page
         }
         SetProgress(null);
         return null;
+    }
+
+    private async void Root_DragEnter(object sender, DragEventArgs e)
+    {
+        try
+        {
+            if (e.DataView.Contains(StandardDataFormats.StorageItems))
+            {
+                var items = await e.DataView.GetStorageItemsAsync();
+                foreach (var item in items)
+                {
+                    if (item is StorageFile file)
+                    {
+                        var ext = Path.GetExtension(file.Name).ToLowerInvariant();
+                        if (ext == ".gzdl" || ext == ".zip")
+                        {
+                            DropHelper.Visibility = Visibility.Visible;
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
+        }
+    }
+
+    private void Root_DragLeave(object sender, DragEventArgs e)
+    {
+        DropHelper.Visibility = Visibility.Collapsed;
+    }
+
+    private void DoomList_DragOver(object sender, DragEventArgs e)
+    {
+        e.AcceptedOperation = DataPackageOperation.Copy;
+    }
+
+    private async void DoomList_Drop(object? sender, DragEventArgs e)
+    {
+        DropHelper.Visibility = Visibility.Collapsed;
+        try
+        {
+            if (e.DataView.Contains(StandardDataFormats.StorageItems))
+            {
+                var items = await e.DataView.GetStorageItemsAsync();
+                var files = new List<StorageFile>();
+                var mods = new List<StorageFile>();
+                var images = new List<StorageFile>();
+                foreach (var item in items)
+                {
+                    if (item is StorageFile file)
+                    {
+                        var ext = Path.GetExtension(file.Name).ToLowerInvariant();
+                        if (ext == ".gzdl" || ext == ".zip")
+                        {
+                            files.Add(file);
+                        } else if (Settings.SupportedModExtensions.Contains(ext))
+                        {
+                            mods.Add(file);
+                        }
+                        else if (Settings.SupportedImageExtensions.Contains(ext))
+                        {
+                            images.Add(file);
+                        }
+                    }
+                }
+                if (files.Any())
+                {
+                    await ImportEntriesFromFiles(files, withConfirm: true);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
+        }
     }
 }

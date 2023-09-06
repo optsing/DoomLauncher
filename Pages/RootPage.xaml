@@ -4,6 +4,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
     xmlns:local="using:DoomLauncher"
     xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
     mc:Ignorable="d"
@@ -42,6 +43,9 @@
                     x:Name="gridPane"
                     Background="{ThemeResource SystemControlPageBackgroundChromeLowBrush}"
                     CornerRadius="8"
+                    AllowDrop="True"
+                    DragEnter="Root_DragEnter"
+                    DragLeave="Root_DragLeave"
                 >
                     <Grid.RowDefinitions>
                         <RowDefinition Height="{x:Bind TitleBarHeight}" />
@@ -76,10 +80,7 @@
                         IsItemClickEnabled="True"
                         ItemsSource="{x:Bind settings.Entries}"
                         SelectionChanged="DoomList_SelectionChanged"
-                        AllowDrop="True"
                         CanReorderItems="True"
-                        DragOver="DoomList_DragOver"
-                        Drop="DoomList_Drop"
                     >
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="local:DoomEntry">
@@ -144,6 +145,33 @@
                             <TextBlock>Настройки</TextBlock>
                         </StackPanel>
                     </Button>
+                    <Border
+                        x:Name="DropHelper"
+                        Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+                        Grid.Row="1"
+                        Grid.RowSpan="3"
+                        CornerRadius="8"
+                        AllowDrop="True"
+                        DragOver="DoomList_DragOver"
+                        Drop="DoomList_Drop"
+                        Visibility="Collapsed"
+                    >
+                        <animations:Implicit.ShowAnimations>
+                            <animations:OpacityAnimation Duration="0:0:0.2" From="0" To="1.0"/>
+                        </animations:Implicit.ShowAnimations>
+                        <animations:Implicit.HideAnimations>
+                            <animations:OpacityAnimation Duration="0:0:0.2" From="1.0" To="0"/>
+                        </animations:Implicit.HideAnimations>
+                        <TextBlock
+                            FontSize="24"
+                            Margin="8"
+                            Text="Отпустите файлы, чтобы импортировать их как сборку"
+                            TextWrapping="WrapWholeWords"
+                            HorizontalAlignment="Stretch"
+                            TextAlignment="Center"
+                            VerticalAlignment="Center"
+                        />
+                    </Border>
                 </Grid>
             </SplitView.Pane>
             <Grid>
