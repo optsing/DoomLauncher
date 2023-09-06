@@ -86,11 +86,6 @@ public sealed partial class EditModContentDialog : ContentDialog
 
     public List<TitleChecked> ModFiles { get; private set; }
     public List<TitleChecked> ImageFiles { get; private set; }
-
-    public static Visibility HasItems (List<TitleChecked> list)
-    {
-        return list.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-    }
 }
 
 public enum EditDialogMode

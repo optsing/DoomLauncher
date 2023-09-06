@@ -428,12 +428,6 @@ public sealed partial class RootPage : Page
         }
     }
 
-
-    public static Visibility HasText(string text)
-    {
-        return string.IsNullOrEmpty(text) ? Visibility.Collapsed : Visibility.Visible;
-    }
-
     private async Task ExportMod(DoomEntry entry)
     {
         var picker = new Windows.Storage.Pickers.FileSavePicker();
@@ -729,6 +723,14 @@ public sealed partial class RootPage : Page
             });
             if (withConfirm)
             {
+                foreach (var mod in mods)
+                {
+                    entryProperties.modFiles.Add(mod.Name);
+                }
+                foreach (var image in images)
+                {
+                    entryProperties.imageFiles.Add(image.Name);
+                }
                 entryProperties = await AddOrEditModDialogShow(entryProperties, EditDialogMode.Import);
             }
             if (entryProperties != null)
@@ -737,15 +739,21 @@ public sealed partial class RootPage : Page
                 var imagesCopied = new List<string>();
                 foreach (var mod in mods)
                 {
-                    SetProgress($"Копирование: {mod.Name}");
-                    await Settings.CopyFileWithConfirmation(XamlRoot, mod, Path.Combine(dataFolderPath, "mods"));
-                    modsCopied.Add(mod.Name);
+                    if (!withConfirm || entryProperties.modFiles.Contains(mod.Name))
+                    {
+                        SetProgress($"Копирование: {mod.Name}");
+                        await Settings.CopyFileWithConfirmation(XamlRoot, mod, Path.Combine(dataFolderPath, "mods"));
+                        modsCopied.Add(mod.Name);
+                    }
                 }
                 foreach (var image in images)
                 {
-                    SetProgress($"Копирование: {image.Name}");
-                    await Settings.CopyFileWithConfirmation(XamlRoot, image, Path.Combine(dataFolderPath, "images"));
-                    imagesCopied.Add(image.Name);
+                    if (!withConfirm || entryProperties.imageFiles.Contains(image.Name))
+                    {
+                        SetProgress($"Копирование: {image.Name}");
+                        await Settings.CopyFileWithConfirmation(XamlRoot, image, Path.Combine(dataFolderPath, "images"));
+                        imagesCopied.Add(image.Name);
+                    }
                 }
                 
                 var finalModFiles = modsCopied

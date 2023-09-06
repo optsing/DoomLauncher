@@ -2,6 +2,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -24,6 +25,7 @@ public sealed partial class SettingsContentDialog : ContentDialog
         this.XamlRoot = root;
         this.hWnd = hWnd;
         this.State = state;
+        State.GZDoomVersion = GetGZDoomVersion();
     }
 
     private async Task ChooseGZDoomPath()
@@ -40,6 +42,7 @@ public sealed partial class SettingsContentDialog : ContentDialog
         if (file != null)
         {
             State.GZDoomPath = file.Path;
+            State.GZDoomVersion = GetGZDoomVersion();
         }
     }
 
@@ -56,6 +59,19 @@ public sealed partial class SettingsContentDialog : ContentDialog
             args.Cancel = true;
         }
     }
+
+    private string GetGZDoomVersion()
+    {
+        if (Settings.ValidateGZDoomPath(State.GZDoomPath))
+        {
+            var version = FileVersionInfo.GetVersionInfo(State.GZDoomPath);
+            if (version.ProductVersion != null)
+            {
+                return $"Версия: {version.ProductVersion}";
+            }
+        }
+        return "";
+    }
 }
 
 public class SettingsDialogState: ObservableObject
@@ -66,6 +82,14 @@ public class SettingsDialogState: ObservableObject
     {
         get => gZDoomPath;
         set => SetProperty(ref gZDoomPath, value);
+    }
+
+    private string gZDoomVersion = "";
+
+    public string GZDoomVersion
+    {
+        get => gZDoomVersion;
+        set => SetProperty(ref gZDoomVersion, value);
     }
 
     public bool CloseOnLaunch { get; set; } = false;

@@ -23,7 +23,7 @@
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
                 Margin="0,8,8,8"
-                Text="{x:Bind State.GZDoomPath, Mode=TwoWay}"
+                Text="{x:Bind State.GZDoomPath, Mode=OneWay}"
                 AcceptsReturn="False"
                 PlaceholderText="Выберите исполняемый файл"
                 IsReadOnly="True"
@@ -37,8 +37,36 @@
                 Выбрать
             </Button>
         </Grid>
+        <Grid ColumnDefinitions="*,Auto">
+            <TextBlock
+                Grid.Column="0"
+                Text="{x:Bind State.GZDoomVersion, Mode=OneWay}"
+                VerticalAlignment="Center"
+            />
+            <HyperlinkButton
+                Grid.Column="1"
+                NavigateUri="https://www.zdoom.org/downloads"
+                VerticalAlignment="Center"
+            >
+                <StackPanel
+                    Orientation="Horizontal"
+                >
+                    <TextBlock
+                        Text="Скачать с официального сайта"
+                        VerticalAlignment="Center"
+                    />
+                    <FontIcon
+                        FontSize="14"
+                        Glyph="&#xE8A7;"
+                        Margin="4,0,0,0"
+                        VerticalAlignment="Center"
+                    />
+                </StackPanel>
+            </HyperlinkButton>
+        </Grid>
         <CheckBox
+            Content="Закрывать лаунчер при запуске сборки"
             IsChecked="{x:Bind State.CloseOnLaunch, Mode=TwoWay}"
-        >Закрывать лаунчер при запуске сборки</CheckBox>
+        />
     </StackPanel>
 </ContentDialog>

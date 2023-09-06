@@ -270,16 +270,6 @@ public sealed partial class DoomPage : Page
         return null;
     }
 
-    public static bool HasMoreItems(int itemsCount, int count)
-    {
-        return itemsCount > count;
-    }
-
-    public static Visibility HasNoItems(int itemsCount)
-    {
-        return itemsCount == 0 ? Visibility.Visible : Visibility.Collapsed;
-    }
-
     private async void Root_DragEnter(object sender, DragEventArgs e)
     {
         try

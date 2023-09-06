@@ -64,11 +64,11 @@
                 Content="Использовать уникальную папку сохранений"
                 IsChecked="{x:Bind UniqueSavesFolder, Mode=TwoWay}"
             />
-            <TextBlock Visibility="{x:Bind local:EditModContentDialog.HasItems(ModFiles)}">Файлы</TextBlock>
+            <TextBlock Visibility="{x:Bind local:XamlHelper.HasItems(ModFiles.Count)}">Файлы</TextBlock>
             <ListView
                 ItemsSource="{x:Bind ModFiles}"
                 SelectionMode="None"
-                Visibility="{x:Bind local:EditModContentDialog.HasItems(ModFiles)}"
+                Visibility="{x:Bind local:XamlHelper.HasItems(ModFiles.Count)}"
             >
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
@@ -85,11 +85,11 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <TextBlock Visibility="{x:Bind local:EditModContentDialog.HasItems(ImageFiles)}">Изображения</TextBlock>
+            <TextBlock Visibility="{x:Bind local:XamlHelper.HasItems(ImageFiles.Count)}">Изображения</TextBlock>
             <ListView
                 ItemsSource="{x:Bind ImageFiles}"
                 SelectionMode="None"
-                Visibility="{x:Bind local:EditModContentDialog.HasItems(ImageFiles)}"
+                Visibility="{x:Bind local:XamlHelper.HasItems(ImageFiles.Count)}"
             >
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">

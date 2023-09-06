@@ -120,7 +120,7 @@
                                     />
                                     <TextBlock
                                         Text="{x:Bind Description, Mode=OneWay}"
-                                        Visibility="{x:Bind local:RootPage.HasText(Description), Mode=OneWay}"
+                                        Visibility="{x:Bind local:XamlHelper.HasText(Description), Mode=OneWay}"
                                         FontSize="12"
                                         TextWrapping="WrapWholeWords"
                                     />
@@ -223,6 +223,12 @@
             Grid.RowSpan="2"
             Visibility="Collapsed"
         >
+            <animations:Implicit.ShowAnimations>
+                <animations:OpacityAnimation Duration="0:0:0.2" From="0" To="1.0"/>
+            </animations:Implicit.ShowAnimations>
+            <animations:Implicit.HideAnimations>
+                <animations:OpacityAnimation Duration="0:0:0.2" From="1.0" To="0"/>
+            </animations:Implicit.HideAnimations>
             <StackPanel
                 Orientation="Horizontal"
                 HorizontalAlignment="Center"

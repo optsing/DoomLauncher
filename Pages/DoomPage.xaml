@@ -29,7 +29,7 @@
             Orientation="Horizontal"
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
-            Visibility="{x:Bind local:DoomPage.HasNoItems(entry.ModFiles.Count), Mode=OneWay}"
+            Visibility="{x:Bind local:XamlHelper.HasNoItems(entry.ModFiles.Count), Mode=OneWay}"
         >
             <TextBlock
                 FontSize="24"
@@ -89,7 +89,7 @@
             </DropDownButton>
             <Button Grid.Column="3" Width="180" Margin="4,8,8,8" VerticalAlignment="Center" Click="Start_Click" Style="{ThemeResource AccentButtonStyle}">
                 <StackPanel Orientation="Horizontal">
-                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7FC;" Margin="0,0,4,0" />
+                    <FontIcon Glyph="&#xE7FC;" Margin="0,0,4,0" />
                     <TextBlock>Играть</TextBlock>
                 </StackPanel>
             </Button>
@@ -138,6 +138,10 @@
         <ScrollViewer
             Grid.Row="2"
             MaxHeight="256"
+            Background="{ThemeResource AcrylicInAppFillColorBaseBrush}"
+            Margin="8"
+            CornerRadius="8"
+            Visibility="{x:Bind local:XamlHelper.HasText(entry.LongDescription)}"
         >
             <TextBlock
                 Margin="8"
@@ -166,7 +170,7 @@
                 Style="{ThemeResource EllipsisButton}"
                 Height="40"
                 Width="40"
-                IsEnabled="{x:Bind local:DoomPage.HasMoreItems(entry.ImageFiles.Count, 1), Mode=OneWay}"
+                IsEnabled="{x:Bind local:XamlHelper.HasMoreItems(entry.ImageFiles.Count, 1), Mode=OneWay}"
             >
                 <FontIcon Glyph="&#xE892;" FontSize="16" />
             </Button>
@@ -176,7 +180,7 @@
                 Style="{ThemeResource EllipsisButton}"
                 Height="40"
                 Width="40"
-                IsEnabled="{x:Bind local:DoomPage.HasMoreItems(entry.ImageFiles.Count, 1), Mode=OneWay}"
+                IsEnabled="{x:Bind local:XamlHelper.HasMoreItems(entry.ImageFiles.Count, 1), Mode=OneWay}"
             >
                 <FontIcon Glyph="&#xE893;" FontSize="16" />
             </Button>
@@ -186,7 +190,7 @@
                 Click="RemoveBackground_Click"
                 Height="40"
                 Width="40"
-                IsEnabled="{x:Bind local:DoomPage.HasMoreItems(entry.ImageFiles.Count, 0), Mode=OneWay}"
+                IsEnabled="{x:Bind local:XamlHelper.HasMoreItems(entry.ImageFiles.Count, 0), Mode=OneWay}"
             >
                 <FontIcon Glyph="&#xE74D;" FontSize="16" />
             </Button>
