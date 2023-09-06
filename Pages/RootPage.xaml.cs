@@ -267,18 +267,18 @@ public sealed partial class RootPage : Page
         };
         if (entry.UniqueConfig)
         {
-            var configFolderPath = Path.Combine(dataFolderPath, "configs");
-            if (!Directory.Exists(configFolderPath))
+            var entryFolderPath = Path.Combine(dataFolderPath, "entries", entry.Id);
+            if (!Directory.Exists(entryFolderPath))
             {
-                Directory.CreateDirectory(configFolderPath);
+                Directory.CreateDirectory(entryFolderPath);
             }
-            var configPath = Path.Combine(configFolderPath, $"{entry.Id}.ini");
+            var configPath = Path.Combine(entryFolderPath, "config.ini");
             processInfo.ArgumentList.Add("-config");
             processInfo.ArgumentList.Add(configPath);
         }
         if (entry.UniqueSavesFolder)
         {
-            var entrySavesFolderPath = Path.Combine(dataFolderPath, "saves", entry.Id);
+            var entrySavesFolderPath = Path.Combine(dataFolderPath, "entries", entry.Id, "saves");
             if (!Directory.Exists(entrySavesFolderPath))
             {
                 Directory.CreateDirectory(entrySavesFolderPath);
