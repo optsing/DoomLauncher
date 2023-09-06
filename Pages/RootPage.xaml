@@ -81,6 +81,7 @@
                         ItemsSource="{x:Bind settings.Entries}"
                         SelectionChanged="DoomList_SelectionChanged"
                         CanReorderItems="True"
+                        AllowDrop="True"
                     >
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="local:DoomEntry">
@@ -152,8 +153,8 @@
                         Grid.RowSpan="3"
                         CornerRadius="8"
                         AllowDrop="True"
-                        DragOver="DoomList_DragOver"
-                        Drop="DoomList_Drop"
+                        DragOver="DropHelper_DragOver"
+                        Drop="DropHelper_Drop"
                         Visibility="Collapsed"
                     >
                         <animations:Implicit.ShowAnimations>

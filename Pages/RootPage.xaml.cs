@@ -809,12 +809,12 @@ public sealed partial class RootPage : Page
         DropHelper.Visibility = Visibility.Collapsed;
     }
 
-    private void DoomList_DragOver(object sender, DragEventArgs e)
+    private void DropHelper_DragOver(object sender, DragEventArgs e)
     {
         e.AcceptedOperation = DataPackageOperation.Copy;
     }
 
-    private async void DoomList_Drop(object? sender, DragEventArgs e)
+    private async void DropHelper_Drop(object? sender, DragEventArgs e)
     {
         DropHelper.Visibility = Visibility.Collapsed;
         try

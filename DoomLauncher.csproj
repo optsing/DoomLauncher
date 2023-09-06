@@ -29,7 +29,7 @@
 		<DefaultLanguage>ru-RU</DefaultLanguage>
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<WindowsPackageType>None</WindowsPackageType>
+		<!--<WindowsPackageType>None</WindowsPackageType>-->
 	</PropertyGroup>
 	<ItemGroup>
 		<Content Remove="Assets\StoreLogo.scale-100.png" />
