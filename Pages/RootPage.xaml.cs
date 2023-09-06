@@ -323,7 +323,7 @@ public sealed partial class RootPage : Page
         var initial = new EditModDialogResult(new DoomEntry());
         if (await AddOrEditModDialogShow(initial, EditDialogMode.Create) is EditModDialogResult result)
         {
-            var entry = new DoomEntry()
+            var newEntry = new DoomEntry()
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = result.name,
@@ -334,8 +334,8 @@ public sealed partial class RootPage : Page
                 UniqueSavesFolder = result.uniqueSavesFolder,
                 SelectedImageIndex = 0,
             };
-            settings.Entries.Add(entry);
-            DoomList.SelectedItem = entry;
+            settings.Entries.Add(newEntry);
+            DoomList.SelectedItem = newEntry;
             OnSave?.Invoke(this, new EventArgs());
         }
     }
@@ -499,11 +499,11 @@ public sealed partial class RootPage : Page
         DoomEntry? lastAddedEntry = null;
         foreach (var file in files)
         {
-            var entry = await ImportModFile(file, withConfirm);
-            if (entry != null)
+            var newEntry = await ImportModFile(file, withConfirm);
+            if (newEntry != null)
             {
-                settings.Entries.Add(entry);
-                lastAddedEntry = entry;
+                settings.Entries.Add(newEntry);
+                lastAddedEntry = newEntry;
             }
         }
         if (lastAddedEntry != null)
@@ -519,11 +519,11 @@ public sealed partial class RootPage : Page
         var wadInfo = await DoomWorldAPI.GetWADInfo(wadId);
         if (wadInfo != null)
         {
-            var entry = await ImportModFileFromDoomWorld(wadInfo, withConfirm);
-            if (entry != null)
+            var newEntry = await ImportModFileFromDoomWorld(wadInfo, withConfirm);
+            if (newEntry != null)
             {
-                settings.Entries.Add(entry);
-                DoomList.SelectedItem = entry;
+                settings.Entries.Add(newEntry);
+                DoomList.SelectedItem = newEntry;
                 OnSave?.Invoke(this, new EventArgs());
             }
         }
@@ -709,6 +709,74 @@ public sealed partial class RootPage : Page
         return null;
     }
 
+    private async Task<DoomEntry?> CreateModFromFiles(List<StorageFile> mods, List<StorageFile> images, bool withConfirm)
+    {
+        try
+        {
+            string title = "Новая сборка";
+            if (mods.Any())
+            {
+                title = Path.GetFileNameWithoutExtension(mods.First().Name);
+            }
+            else if (images.Any())
+            {
+                title = Path.GetFileNameWithoutExtension(images.First().Name);
+            }
+
+            var entryProperties = new EditModDialogResult(new DoomEntry()
+            {
+                Name = title,
+            });
+            if (withConfirm)
+            {
+                entryProperties = await AddOrEditModDialogShow(entryProperties, EditDialogMode.Import);
+            }
+            if (entryProperties != null)
+            {
+                var modsCopied = new List<string>();
+                var imagesCopied = new List<string>();
+                foreach (var mod in mods)
+                {
+                    SetProgress($"Копирование: {mod.Name}");
+                    await Settings.CopyFileWithConfirmation(XamlRoot, mod, Path.Combine(dataFolderPath, "mods"));
+                    modsCopied.Add(mod.Name);
+                }
+                foreach (var image in images)
+                {
+                    SetProgress($"Копирование: {image.Name}");
+                    await Settings.CopyFileWithConfirmation(XamlRoot, image, Path.Combine(dataFolderPath, "images"));
+                    imagesCopied.Add(image.Name);
+                }
+                
+                var finalModFiles = modsCopied
+                    .Select(fileName => Path.Combine(dataFolderPath, "mods", fileName));
+                var finalImageFiles = imagesCopied
+                    .Select(fileName => Path.Combine(dataFolderPath, "images", fileName));
+
+                SetProgress(null);
+                return new DoomEntry()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = entryProperties.name,
+                    Description = entryProperties.description,
+                    LongDescription = entryProperties.longDescription,
+                    IWadFile = entryProperties.iWadFile,
+                    UniqueConfig = entryProperties.uniqueConfig,
+                    UniqueSavesFolder = entryProperties.uniqueSavesFolder,
+                    SelectedImageIndex = 0,
+                    ModFiles = new(finalModFiles),
+                    ImageFiles = new(finalImageFiles),
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
+        }
+        SetProgress(null);
+        return null;
+    }
+
     private async void Root_DragEnter(object sender, DragEventArgs e)
     {
         try
@@ -721,7 +789,7 @@ public sealed partial class RootPage : Page
                     if (item is StorageFile file)
                     {
                         var ext = Path.GetExtension(file.Name).ToLowerInvariant();
-                        if (ext == ".gzdl" || ext == ".zip")
+                        if (ext == ".gzdl" || ext == ".zip" || Settings.SupportedModExtensions.Contains(ext) || Settings.SupportedImageExtensions.Contains(ext))
                         {
                             DropHelper.Visibility = Visibility.Visible;
                             return;
@@ -765,7 +833,8 @@ public sealed partial class RootPage : Page
                         if (ext == ".gzdl" || ext == ".zip")
                         {
                             files.Add(file);
-                        } else if (Settings.SupportedModExtensions.Contains(ext))
+                        }
+                        else if (Settings.SupportedModExtensions.Contains(ext))
                         {
                             mods.Add(file);
                         }
@@ -778,6 +847,16 @@ public sealed partial class RootPage : Page
                 if (files.Any())
                 {
                     await ImportEntriesFromFiles(files, withConfirm: true);
+                }
+                if (mods.Any() || images.Any())
+                {
+                    var newEntry = await CreateModFromFiles(mods, images, withConfirm: true);
+                    if (newEntry != null)
+                    {
+                        settings.Entries.Add(newEntry);
+                        DoomList.SelectedItem = newEntry;
+                        OnSave?.Invoke(this, new EventArgs());
+                    }
                 }
             }
         }
