@@ -4,7 +4,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
+    xmlns:animations="using:CommunityToolkit.WinUI.Animations"
     xmlns:local="using:DoomLauncher"
     xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
     mc:Ignorable="d"
@@ -158,10 +158,10 @@
                         Visibility="Collapsed"
                     >
                         <animations:Implicit.ShowAnimations>
-                            <animations:OpacityAnimation Duration="0:0:0.2" From="0" To="1.0"/>
+                            <animations:OpacityAnimation Duration="0:0:0.3" From="0" To="1.0"/>
                         </animations:Implicit.ShowAnimations>
                         <animations:Implicit.HideAnimations>
-                            <animations:OpacityAnimation Duration="0:0:0.2" From="1.0" To="0"/>
+                            <animations:OpacityAnimation Duration="0:0:0.3" From="1.0" To="0"/>
                         </animations:Implicit.HideAnimations>
                         <TextBlock
                             FontSize="24"
@@ -224,10 +224,10 @@
             Visibility="Collapsed"
         >
             <animations:Implicit.ShowAnimations>
-                <animations:OpacityAnimation Duration="0:0:0.2" From="0" To="1.0"/>
+                <animations:OpacityAnimation Duration="0:0:0.3" From="0" To="1.0"/>
             </animations:Implicit.ShowAnimations>
             <animations:Implicit.HideAnimations>
-                <animations:OpacityAnimation Duration="0:0:0.2" From="1.0" To="0"/>
+                <animations:OpacityAnimation Duration="0:0:0.3" From="1.0" To="0"/>
             </animations:Implicit.HideAnimations>
             <StackPanel
                 Orientation="Horizontal"

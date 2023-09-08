@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="using:DoomLauncher"
-    xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
+    xmlns:animations="using:CommunityToolkit.WinUI.Animations"
     d:DataContext="{d:DesignInstance Type=local:DoomEntry}"
     mc:Ignorable="d"
     Background="Transparent"
@@ -205,10 +205,10 @@
             Visibility="Collapsed"
         >
             <animations:Implicit.ShowAnimations>
-                <animations:OpacityAnimation Duration="0:0:0.2" From="0" To="1.0"/>
+                <animations:OpacityAnimation Duration="0:0:0.3" From="0" To="1.0"/>
             </animations:Implicit.ShowAnimations>
             <animations:Implicit.HideAnimations>
-                <animations:OpacityAnimation Duration="0:0:0.2" From="1.0" To="0"/>
+                <animations:OpacityAnimation Duration="0:0:0.3" From="1.0" To="0"/>
             </animations:Implicit.HideAnimations>
             <TextBlock
                 FontSize="24"
