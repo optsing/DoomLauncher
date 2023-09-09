@@ -302,6 +302,8 @@ public sealed partial class RootPage : Page
         var process = Process.Start(processInfo);
         if (process != null)
         {
+            entry.LastLaunch = DateTime.Now;
+
             WindowHelper.SetForegroundWindow(process.MainWindowHandle);
 
             if (settings.CloseOnLaunch)
@@ -315,28 +317,6 @@ public sealed partial class RootPage : Page
                 presenter.Restore();
                 WindowHelper.SetForegroundWindow(hWnd);
             }
-        }
-    }
-
-    private async void CreateMod_Click(object sender, SplitButtonClickEventArgs e)
-    {
-        var initial = new EditModDialogResult(new DoomEntry());
-        if (await AddOrEditModDialogShow(initial, EditDialogMode.Create) is EditModDialogResult result)
-        {
-            var newEntry = new DoomEntry()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = result.name,
-                Description = result.description,
-                LongDescription = result.longDescription,
-                IWadFile = result.iWadFile,
-                UniqueConfig = result.uniqueConfig,
-                UniqueSavesFolder = result.uniqueSavesFolder,
-                SelectedImageIndex = 0,
-            };
-            settings.Entries.Add(newEntry);
-            DoomList.SelectedItem = newEntry;
-            OnSave?.Invoke(this, new EventArgs());
         }
     }
 
@@ -405,6 +385,61 @@ public sealed partial class RootPage : Page
     {
         if (await OpenSettings())
         {
+            OnSave?.Invoke(this, new EventArgs());
+        }
+    }
+
+    private async void CreateEntryFromFiles_Click(object sender, SplitButtonClickEventArgs e)
+    {
+        var picker = new Windows.Storage.Pickers.FileOpenPicker();
+
+        // Need to initialize the picker object with the hwnd / IInitializeWithWindow
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
+
+        // Now we can use the picker object as normal
+        foreach (var ext in Settings.SupportedModExtensions)
+        {
+            picker.FileTypeFilter.Add(ext);
+        }
+        foreach (var ext in Settings.SupportedImageExtensions)
+        {
+            picker.FileTypeFilter.Add(ext);
+        }
+
+        var files = await picker.PickMultipleFilesAsync();
+
+        if (files.Any())
+        {
+            var mods = files.Where(file => Settings.SupportedModExtensions.Contains(Path.GetExtension(file.Name))).ToList();
+            var images = files.Where(file => Settings.SupportedImageExtensions.Contains(Path.GetExtension(file.Name))).ToList();
+            var newEntry = await CreateModFromFiles(mods, images, withConfirm: true);
+            if (newEntry != null)
+            {
+                settings.Entries.Add(newEntry);
+                DoomList.SelectedItem = newEntry;
+                OnSave?.Invoke(this, new EventArgs());
+            }
+        }
+    }
+
+    private async void CreateMod_Click(object sender, RoutedEventArgs e)
+    {
+        var initial = new EditModDialogResult(new DoomEntry());
+        if (await AddOrEditModDialogShow(initial, EditDialogMode.Create) is EditModDialogResult result)
+        {
+            var newEntry = new DoomEntry()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = result.name,
+                Description = result.description,
+                LongDescription = result.longDescription,
+                IWadFile = result.iWadFile,
+                UniqueConfig = result.uniqueConfig,
+                UniqueSavesFolder = result.uniqueSavesFolder,
+                SelectedImageIndex = 0,
+            };
+            settings.Entries.Add(newEntry);
+            DoomList.SelectedItem = newEntry;
             OnSave?.Invoke(this, new EventArgs());
         }
     }
@@ -731,7 +766,7 @@ public sealed partial class RootPage : Page
                 {
                     entryProperties.imageFiles.Add(image.Name);
                 }
-                entryProperties = await AddOrEditModDialogShow(entryProperties, EditDialogMode.Import);
+                entryProperties = await AddOrEditModDialogShow(entryProperties, EditDialogMode.Create);
             }
             if (entryProperties != null)
             {

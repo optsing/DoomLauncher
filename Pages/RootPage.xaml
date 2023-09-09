@@ -53,13 +53,22 @@
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <SplitButton Grid.Row="1" Click="CreateMod_Click" HorizontalAlignment="Stretch" Margin="8">
+                    <SplitButton Grid.Row="1" Click="CreateEntryFromFiles_Click" HorizontalAlignment="Stretch" Margin="8">
                         <SplitButton.Flyout>
                             <MenuFlyout>
                                 <MenuFlyoutItem
+                                    Click="CreateMod_Click"
+                                    HorizontalAlignment="Stretch"
+                                    Text="Создать пустую сборку"
+                                >
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE7C3;" FontSize="16" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem
                                     Click="ImportButton_Click"
                                     HorizontalAlignment="Stretch"
-                                    Text="Импортировать сборки"
+                                    Text="Импортировать из файла"
                                 >
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xE898;" FontSize="16" />
@@ -91,22 +100,22 @@
                                 >
                                     <StackPanel.ContextFlyout>
                                         <MenuFlyout>
-                                            <MenuFlyoutItem Text="Настроить сборку" Click="EditMod_Click">
+                                            <MenuFlyoutItem Text="Настроить" Click="EditMod_Click">
                                                 <MenuFlyoutItem.Icon>
                                                     <SymbolIcon Symbol="Edit" />
                                                 </MenuFlyoutItem.Icon>
                                             </MenuFlyoutItem>
-                                            <MenuFlyoutItem Text="Дублировать сборку" Click="CopyMod_Click">
+                                            <MenuFlyoutItem Text="Дублировать" Click="CopyMod_Click">
                                                 <MenuFlyoutItem.Icon>
                                                     <SymbolIcon Symbol="Copy" />
                                                 </MenuFlyoutItem.Icon>
                                             </MenuFlyoutItem>
-                                            <MenuFlyoutItem Text="Экспортировать сборку" Click="ExportMod_Click">
+                                            <MenuFlyoutItem Text="Экспортировать" Click="ExportMod_Click">
                                                 <MenuFlyoutItem.Icon>
                                                     <SymbolIcon Symbol="Download" />
                                                 </MenuFlyoutItem.Icon>
                                             </MenuFlyoutItem>
-                                            <MenuFlyoutItem Text="Удалить сборку" Click="RemoveMod_Click">
+                                            <MenuFlyoutItem Text="Удалить" Click="RemoveMod_Click">
                                                 <MenuFlyoutItem.Icon>
                                                     <SymbolIcon Symbol="Delete" />
                                                 </MenuFlyoutItem.Icon>
@@ -166,7 +175,7 @@
                         <TextBlock
                             FontSize="24"
                             Margin="8"
-                            Text="Отпустите файлы, чтобы импортировать их как сборку"
+                            Text="Отпустите файлы, чтобы создать или импортировать сборку"
                             TextWrapping="WrapWholeWords"
                             HorizontalAlignment="Stretch"
                             TextAlignment="Center"
@@ -206,7 +215,6 @@
             <Border
                 Grid.Column="2"
                 x:Name="titleBar"
-
             >
                 <TextBlock
                     Text="GZDoom Launcher"
