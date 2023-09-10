@@ -145,6 +145,8 @@ public partial class DoomEntry: ObservableObject
         set => SetProperty(ref selectedImageIndex, value);
     }
 
+    public bool Slideshow { get; set; } = true;
+
     public ObservableCollection<string> ImageFiles { get; set; } = new();
     public ObservableCollection<string> ModFiles { get; set; } = new();
 

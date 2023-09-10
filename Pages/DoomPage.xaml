@@ -18,12 +18,82 @@
     >
         <Image
             Grid.RowSpan="4"
-            Source="{x:Bind local:DoomPage.GetCurrentBackground(entry.ImageFiles, entry.SelectedImageIndex), Mode=OneWay}"
+            x:Name="imgBackground"
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
             Opacity="0.25"
             Stretch="UniformToFill"
-        />
+        >
+            <Image.Resources>
+                <Storyboard x:Name="sbToLeft">
+                    <DoubleAnimation
+                        Storyboard.TargetName="imgBackgroundTranslate"
+                        Storyboard.TargetProperty="X"
+                        From="0"
+                        To="-200"
+                        Duration="{x:Bind SlideshowAnimationDuration}"
+                    />
+                    <DoubleAnimation
+                        Storyboard.TargetName="imgBackground"
+                        Storyboard.TargetProperty="Opacity"
+                        From="0.25"
+                        To="0"
+                        Duration="{x:Bind SlideshowAnimationDuration}"
+                    />
+                </Storyboard>
+                <Storyboard x:Name="sbToRight">
+                    <DoubleAnimation
+                        Storyboard.TargetName="imgBackgroundTranslate"
+                        Storyboard.TargetProperty="X"
+                        From="0"
+                        To="200"
+                        Duration="{x:Bind SlideshowAnimationDuration}"
+                    />
+                    <DoubleAnimation
+                        Storyboard.TargetName="imgBackground"
+                        Storyboard.TargetProperty="Opacity"
+                        From="0.25"
+                        To="0"
+                        Duration="{x:Bind SlideshowAnimationDuration}"
+                    />
+                </Storyboard>
+                <Storyboard x:Name="sbFromLeft">
+                    <DoubleAnimation
+                        Storyboard.TargetName="imgBackgroundTranslate"
+                        Storyboard.TargetProperty="X"
+                        From="-200"
+                        To="0"
+                        Duration="{x:Bind SlideshowAnimationDuration}"
+                    />
+                    <DoubleAnimation
+                        Storyboard.TargetName="imgBackground"
+                        Storyboard.TargetProperty="Opacity"
+                        From="0"
+                        To="0.25"
+                        Duration="{x:Bind SlideshowAnimationDuration}"
+                    />
+                </Storyboard>
+                <Storyboard x:Name="sbFromRight">
+                    <DoubleAnimation
+                        Storyboard.TargetName="imgBackgroundTranslate"
+                        Storyboard.TargetProperty="X"
+                        From="200"
+                        To="0"
+                        Duration="{x:Bind SlideshowAnimationDuration}"
+                    />
+                    <DoubleAnimation
+                        Storyboard.TargetName="imgBackground"
+                        Storyboard.TargetProperty="Opacity"
+                        From="0"
+                        To="0.25"
+                        Duration="{x:Bind SlideshowAnimationDuration}"
+                    />
+                </Storyboard>
+            </Image.Resources>
+            <Image.RenderTransform>
+                <TranslateTransform x:Name="imgBackgroundTranslate"/>
+            </Image.RenderTransform>
+        </Image>
         <StackPanel
             Grid.RowSpan="4"
             Orientation="Horizontal"
@@ -173,6 +243,16 @@
                 Width="40"
             >
                 <FontIcon Glyph="&#xE7C5;" FontSize="16" />
+            </Button>
+            <Button
+                ToolTipService.ToolTip="Слайд-шоу"
+                Click="Slideshow_Click"
+                Style="{ThemeResource EllipsisButton}"
+                Height="40"
+                Width="40"
+                IsEnabled="{x:Bind local:XamlHelper.HasMoreItems(entry.ImageFiles.Count, 1), Mode=OneWay}"
+            >
+                <FontIcon x:Name="btnSlideshowIcon" FontSize="16" />
             </Button>
             <Button
                 ToolTipService.ToolTip="Предыдущий фон"

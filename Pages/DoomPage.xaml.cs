@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
@@ -20,6 +21,10 @@ namespace DoomLauncher;
 /// </summary>
 public sealed partial class DoomPage : Page
 {
+    private readonly TimeSpan SlideshowAnimationDuration = TimeSpan.FromMilliseconds(150);
+    private readonly TimeSpan SlideshowInterval = TimeSpan.FromSeconds(10);
+    private readonly DispatcherTimer timerSlideshow = new();
+
     private readonly DoomEntry entry;
     private readonly IntPtr hWnd;
     private readonly string modsFolderPath;
@@ -33,6 +38,11 @@ public sealed partial class DoomPage : Page
         this.modsFolderPath = Path.Combine(dataFolderPath, "mods");
         this.imagesFolderPath = Path.Combine(dataFolderPath, "images");
 
+        timerSlideshow.Interval = SlideshowInterval;
+        timerSlideshow.Tick += Timer_Tick;
+
+        SetSelectedImageIndex(entry.SelectedImageIndex, direction: AnimationDirection.None);
+        SetSlideshow();
         RefillFileMenu();
     }
 
@@ -146,27 +156,71 @@ public sealed partial class DoomPage : Page
         }
     }
 
-    private void PreviousBackground_Click(object sender, RoutedEventArgs e)
+    enum AnimationDirection
     {
-        if (entry.SelectedImageIndex > 0)
+        None, Previous, Next
+    }
+
+    private readonly SemaphoreSlim semaphoreAnimation = new(1, 1);
+
+    private async void SetSelectedImageIndex(int ind, AnimationDirection direction)
+    {
+        if (entry.ImageFiles.Any())
         {
-            entry.SelectedImageIndex -= 1;
+            if (ind < 0)
+            {
+                ind = entry.ImageFiles.Count - 1;
+            }
+            else if (ind >= entry.ImageFiles.Count)
+            {
+                ind = 0;
+            }
+            entry.SelectedImageIndex = ind;
+            var bitmap = await BitmapHelper.CreateBitmapFromFile(entry.ImageFiles[entry.SelectedImageIndex]);
+            await semaphoreAnimation.WaitAsync();
+            if (direction == AnimationDirection.Next)
+            {
+                sbToLeft.Begin();
+                await Task.Delay(SlideshowAnimationDuration);
+            }
+            else if (direction == AnimationDirection.Previous)
+            {
+                sbToRight.Begin();
+                await Task.Delay(SlideshowAnimationDuration);
+            }
+            imgBackground.Source = bitmap;
+            if (direction == AnimationDirection.Next)
+            {
+                sbFromRight.Begin();
+                await Task.Delay(SlideshowAnimationDuration);
+            }
+            else if (direction == AnimationDirection.Previous)
+            {
+                sbFromLeft.Begin();
+                await Task.Delay(SlideshowAnimationDuration);
+            }
+            semaphoreAnimation.Release();
         }
         else
         {
-            entry.SelectedImageIndex = entry.ImageFiles.Count - 1;
+            entry.SelectedImageIndex = 0;
+            imgBackground.Source = null;
         }
+    }
+
+    private void PreviousBackground_Click(object sender, RoutedEventArgs e)
+    {
+        SetSelectedImageIndex(entry.SelectedImageIndex - 1, direction: AnimationDirection.Previous);
     }
 
     private void NextBackground_Click(object sender, RoutedEventArgs e)
     {
-        if (entry.SelectedImageIndex < entry.ImageFiles.Count - 1)
-        {
-            entry.SelectedImageIndex += 1;
-        } else
-        {
-            entry.SelectedImageIndex = 0;
-        }
+        SetSelectedImageIndex(entry.SelectedImageIndex + 1, direction: AnimationDirection.Next);
+    }
+
+    private void Timer_Tick(object? sender, object e)
+    {
+        SetSelectedImageIndex(entry.SelectedImageIndex + 1, direction: AnimationDirection.Next);
     }
 
     private async Task AddFiles(IEnumerable<StorageFile> files)
@@ -214,7 +268,8 @@ public sealed partial class DoomPage : Page
         OnProgress?.Invoke(this, "");
         if (hasAddedImages)
         {
-            entry.SelectedImageIndex = entry.ImageFiles.Count - 1;
+            SetSelectedImageIndex(entry.ImageFiles.Count - 1, direction: AnimationDirection.Next);
+            SetSlideshow();
         }
     }
 
@@ -247,11 +302,14 @@ public sealed partial class DoomPage : Page
 
     private async void RemoveBackground_Click(object sender, RoutedEventArgs e)
     {
-        if (entry.SelectedImageIndex < entry.ImageFiles.Count)
+        if (entry.SelectedImageIndex >= 0 && entry.SelectedImageIndex < entry.ImageFiles.Count)
         {
+            var selectedImageIndex = entry.SelectedImageIndex;
             if (await AskDialog.ShowAsync(XamlRoot, "Удаление фона", $"Вы уверены, что хотите удалить текущий фон?", "Удалить", "Отмена"))
             {
-                entry.ImageFiles.RemoveAt(entry.SelectedImageIndex);
+                entry.ImageFiles.RemoveAt(selectedImageIndex);
+                SetSelectedImageIndex(selectedImageIndex, direction: AnimationDirection.Next);
+                SetSlideshow();
             }
         }
     }
@@ -346,5 +404,25 @@ public sealed partial class DoomPage : Page
         {
             Console.Error.WriteLine(ex);
         }
+    }
+
+    private void SetSlideshow()
+    {
+        var slideshow = entry.Slideshow && entry.ImageFiles.Count > 1;
+        btnSlideshowIcon.Glyph = slideshow ? "\uE769" : "\uE768";
+        if (slideshow)
+        {
+            timerSlideshow.Start();
+        }
+        else
+        {
+            timerSlideshow.Stop();
+        }
+    }
+
+    private void Slideshow_Click(object sender, RoutedEventArgs e)
+    {
+        entry.Slideshow = !entry.Slideshow;
+        SetSlideshow();
     }
 }
