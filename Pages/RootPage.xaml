@@ -86,7 +86,6 @@
                         SelectionMode="Single"
                         Grid.Row="2"
                         VerticalAlignment="Stretch"
-                        IsItemClickEnabled="True"
                         ItemsSource="{x:Bind settings.Entries}"
                         SelectionChanged="DoomList_SelectionChanged"
                         CanReorderItems="True"
@@ -125,13 +124,13 @@
                                     <TextBlock
                                         Text="{x:Bind Name, Mode=OneWay}"
                                         FontSize="16"
-                                        TextWrapping="WrapWholeWords"
+                                        TextTrimming="CharacterEllipsis"
                                     />
                                     <TextBlock
                                         Text="{x:Bind Description, Mode=OneWay}"
                                         Visibility="{x:Bind local:XamlHelper.HasText(Description), Mode=OneWay}"
                                         FontSize="12"
-                                        TextWrapping="WrapWholeWords"
+                                        TextTrimming="CharacterEllipsis"
                                     />
                                 </StackPanel>
                             </DataTemplate>
