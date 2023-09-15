@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -18,7 +19,8 @@ internal partial class JsonSettingsContext : JsonSerializerContext
 
 public class Settings
 {
-    public string GZDoomPath { get; set; } = "";
+    public ObservableCollection<GZDoomPackage> GZDoomInstalls { get; set; } = new();
+    public ObservableCollection<string> IWadFiles { get; set; } = new();
     public bool CloseOnLaunch { get; set; } = false;
     public int SelectedModIndex { get; set; } = 0;
     public ObservableCollection<DoomEntry> Entries { get; set; } = new();
@@ -36,7 +38,6 @@ public class Settings
 
     public static readonly Dictionary<string, string> IWads = new()
     {
-        { "", "Не выбрано" },
         { "doom1.wad", "Doom (Shareware)" },
         { "doom.wad", "Ultimate Doom" },
         { "doom2.wad", "Doom II" },
@@ -56,6 +57,8 @@ public class Settings
 
     public static readonly string[] SupportedModExtensions = new[] { ".pk3", ".wad", ".zip" };
     public static readonly string[] SupportedImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif", ".svg" };
+
+    public static readonly WebAPI WebAPI = new("GZDoom Launcher");
 
     public static async Task<string> CopyFileWithConfirmation(XamlRoot xamlRoot, StorageFile file, string targetFolder)
     {
@@ -104,6 +107,20 @@ public class Settings
     }
 }
 
+public class GZDoomPackage: ObservableObject
+{
+    public string Path { get; set; } = "";
+
+    private Version? version = null;
+    public Version? Version
+    {
+        get => version;
+        set => SetProperty(ref version, value);
+    }
+
+    [JsonConverter(typeof(AssetArchJsonConverter))]
+    public AssetArch Arch { get; set; } = AssetArch.unknown;
+}
 
 public partial class DoomEntry: ObservableObject
 {
@@ -129,10 +146,10 @@ public partial class DoomEntry: ObservableObject
         set => SetProperty(ref longDescription, value);
     }
 
+    public string GZDoomPath { get; set; } = "";
     public string IWadFile { get; set; } = "";
 
     public bool UniqueConfig { get; set; } = false;
-
     public bool UniqueSavesFolder { get; set; } = false;
 
     public string Id { get; set; } = "";
@@ -156,5 +173,20 @@ public partial class DoomEntry: ObservableObject
     {
         get => lastLaunch;
         set => SetProperty(ref lastLaunch, value);
+    }
+}
+
+public class AssetArchJsonConverter : JsonConverter<AssetArch>
+{
+    public override AssetArch Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        var str = reader.GetString();
+        return SettingsPage.ArchFromString(str);
+    }
+
+    public override void Write(Utf8JsonWriter writer, AssetArch value, JsonSerializerOptions options)
+    {
+        var str = SettingsPage.ArchToString(value);
+        writer.WriteStringValue(str);
     }
 }

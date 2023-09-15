@@ -43,7 +43,20 @@
                 Text="{x:Bind ModLongDescription, Mode=TwoWay}"
                 PlaceholderText="Введите подробное описание"
             />
-            <TextBlock>Игра</TextBlock>
+            <TextBlock>Версия GZDoom</TextBlock>
+            <ComboBox
+                HorizontalAlignment="Stretch"
+                Margin="0,8,0,8"
+                SelectedItem="{x:Bind GZDoomPackage, Mode=TwoWay}"
+                ItemsSource="{x:Bind GZDoomPackages}"
+            >
+                <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="local:GZDoomPackage">
+                        <TextBlock Text="{x:Bind local:SettingsPage.GZDoomPackageToTitle(Version, Arch)}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <TextBlock>iWad</TextBlock>
             <ComboBox
                 HorizontalAlignment="Stretch"
                 Margin="0,8,0,8"

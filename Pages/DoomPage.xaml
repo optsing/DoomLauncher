@@ -25,19 +25,30 @@
             Stretch="UniformToFill"
         >
             <Image.Resources>
+                <Storyboard x:Name="sbShow">
+                    <DoubleAnimation
+                        Storyboard.TargetName="imgBackground"
+                        Storyboard.TargetProperty="Opacity"
+                        From="0"
+                        To="0.25"
+                        Duration="{x:Bind SlideshowAnimationDuration}"
+                    />
+                </Storyboard>
+                <Storyboard x:Name="sbHide">
+                    <DoubleAnimation
+                        Storyboard.TargetName="imgBackground"
+                        Storyboard.TargetProperty="Opacity"
+                        From="0.25"
+                        To="0"
+                        Duration="{x:Bind SlideshowAnimationDuration}"
+                    />
+                </Storyboard>
                 <Storyboard x:Name="sbToLeft">
                     <DoubleAnimation
                         Storyboard.TargetName="imgBackgroundTranslate"
                         Storyboard.TargetProperty="X"
                         From="0"
                         To="-200"
-                        Duration="{x:Bind SlideshowAnimationDuration}"
-                    />
-                    <DoubleAnimation
-                        Storyboard.TargetName="imgBackground"
-                        Storyboard.TargetProperty="Opacity"
-                        From="0.25"
-                        To="0"
                         Duration="{x:Bind SlideshowAnimationDuration}"
                     />
                 </Storyboard>
@@ -49,13 +60,6 @@
                         To="200"
                         Duration="{x:Bind SlideshowAnimationDuration}"
                     />
-                    <DoubleAnimation
-                        Storyboard.TargetName="imgBackground"
-                        Storyboard.TargetProperty="Opacity"
-                        From="0.25"
-                        To="0"
-                        Duration="{x:Bind SlideshowAnimationDuration}"
-                    />
                 </Storyboard>
                 <Storyboard x:Name="sbFromLeft">
                     <DoubleAnimation
@@ -65,13 +69,6 @@
                         To="0"
                         Duration="{x:Bind SlideshowAnimationDuration}"
                     />
-                    <DoubleAnimation
-                        Storyboard.TargetName="imgBackground"
-                        Storyboard.TargetProperty="Opacity"
-                        From="0"
-                        To="0.25"
-                        Duration="{x:Bind SlideshowAnimationDuration}"
-                    />
                 </Storyboard>
                 <Storyboard x:Name="sbFromRight">
                     <DoubleAnimation
@@ -79,13 +76,6 @@
                         Storyboard.TargetProperty="X"
                         From="200"
                         To="0"
-                        Duration="{x:Bind SlideshowAnimationDuration}"
-                    />
-                    <DoubleAnimation
-                        Storyboard.TargetName="imgBackground"
-                        Storyboard.TargetProperty="Opacity"
-                        From="0"
-                        To="0.25"
                         Duration="{x:Bind SlideshowAnimationDuration}"
                     />
                 </Storyboard>

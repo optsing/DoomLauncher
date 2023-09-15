@@ -41,7 +41,7 @@ public sealed partial class DoomPage : Page
         timerSlideshow.Interval = SlideshowInterval;
         timerSlideshow.Tick += Timer_Tick;
 
-        SetSelectedImageIndex(entry.SelectedImageIndex, direction: AnimationDirection.None);
+        SetSelectedImageIndex(entry.SelectedImageIndex);
         SetSlideshow();
         RefillFileMenu();
     }
@@ -156,15 +156,12 @@ public sealed partial class DoomPage : Page
         }
     }
 
-    enum AnimationDirection
-    {
-        None, Previous, Next
-    }
-
     private readonly SemaphoreSlim semaphoreAnimation = new(1, 1);
 
-    private async void SetSelectedImageIndex(int ind, AnimationDirection direction)
+    private async void SetSelectedImageIndex(int ind, bool toPrevious = false)
     {
+        BitmapImage? bitmap;
+        bool hasPrevBitmap = imgBackground.Source != null;
         if (entry.ImageFiles.Any())
         {
             if (ind < 0)
@@ -176,51 +173,63 @@ public sealed partial class DoomPage : Page
                 ind = 0;
             }
             entry.SelectedImageIndex = ind;
-            var bitmap = await BitmapHelper.CreateBitmapFromFile(entry.ImageFiles[entry.SelectedImageIndex]);
-            await semaphoreAnimation.WaitAsync();
-            if (direction == AnimationDirection.Next)
-            {
-                sbToLeft.Begin();
-                await Task.Delay(SlideshowAnimationDuration);
-            }
-            else if (direction == AnimationDirection.Previous)
-            {
-                sbToRight.Begin();
-                await Task.Delay(SlideshowAnimationDuration);
-            }
-            imgBackground.Source = bitmap;
-            if (direction == AnimationDirection.Next)
-            {
-                sbFromRight.Begin();
-                await Task.Delay(SlideshowAnimationDuration);
-            }
-            else if (direction == AnimationDirection.Previous)
-            {
-                sbFromLeft.Begin();
-                await Task.Delay(SlideshowAnimationDuration);
-            }
-            semaphoreAnimation.Release();
+            bitmap = await BitmapHelper.CreateBitmapFromFile(entry.ImageFiles[entry.SelectedImageIndex]);
         }
         else
         {
             entry.SelectedImageIndex = 0;
-            imgBackground.Source = null;
+            bitmap = null;
         }
+        await semaphoreAnimation.WaitAsync();
+        if (hasPrevBitmap)
+        {
+            if (bitmap != null)
+            {
+                if (toPrevious)
+                {
+                    sbToRight.Begin();
+                }
+                else
+                {
+                    sbToLeft.Begin();
+                }
+            }
+            sbHide.Begin();
+            await Task.Delay(SlideshowAnimationDuration);
+        }
+        imgBackground.Source = bitmap;
+        if (imgBackground.Source != null)
+        {
+            if (hasPrevBitmap)
+            {
+                if (toPrevious)
+                {
+                    sbFromLeft.Begin();
+                }
+                else
+                {
+                    sbFromRight.Begin();
+                }
+            }
+            sbShow.Begin();
+            await Task.Delay(SlideshowAnimationDuration);
+        }
+        semaphoreAnimation.Release();
     }
 
     private void PreviousBackground_Click(object sender, RoutedEventArgs e)
     {
-        SetSelectedImageIndex(entry.SelectedImageIndex - 1, direction: AnimationDirection.Previous);
+        SetSelectedImageIndex(entry.SelectedImageIndex - 1, toPrevious: true);
     }
 
     private void NextBackground_Click(object sender, RoutedEventArgs e)
     {
-        SetSelectedImageIndex(entry.SelectedImageIndex + 1, direction: AnimationDirection.Next);
+        SetSelectedImageIndex(entry.SelectedImageIndex + 1);
     }
 
     private void Timer_Tick(object? sender, object e)
     {
-        SetSelectedImageIndex(entry.SelectedImageIndex + 1, direction: AnimationDirection.Next);
+        SetSelectedImageIndex(entry.SelectedImageIndex + 1);
     }
 
     private async Task AddFiles(IEnumerable<StorageFile> files)
@@ -255,6 +264,7 @@ public sealed partial class DoomPage : Page
     private async Task AddImages(IEnumerable<StorageFile> files)
     {
         bool hasAddedImages = false;
+        bool hasImagesBeforeAdded = entry.ImageFiles.Any();
         foreach (var file in files)
         {
             OnProgress?.Invoke(this, $"Копирование: {file.Name}");
@@ -268,7 +278,7 @@ public sealed partial class DoomPage : Page
         OnProgress?.Invoke(this, "");
         if (hasAddedImages)
         {
-            SetSelectedImageIndex(entry.ImageFiles.Count - 1, direction: AnimationDirection.Next);
+            SetSelectedImageIndex(entry.ImageFiles.Count - 1);
             SetSlideshow();
         }
     }
@@ -308,7 +318,7 @@ public sealed partial class DoomPage : Page
             if (await AskDialog.ShowAsync(XamlRoot, "Удаление фона", $"Вы уверены, что хотите удалить текущий фон?", "Удалить", "Отмена"))
             {
                 entry.ImageFiles.RemoveAt(selectedImageIndex);
-                SetSelectedImageIndex(selectedImageIndex, direction: AnimationDirection.Next);
+                SetSelectedImageIndex(selectedImageIndex);
                 SetSlideshow();
             }
         }

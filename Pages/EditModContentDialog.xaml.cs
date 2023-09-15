@@ -12,17 +12,27 @@ namespace DoomLauncher;
 /// </summary>
 public sealed partial class EditModContentDialog : ContentDialog
 {
-    public EditModContentDialog(XamlRoot root, EditModDialogResult initial, List<KeyValue> filteredIWads, EditDialogMode mode)
+    private Settings settings;
+
+    public EditModContentDialog(XamlRoot root, EditModDialogResult initial, Settings settings, EditDialogMode mode)
     {
         InitializeComponent();
         XamlRoot = root;
         ModName = initial.name;
         ModDescription = initial.description;
         ModLongDescription = initial.longDescription;
-        IWadFile = filteredIWads.FirstOrDefault(kv => kv.Key == initial.iWadFile, filteredIWads.First());
+        this.settings = settings;
         UniqueConfig = initial.uniqueConfig;
         UniqueSavesFolder = initial.uniqueSavesFolder;
-        FilteredIWads = filteredIWads;
+
+        GZDoomPackages = new List<GZDoomPackage>() { new GZDoomPackage { Path = "", Arch = AssetArch.notSelected } };
+        GZDoomPackages.AddRange(settings.GZDoomInstalls);
+        GZDoomPackage = settings.GZDoomInstalls.FirstOrDefault(package => package.Path == initial.gZDoomPath, GZDoomPackages.First());
+
+        FilteredIWads = new() { new KeyValue("", "Не выбрано") };
+        FilteredIWads.AddRange(settings.IWadFiles.Select(iWadFile => new KeyValue(iWadFile, Settings.IWads.GetValueOrDefault(iWadFile.ToLower(), iWadFile))));
+        IWadFile = FilteredIWads.FirstOrDefault(iWad => iWad.Key == initial.iWadFile, FilteredIWads.First());
+
         PrimaryButtonText = mode switch
         {
             EditDialogMode.Create => "Создать",
@@ -50,10 +60,6 @@ public sealed partial class EditModContentDialog : ContentDialog
         }
     }
 
-    public List<KeyValue> FilteredIWads {
-        get;
-    }
-
     public string ModName
     {
         get; private set;
@@ -67,6 +73,21 @@ public sealed partial class EditModContentDialog : ContentDialog
     public string ModLongDescription
     {
         get; private set;
+    }
+
+    public List<GZDoomPackage> GZDoomPackages
+    {
+        get;
+    }
+
+    public GZDoomPackage GZDoomPackage
+    {
+        get; private set;
+    }
+
+    public List<KeyValue> FilteredIWads
+    {
+        get;
     }
 
     public KeyValue IWadFile
@@ -98,6 +119,7 @@ public class EditModDialogResult
     public readonly string name;
     public readonly string description;
     public readonly string longDescription;
+    public readonly string gZDoomPath;
     public readonly string iWadFile;
     public readonly bool uniqueConfig;
     public readonly bool uniqueSavesFolder;
@@ -109,6 +131,7 @@ public class EditModDialogResult
         name = entry.Name;
         description = entry.Description;
         longDescription = entry.LongDescription;
+        gZDoomPath = entry.GZDoomPath;
         iWadFile = entry.IWadFile;
         uniqueConfig = entry.UniqueConfig;
         uniqueSavesFolder = entry.UniqueSavesFolder;
@@ -135,7 +158,7 @@ public readonly struct KeyValue
     public readonly string Value;
 
     public KeyValue(string key, string value) { 
-        this.Key = key;
-        this.Value = value;
+        Key = key;
+        Value = value;
     }
 }

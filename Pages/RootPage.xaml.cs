@@ -218,6 +218,7 @@ public sealed partial class RootPage : Page
             entry.Name = result.name;
             entry.Description = result.description;
             entry.LongDescription = result.longDescription;
+            entry.GZDoomPath = result.gZDoomPath;
             entry.IWadFile = result.iWadFile;
             entry.UniqueConfig = result.uniqueConfig;
             entry.UniqueSavesFolder = result.uniqueSavesFolder;
@@ -233,6 +234,7 @@ public sealed partial class RootPage : Page
             Name = entry.Name,
             Description = entry.Description,
             LongDescription = entry.LongDescription,
+            GZDoomPath = entry.GZDoomPath,
             IWadFile = entry.IWadFile,
             UniqueConfig = entry.UniqueConfig,
             UniqueSavesFolder = entry.UniqueSavesFolder,
@@ -250,20 +252,31 @@ public sealed partial class RootPage : Page
         Start(entry);
     }
 
+    private void PlayMod_Click(object? sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement el)
+        {
+            if (el.DataContext is DoomEntry entry)
+            {
+                Start(entry);
+            }
+        }
+    }
+
     private async void Start(DoomEntry entry)
     {
-        if (!Settings.ValidateGZDoomPath(settings.GZDoomPath))
+        if (!Settings.ValidateGZDoomPath(entry.GZDoomPath))
         {
-            var success = await OpenSettings();
-            if (!success)
+            if (await AskDialog.ShowAsync(XamlRoot, "Не выбран GZDoom", "Выберите нужную версию GZDoom в настройках сборки", "Перейти в настройки", "Отмена"))
             {
-                return;
+                await EditMod(entry);
             }
+            return;
         }
         ProcessStartInfo processInfo = new()
         {
-            FileName = settings.GZDoomPath,
-            WorkingDirectory = Path.GetDirectoryName(settings.GZDoomPath),
+            FileName = entry.GZDoomPath,
+            WorkingDirectory = Path.GetDirectoryName(entry.GZDoomPath),
         };
         if (entry.UniqueConfig)
         {
@@ -289,7 +302,7 @@ public sealed partial class RootPage : Page
         if (!string.IsNullOrEmpty(entry.IWadFile))
         {
             processInfo.ArgumentList.Add("-iwad");
-            processInfo.ArgumentList.Add(entry.IWadFile);
+            processInfo.ArgumentList.Add(Path.Combine(dataFolderPath, "iwads", entry.IWadFile));
         }
         if (entry.ModFiles.Count > 0)
         {
@@ -320,44 +333,9 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private async Task<bool> OpenSettings()
-    {
-        var dialog = new SettingsContentDialog(XamlRoot, hWnd, new()
-        {
-            GZDoomPath = settings.GZDoomPath,
-            CloseOnLaunch = settings.CloseOnLaunch,
-        });
-        if (ContentDialogResult.Primary == await dialog.ShowAsync())
-        {
-            settings.GZDoomPath = dialog.State.GZDoomPath;
-            settings.CloseOnLaunch = dialog.State.CloseOnLaunch;
-            return true;
-        }
-        return false;
-    }
-
     public async Task<EditModDialogResult?> AddOrEditModDialogShow(EditModDialogResult initial, EditDialogMode mode)
     {
-        if (!Settings.ValidateGZDoomPath(settings.GZDoomPath))
-        {
-            var success = await OpenSettings();
-            if (!success)
-            {
-                return null;
-            }
-        }
-
-        var filteredIWads = new List<KeyValue>() { new KeyValue("", Settings.IWads[""]) };
-        var gzDoomFolderPath = Path.GetDirectoryName(settings.GZDoomPath) ?? "";
-        foreach (var iWad in Settings.IWads.Keys)
-        {
-            if (iWad != "" && File.Exists(Path.Combine(gzDoomFolderPath, iWad)))
-            {
-                filteredIWads.Add(new KeyValue(iWad, Settings.IWads[iWad]));
-            }
-        }
-
-        var dialog = new EditModContentDialog(XamlRoot, initial, filteredIWads, mode);
+        var dialog = new EditModContentDialog(XamlRoot, initial, settings, mode);
         if (ContentDialogResult.Primary == await dialog.ShowAsync())
         {
             var modFiles = dialog.ModFiles.Where(tc => tc.IsChecked).Select(tc => tc.Title).ToList();
@@ -368,6 +346,7 @@ public sealed partial class RootPage : Page
                     Name = dialog.ModName,
                     Description = dialog.ModDescription,
                     LongDescription = dialog.ModLongDescription,
+                    GZDoomPath = dialog.GZDoomPackage.Path,
                     IWadFile = dialog.IWadFile.Key,
                     UniqueConfig = dialog.UniqueConfig,
                     UniqueSavesFolder = dialog.UniqueSavesFolder,
@@ -381,11 +360,13 @@ public sealed partial class RootPage : Page
         swMain.IsPaneOpen = !swMain.IsPaneOpen;
     }
 
-    private async void SettingsButton_Click(object sender, RoutedEventArgs e)
+    private void SettingsButton_Click(object sender, RoutedEventArgs e)
     {
-        if (await OpenSettings())
-        {
-            OnSave?.Invoke(this, new EventArgs());
+        if (frameMain.Content is not SettingsPage) {
+            DoomList.SelectedItem = null;
+            var settingsPage = new SettingsPage(hWnd, settings, dataFolderPath);
+            settingsPage.OnProgress += Page_OnProgress;
+            frameMain.Content = settingsPage;
         }
     }
 
@@ -433,6 +414,7 @@ public sealed partial class RootPage : Page
                 Name = result.name,
                 Description = result.description,
                 LongDescription = result.longDescription,
+                GZDoomPath = result.gZDoomPath,
                 IWadFile = result.iWadFile,
                 UniqueConfig = result.uniqueConfig,
                 UniqueSavesFolder = result.uniqueSavesFolder,
@@ -481,7 +463,7 @@ public sealed partial class RootPage : Page
         }
 
         SetProgress($"Экспорт: {file.Name}");
-        var zipToWrite = await file.OpenStreamForWriteAsync();
+        using var zipToWrite = await file.OpenStreamForWriteAsync();
         using var archive = new ZipArchive(zipToWrite, ZipArchiveMode.Create);
 
         var zipConfigEntry = archive.CreateEntry(Path.Combine("entry.json"));
@@ -495,6 +477,7 @@ public sealed partial class RootPage : Page
                 Name = entry.Name,
                 Description = entry.Description,
                 LongDescription = entry.LongDescription,
+                GZDoomPath = "",
                 IWadFile = entry.IWadFile,
                 UniqueConfig = entry.UniqueConfig,
                 UniqueSavesFolder = entry.UniqueSavesFolder,
@@ -545,7 +528,7 @@ public sealed partial class RootPage : Page
     public async Task ImportEntryFromDoomWorldId(string wadId, bool withConfirm)
     {
         SetProgress($"Получение информации...");
-        var wadInfo = await DoomWorldAPI.GetWADInfo(wadId);
+        var wadInfo = await Settings.WebAPI.GetDoomWorldWADInfo(wadId);
         if (wadInfo != null)
         {
             var newEntry = await ImportModFileFromDoomWorld(wadInfo, withConfirm);
@@ -635,6 +618,7 @@ public sealed partial class RootPage : Page
                     Name = entryProperties.name,
                     Description = entryProperties.description,
                     LongDescription = entryProperties.longDescription,
+                    GZDoomPath = entryProperties.gZDoomPath,
                     IWadFile = entryProperties.iWadFile,
                     UniqueConfig = entryProperties.uniqueConfig,
                     UniqueSavesFolder = entryProperties.uniqueSavesFolder,
@@ -662,7 +646,7 @@ public sealed partial class RootPage : Page
         try
         {
             SetProgress($"Чтение файла: {wadInfo.Filename}");
-            var zipToRead = await DoomWorldAPI.DownloadWadArchive(wadInfo);
+            using var zipToRead = await Settings.WebAPI.DownloadDoomWorldWadArchive(wadInfo);
             using var archive = new ZipArchive(zipToRead, ZipArchiveMode.Read);
 
             var entryProperties = new EditModDialogResult(new DoomEntry()
@@ -721,6 +705,7 @@ public sealed partial class RootPage : Page
                     Name = entryProperties.name,
                     Description = entryProperties.description,
                     LongDescription = entryProperties.longDescription,
+                    GZDoomPath = entryProperties.gZDoomPath,
                     IWadFile = entryProperties.iWadFile,
                     UniqueConfig = entryProperties.uniqueConfig,
                     UniqueSavesFolder = entryProperties.uniqueSavesFolder,
@@ -803,6 +788,7 @@ public sealed partial class RootPage : Page
                     Name = entryProperties.name,
                     Description = entryProperties.description,
                     LongDescription = entryProperties.longDescription,
+                    GZDoomPath = entryProperties.gZDoomPath,
                     IWadFile = entryProperties.iWadFile,
                     UniqueConfig = entryProperties.uniqueConfig,
                     UniqueSavesFolder = entryProperties.uniqueSavesFolder,
