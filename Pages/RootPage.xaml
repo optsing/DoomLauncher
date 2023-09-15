@@ -99,12 +99,6 @@
                                 >
                                     <StackPanel.ContextFlyout>
                                         <MenuFlyout>
-                                            <MenuFlyoutItem Text="Играть" Click="PlayMod_Click">
-                                                <MenuFlyoutItem.Icon>
-                                                    <FontIcon Glyph="&#xE7FC;" FontSize="16"/>
-                                                </MenuFlyoutItem.Icon>
-                                            </MenuFlyoutItem>
-                                            <MenuFlyoutSeparator />
                                             <MenuFlyoutItem Text="Настроить" Click="EditMod_Click">
                                                 <MenuFlyoutItem.Icon>
                                                     <SymbolIcon Symbol="Edit" />

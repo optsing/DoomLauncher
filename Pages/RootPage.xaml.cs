@@ -252,17 +252,6 @@ public sealed partial class RootPage : Page
         Start(entry);
     }
 
-    private void PlayMod_Click(object? sender, RoutedEventArgs e)
-    {
-        if (sender is FrameworkElement el)
-        {
-            if (el.DataContext is DoomEntry entry)
-            {
-                Start(entry);
-            }
-        }
-    }
-
     private async void Start(DoomEntry entry)
     {
         if (!Settings.ValidateGZDoomPath(entry.GZDoomPath))

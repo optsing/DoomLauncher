@@ -11,7 +11,7 @@
     Style="{ThemeResource DefaultContentDialogStyle}"
     PrimaryButtonClick="EditModContentDialog_PrimaryButtonClick"
 >
-    <ScrollViewer
+    <ScrollView
         VerticalAlignment="Center"
         HorizontalAlignment="Center"
         VerticalScrollBarVisibility="Auto"
@@ -120,5 +120,5 @@
                 </ListView.ItemTemplate>
             </ListView>
         </StackPanel>
-    </ScrollViewer>
+    </ScrollView>
 </ContentDialog>

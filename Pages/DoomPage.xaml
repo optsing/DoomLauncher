@@ -195,7 +195,7 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <ScrollViewer
+        <ScrollView
             Grid.Row="2"
             MaxHeight="256"
             Background="{ThemeResource AcrylicInAppFillColorBaseBrush}"
@@ -219,7 +219,7 @@
                     TextWrapping="WrapWholeWords"
                 />
             </StackPanel>
-        </ScrollViewer>
+        </ScrollView>
         <StackPanel
             Grid.Row="3"
             Orientation="Horizontal"
