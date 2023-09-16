@@ -53,16 +53,16 @@
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <SplitButton Grid.Row="1" Click="CreateEntryFromFiles_Click" HorizontalAlignment="Stretch" Margin="8">
+                    <SplitButton Grid.Row="1" Click="CreateMod_Click" HorizontalAlignment="Stretch" Margin="8">
                         <SplitButton.Flyout>
                             <MenuFlyout>
                                 <MenuFlyoutItem
-                                    Click="CreateMod_Click"
+                                    Click="CreateEntryFromFiles_Click"
                                     HorizontalAlignment="Stretch"
-                                    Text="Создать пустую сборку"
+                                    Text="Создать сборку из файлов"
                                 >
                                     <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE7C3;" FontSize="16" />
+                                        <FontIcon Glyph="&#xEC50;" FontSize="16" />
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                                 <MenuFlyoutItem

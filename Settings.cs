@@ -60,7 +60,7 @@ public class Settings
 
     public static readonly WebAPI WebAPI = new("GZDoom Launcher");
 
-    public static async Task<string> CopyFileWithConfirmation(XamlRoot xamlRoot, StorageFile file, string targetFolder)
+    public static async Task CopyFileWithConfirmation(XamlRoot xamlRoot, StorageFile file, string targetFolder)
     {
         var targetPath = Path.Combine(targetFolder, file.Name);
         if (targetPath != file.Path)
@@ -82,10 +82,9 @@ public class Settings
                 await sourceStream.CopyToAsync(destinationStream);
             }
         }
-        return targetPath;
     }
 
-    public static async Task<string> CopyFileWithConfirmation(XamlRoot xamlRoot, Stream sourceStream, string fileName, string targetFolder)
+    public static async Task CopyFileWithConfirmation(XamlRoot xamlRoot, Stream sourceStream, string fileName, string targetFolder)
     {
         var targetPath = Path.Combine(targetFolder, fileName);
         if (!Directory.Exists(targetFolder))
@@ -103,7 +102,6 @@ public class Settings
             using var destinationStream = new FileStream(targetPath, FileMode.Create, FileAccess.Write);
             await sourceStream.CopyToAsync(destinationStream);
         }
-        return targetPath;
     }
 }
 

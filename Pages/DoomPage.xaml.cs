@@ -173,7 +173,8 @@ public sealed partial class DoomPage : Page
                 ind = 0;
             }
             entry.SelectedImageIndex = ind;
-            bitmap = await BitmapHelper.CreateBitmapFromFile(entry.ImageFiles[entry.SelectedImageIndex]);
+            var imagePath = Path.GetFullPath(entry.ImageFiles[entry.SelectedImageIndex], imagesFolderPath);
+            bitmap = await BitmapHelper.CreateBitmapFromFile(imagePath);
         }
         else
         {
@@ -232,48 +233,33 @@ public sealed partial class DoomPage : Page
         SetSelectedImageIndex(entry.SelectedImageIndex + 1);
     }
 
-    private async Task AddFiles(IEnumerable<StorageFile> files)
+    private async Task AddFiles(IReadOnlyList<StorageFile> files)
     {
         foreach (var file in files)
         {
             OnProgress?.Invoke(this, $"Копирование: {file.Name}");
-            var targetPath = await Settings.CopyFileWithConfirmation(XamlRoot, file, modsFolderPath);
-            if (!string.IsNullOrEmpty(targetPath))
+            await Settings.CopyFileWithConfirmation(XamlRoot, file, modsFolderPath);
+            if (!entry.ModFiles.Contains(file.Name))
             {
-                var fileName = GetFileTitle(targetPath);
-                var isInList = false;
-                for (var i = 0; i  < entry.ModFiles.Count; i += 1)
-                {
-                    if (GetFileTitle(entry.ModFiles[i]) == fileName)
-                    {
-                        entry.ModFiles[i] = targetPath;
-                        isInList = true;
-                        break;
-                    }
-                }
-                if (!isInList)
-                {
-                    entry.ModFiles.Add(targetPath);
-                }
+                entry.ModFiles.Add(file.Name);
             }
         }
         OnProgress?.Invoke(this, null);
         RefillFileMenu();
     }
 
-    private async Task AddImages(IEnumerable<StorageFile> files)
+    private async Task AddImages(IReadOnlyList<StorageFile> files)
     {
         bool hasAddedImages = false;
-        bool hasImagesBeforeAdded = entry.ImageFiles.Any();
         foreach (var file in files)
         {
             OnProgress?.Invoke(this, $"Копирование: {file.Name}");
-            var targetPath = await Settings.CopyFileWithConfirmation(XamlRoot, file, imagesFolderPath);
-            if (!string.IsNullOrEmpty(targetPath))
+            await Settings.CopyFileWithConfirmation(XamlRoot, file, imagesFolderPath);
+            if (!entry.ModFiles.Contains(file.Name))
             {
-                entry.ImageFiles.Add(targetPath);
-                hasAddedImages = true;
+                entry.ImageFiles.Add(file.Name);
             }
+            hasAddedImages = true;
         }
         OnProgress?.Invoke(this, "");
         if (hasAddedImages)
@@ -289,7 +275,7 @@ public sealed partial class DoomPage : Page
         {
             if (el.DataContext is string filePath)
             {
-                Process.Start("explorer.exe", "/select," + filePath);
+                Process.Start("explorer.exe", "/select," + Path.GetFullPath(filePath, modsFolderPath));
             }
         }
     }

@@ -239,8 +239,8 @@ public sealed partial class RootPage : Page
             UniqueConfig = entry.UniqueConfig,
             UniqueSavesFolder = entry.UniqueSavesFolder,
             SelectedImageIndex = entry.SelectedImageIndex,
-            ModFiles = new(entry.ModFiles.Select(path => path)),
-            ImageFiles = new(entry.ImageFiles.Select(path => path)),
+            ModFiles = new(entry.ModFiles),
+            ImageFiles = new(entry.ImageFiles),
         };
         settings.Entries.Add(newEntry);
         DoomList.SelectedItem = newEntry;
@@ -254,7 +254,8 @@ public sealed partial class RootPage : Page
 
     private async void Start(DoomEntry entry)
     {
-        if (!Settings.ValidateGZDoomPath(entry.GZDoomPath))
+        var gZDoomPath = Path.GetFullPath(entry.GZDoomPath, Path.Combine(dataFolderPath, "gzdoom"));
+        if (!Settings.ValidateGZDoomPath(gZDoomPath))
         {
             if (await AskDialog.ShowAsync(XamlRoot, "Не выбран GZDoom", "Выберите нужную версию GZDoom в настройках сборки", "Перейти в настройки", "Отмена"))
             {
@@ -264,8 +265,8 @@ public sealed partial class RootPage : Page
         }
         ProcessStartInfo processInfo = new()
         {
-            FileName = entry.GZDoomPath,
-            WorkingDirectory = Path.GetDirectoryName(entry.GZDoomPath),
+            FileName = gZDoomPath,
+            WorkingDirectory = Path.GetDirectoryName(gZDoomPath),
         };
         if (entry.UniqueConfig)
         {
@@ -291,14 +292,15 @@ public sealed partial class RootPage : Page
         if (!string.IsNullOrEmpty(entry.IWadFile))
         {
             processInfo.ArgumentList.Add("-iwad");
-            processInfo.ArgumentList.Add(Path.Combine(dataFolderPath, "iwads", entry.IWadFile));
+            processInfo.ArgumentList.Add(Path.GetFullPath(entry.IWadFile, Path.Combine(dataFolderPath, "iwads")));
         }
         if (entry.ModFiles.Count > 0)
         {
             processInfo.ArgumentList.Add("-file");
+            var modsFolderPath = Path.Combine(dataFolderPath, "mods");
             foreach (var filePath in entry.ModFiles)
             {
-                processInfo.ArgumentList.Add(filePath);
+                processInfo.ArgumentList.Add(Path.GetFullPath(filePath, modsFolderPath));
             }
         }
         var process = Process.Start(processInfo);
@@ -359,7 +361,7 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private async void CreateEntryFromFiles_Click(object sender, SplitButtonClickEventArgs e)
+    private async void CreateEntryFromFiles_Click(object sender, RoutedEventArgs e)
     {
         var picker = new Windows.Storage.Pickers.FileOpenPicker();
 
@@ -392,7 +394,7 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private async void CreateMod_Click(object sender, RoutedEventArgs e)
+    private async void CreateMod_Click(object sender, SplitButtonClickEventArgs e)
     {
         var initial = new EditModDialogResult(new DoomEntry());
         if (await AddOrEditModDialogShow(initial, EditDialogMode.Create) is EditModDialogResult result)
@@ -466,7 +468,7 @@ public sealed partial class RootPage : Page
                 Name = entry.Name,
                 Description = entry.Description,
                 LongDescription = entry.LongDescription,
-                GZDoomPath = "",
+                GZDoomPath = entry.GZDoomPath,
                 IWadFile = entry.IWadFile,
                 UniqueConfig = entry.UniqueConfig,
                 UniqueSavesFolder = entry.UniqueSavesFolder,
@@ -477,21 +479,25 @@ public sealed partial class RootPage : Page
             await JsonSerializer.SerializeAsync(configStream, newEntry, JsonSettingsContext.Default.DoomEntry);
         }
 
+        var modsFolderPath = Path.Combine(dataFolderPath, "mods");
+        var imagesFolderPath = Path.Combine(dataFolderPath, "images");
         foreach (var filePath in entry.ModFiles)
         {
+            var fullPath = Path.GetFullPath(filePath, modsFolderPath);
             var fileName = Path.GetFileName(filePath);
             SetProgress($"Экспорт: {fileName}");
             var zipFileEntry = archive.CreateEntry(Path.Combine("mods", fileName));
             using var fileStream = zipFileEntry.Open();
-            await File.OpenRead(filePath).CopyToAsync(fileStream);
+            await File.OpenRead(fullPath).CopyToAsync(fileStream);
         }
         foreach (var filePath in entry.ImageFiles)
         {
+            var fullPath = Path.GetFullPath(filePath, imagesFolderPath);
             var fileName = Path.GetFileName(filePath);
             SetProgress($"Экспорт: {fileName}");
             var zipFileEntry = archive.CreateEntry(Path.Combine("images", fileName));
             using var fileStream = zipFileEntry.Open();
-            await File.OpenRead(filePath).CopyToAsync(fileStream);
+            await File.OpenRead(fullPath).CopyToAsync(fileStream);
         }
         SetProgress(null);
     }
@@ -570,6 +576,8 @@ public sealed partial class RootPage : Page
             {
                 var modsCopied = new List<string>();
                 var imagesCopied = new List<string>();
+                var modsFolderPath = Path.Combine(dataFolderPath, "mods");
+                var imagesFolderPath = Path.Combine(dataFolderPath, "images");
                 foreach (var zipFileEntry in archive.Entries)
                 {
                     var ext = Path.GetExtension(zipFileEntry.Name).ToLowerInvariant();
@@ -577,14 +585,14 @@ public sealed partial class RootPage : Page
                     {
                         SetProgress($"Извлечение: {zipFileEntry.Name}");
                         using var fileStream = zipFileEntry.Open();
-                        await Settings.CopyFileWithConfirmation(XamlRoot, fileStream, zipFileEntry.Name, Path.Combine(dataFolderPath, "mods"));
+                        await Settings.CopyFileWithConfirmation(XamlRoot, fileStream, zipFileEntry.Name, modsFolderPath);
                         modsCopied.Add(zipFileEntry.Name);
                     }
                     else if (Settings.SupportedImageExtensions.Contains(ext) && (!withConfirm || entryProperties.imageFiles.Contains(zipFileEntry.Name)))
                     {
                         SetProgress($"Извлечение: {zipFileEntry.Name}");
                         using var fileStream = zipFileEntry.Open();
-                        await Settings.CopyFileWithConfirmation(XamlRoot, fileStream, zipFileEntry.Name, Path.Combine(dataFolderPath, "images"));
+                        await Settings.CopyFileWithConfirmation(XamlRoot, fileStream, zipFileEntry.Name, imagesFolderPath);
                         imagesCopied.Add(zipFileEntry.Name);
                     }
                 }
@@ -592,13 +600,11 @@ public sealed partial class RootPage : Page
                 var finalModFiles = newEntry.ModFiles
                     .Where(modsCopied.Contains)
                     .Concat(modsCopied
-                        .Where(fileName => !newEntry.ModFiles.Contains(fileName)))
-                    .Select(fileName => Path.Combine(dataFolderPath, "mods", fileName));
+                        .Where(fileName => !newEntry.ModFiles.Contains(fileName)));
                 var finalImageFiles = newEntry.ImageFiles
                     .Where(imagesCopied.Contains)
                     .Concat(imagesCopied
-                        .Where(fileName => !newEntry.ImageFiles.Contains(fileName)))
-                    .Select(fileName => Path.Combine(dataFolderPath, "images", fileName));
+                        .Where(fileName => !newEntry.ImageFiles.Contains(fileName)));
 
                 SetProgress(null);
                 return new DoomEntry()
@@ -663,6 +669,8 @@ public sealed partial class RootPage : Page
             {
                 var modsCopied = new List<string>();
                 var imagesCopied = new List<string>();
+                var modsFolderPath = Path.Combine(dataFolderPath, "mods");
+                var imagesFolderPath = Path.Combine(dataFolderPath, "images");
                 foreach (var zipFileEntry in archive.Entries)
                 {
                     var ext = Path.GetExtension(zipFileEntry.Name).ToLowerInvariant();
@@ -670,22 +678,17 @@ public sealed partial class RootPage : Page
                     {
                         SetProgress($"Извлечение: {zipFileEntry.Name}");
                         using var fileStream = zipFileEntry.Open();
-                        await Settings.CopyFileWithConfirmation(XamlRoot, fileStream, zipFileEntry.Name, Path.Combine(dataFolderPath, "mods"));
+                        await Settings.CopyFileWithConfirmation(XamlRoot, fileStream, zipFileEntry.Name, modsFolderPath);
                         modsCopied.Add(zipFileEntry.Name);
                     }
                     else if (Settings.SupportedImageExtensions.Contains(ext) && (!withConfirm || entryProperties.imageFiles.Contains(zipFileEntry.Name)))
                     {
                         SetProgress($"Извлечение: {zipFileEntry.Name}");
                         using var fileStream = zipFileEntry.Open();
-                        await Settings.CopyFileWithConfirmation(XamlRoot, fileStream, zipFileEntry.Name, Path.Combine(dataFolderPath, "images"));
+                        await Settings.CopyFileWithConfirmation(XamlRoot, fileStream, zipFileEntry.Name, imagesFolderPath);
                         imagesCopied.Add(zipFileEntry.Name);
                     }
                 }
-
-                var finalModFiles = modsCopied
-                    .Select(fileName => Path.Combine(dataFolderPath, "mods", fileName));
-                var finalImageFiles = imagesCopied
-                    .Select(fileName => Path.Combine(dataFolderPath, "images", fileName));
 
                 SetProgress(null);
                 return new DoomEntry()
@@ -699,8 +702,8 @@ public sealed partial class RootPage : Page
                     UniqueConfig = entryProperties.uniqueConfig,
                     UniqueSavesFolder = entryProperties.uniqueSavesFolder,
                     SelectedImageIndex = 0,
-                    ModFiles = new(finalModFiles),
-                    ImageFiles = new(finalImageFiles),
+                    ModFiles = new(modsCopied),
+                    ImageFiles = new(imagesCopied),
                 };
             }
         }
@@ -746,12 +749,14 @@ public sealed partial class RootPage : Page
             {
                 var modsCopied = new List<string>();
                 var imagesCopied = new List<string>();
+                var modsFolderPath = Path.Combine(dataFolderPath, "mods");
+                var imagesFolderPath = Path.Combine(dataFolderPath, "images");
                 foreach (var mod in mods)
                 {
                     if (!withConfirm || entryProperties.modFiles.Contains(mod.Name))
                     {
                         SetProgress($"Копирование: {mod.Name}");
-                        await Settings.CopyFileWithConfirmation(XamlRoot, mod, Path.Combine(dataFolderPath, "mods"));
+                        await Settings.CopyFileWithConfirmation(XamlRoot, mod, modsFolderPath);
                         modsCopied.Add(mod.Name);
                     }
                 }
@@ -760,15 +765,10 @@ public sealed partial class RootPage : Page
                     if (!withConfirm || entryProperties.imageFiles.Contains(image.Name))
                     {
                         SetProgress($"Копирование: {image.Name}");
-                        await Settings.CopyFileWithConfirmation(XamlRoot, image, Path.Combine(dataFolderPath, "images"));
+                        await Settings.CopyFileWithConfirmation(XamlRoot, image, imagesFolderPath);
                         imagesCopied.Add(image.Name);
                     }
                 }
-                
-                var finalModFiles = modsCopied
-                    .Select(fileName => Path.Combine(dataFolderPath, "mods", fileName));
-                var finalImageFiles = imagesCopied
-                    .Select(fileName => Path.Combine(dataFolderPath, "images", fileName));
 
                 SetProgress(null);
                 return new DoomEntry()
@@ -782,8 +782,8 @@ public sealed partial class RootPage : Page
                     UniqueConfig = entryProperties.uniqueConfig,
                     UniqueSavesFolder = entryProperties.uniqueSavesFolder,
                     SelectedImageIndex = 0,
-                    ModFiles = new(finalModFiles),
-                    ImageFiles = new(finalImageFiles),
+                    ModFiles = new(modsCopied),
+                    ImageFiles = new(imagesCopied),
                 };
             }
         }

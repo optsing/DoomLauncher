@@ -170,17 +170,18 @@ public sealed partial class SettingsPage : Page
             {
                 using var stream = await Settings.WebAPI.DownloadUrl(asset.DownloadUrl);
                 using var zipArchive = new ZipArchive(stream, ZipArchiveMode.Read);
-                var targetPath = Path.Combine(packagesFolderPath, AssetToFolderName(asset));
+                var folderName = AssetToFolderName(asset);
+                var targetPath = Path.Combine(packagesFolderPath, folderName);
                 await Task.Run(
                     () => zipArchive.ExtractToDirectory(targetPath, overwriteFiles: true)
                 );
                 var newPackage = new GZDoomPackage()
                 {
-                    Path = Path.Combine(targetPath, "gzdoom.exe"),
+                    Path = Path.Combine(folderName, "gzdoom.exe"),
                     Version = asset.Version,
                     Arch = asset.Arch,
                 };
-                settings.GZDoomInstalls.Insert(0, newPackage);
+                settings.GZDoomInstalls.Add(newPackage);
             }
             finally
             {
@@ -215,7 +216,7 @@ public sealed partial class SettingsPage : Page
                     Version = version,
                     Arch = AssetArch.manual,
                 };
-                settings.GZDoomInstalls.Insert(0, newPackage);
+                settings.GZDoomInstalls.Add(newPackage);
             }
         }
     }
@@ -265,7 +266,7 @@ public sealed partial class SettingsPage : Page
         {
             if (el.DataContext is GZDoomPackage package)
             {
-                Process.Start("explorer.exe", "/select," + package.Path);
+                Process.Start("explorer.exe", "/select," + Path.GetFullPath(package.Path, packagesFolderPath));
             }
         }
     }
@@ -291,7 +292,7 @@ public sealed partial class SettingsPage : Page
         {
             if (el.DataContext is string iWadFile)
             {
-                Process.Start("explorer.exe", "/select," + Path.Combine(iWadFolderPath, iWadFile));
+                Process.Start("explorer.exe", "/select," + Path.GetFullPath(iWadFile, iWadFolderPath));
             }
         }
     }
