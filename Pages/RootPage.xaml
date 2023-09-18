@@ -7,6 +7,7 @@
     xmlns:animations="using:CommunityToolkit.WinUI.Animations"
     xmlns:local="using:DoomLauncher"
     xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
+    xmlns:ui="using:CommunityToolkit.WinUI"
     mc:Ignorable="d"
 >
     <Grid>
@@ -183,7 +184,10 @@
                     </Border>
                 </Grid>
             </SplitView.Pane>
-            <Grid CornerRadius="8,0,0,8" Background="{ThemeResource CustomColor}">
+            <Grid
+                Background="{ThemeResource CustomColor}"
+                ui:UIElementExtensions.ClipToBounds="True"
+            >
                 <Grid.RowDefinitions>
                     <RowDefinition Height="{x:Bind TitleBarHeight}" />
                     <RowDefinition Height="*" />

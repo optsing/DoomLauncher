@@ -237,6 +237,7 @@
             DragOver="DropHelper_DragOver"
             Drop="DropHelper_Drop"
             Visibility="Collapsed"
+            CornerRadius="8"
         >
             <animations:Implicit.ShowAnimations>
                 <animations:OpacityAnimation Duration="0:0:0.3" From="0" To="1.0"/>
