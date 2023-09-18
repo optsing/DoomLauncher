@@ -3,6 +3,7 @@ using Microsoft.Windows.AppLifecycle;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Windows.Storage;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -41,20 +42,9 @@ public partial class App : Application
         {
             mainInstance.Activated += MainInstance_Activated;
             m_window = new MainWindow();
-            m_window.rootPage.Loaded += async (object sender, RoutedEventArgs e) =>
+            m_window.rootPage.Loaded += (object sender, RoutedEventArgs e) =>
             {
-                if (appArgs.Data is Windows.ApplicationModel.Activation.ProtocolActivatedEventArgs protocolArgs)
-                {
-                    await m_window.rootPage.ImportEntryFromDoomWorldId(protocolArgs.Uri.Host, withConfirm: true);
-                }
-                else
-                {
-                    var files = ParseAppArgs(appArgs);
-                    if (files.Count > 0)
-                    {
-                        await m_window.rootPage.ImportEntriesFromFiles(files, withConfirm: true);
-                    }
-                }
+                ParseAppArgs(m_window.rootPage, appArgs);
             };
             m_window.Activate();
         }
@@ -80,45 +70,55 @@ public partial class App : Application
     {
         if (m_window != null)
         {
-            WindowHelper.SetForegroundWindow(m_window.hWnd);
-            if (e.Data is Windows.ApplicationModel.Activation.ProtocolActivatedEventArgs protocolArgs)
-            {
-                m_window.dispatcher.TryEnqueue(
-                    async () => await m_window.rootPage.ImportEntryFromDoomWorldId(protocolArgs.Uri.Host, withConfirm: true)
-                );
-            }
-            else
-            {
-                var files = ParseAppArgs(e);
-                if (files.Count > 0)
-                {
-                    m_window.dispatcher.TryEnqueue(
-                        async () => await m_window.rootPage.ImportEntriesFromFiles(files, withConfirm: true)
-                    );
-                }
-            }
+            WinApi.SetForegroundWindow(m_window.hWnd);
+            m_window.dispatcher.TryEnqueue(
+                () => ParseAppArgs(m_window.rootPage, e)
+            );
         }
     }
 
-    private static List<StorageFile> ParseAppArgs(AppActivationArguments appArgs)
+    private static async void ParseAppArgs(RootPage rootPage, AppActivationArguments appArgs)
     {
-        var files = new List<StorageFile>();
-        if (appArgs.Data is Windows.ApplicationModel.Activation.IFileActivatedEventArgs fileArgs)
+        if (appArgs.Kind == ExtendedActivationKind.Protocol)
         {
-            
-            foreach (var item in fileArgs.Files)
+            if (appArgs.Data is Windows.ApplicationModel.Activation.ProtocolActivatedEventArgs protocolArgs)
             {
-                if (item is StorageFile file)
+                await rootPage.ImportEntryFromDoomWorldId(protocolArgs.Uri.Host, withConfirm: true);
+            }
+        }
+        else if (appArgs.Kind == ExtendedActivationKind.File)
+        {
+            if (appArgs.Data is Windows.ApplicationModel.Activation.IFileActivatedEventArgs fileArgs)
+            {
+                var files = new List<StorageFile>();
+                foreach (var item in fileArgs.Files)
                 {
-                    var ext = Path.GetExtension(file.Name).ToLowerInvariant();
-                    if (ext == ".gzdl")
+                    if (item is StorageFile file)
                     {
-                        files.Add(file);
+                        var ext = Path.GetExtension(file.Name).ToLowerInvariant();
+                        if (ext == ".gzdl")
+                        {
+                            files.Add(file);
+                        }
                     }
+                }
+                if (files.Count > 0)
+                {
+                    await rootPage.ImportEntriesFromFiles(files, withConfirm: true);
                 }
             }
         }
-        return files;
+        else if (appArgs.Kind == ExtendedActivationKind.Launch)
+        {
+            if (appArgs.Data is Windows.ApplicationModel.Activation.ILaunchActivatedEventArgs launchArgs)
+            {
+                var launchOptions = CommandLine.ParseCommandLine(launchArgs.Arguments);
+                if (launchOptions?.EntryId is string entryId)
+                {
+                    rootPage.LaunchEntryFromId(entryId);
+                }
+            }
+        }
     }
 
     private MainWindow? m_window;

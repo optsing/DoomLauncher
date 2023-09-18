@@ -1,0 +1,28 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Windows.UI.StartScreen;
+
+namespace DoomLauncher;
+
+internal class JumpListHelper
+{
+    public static async Task UpdateJumpList(IEnumerable<DoomEntry> entries)
+    {
+        JumpList jumpList = await JumpList.LoadCurrentAsync();
+        jumpList.Items.Clear();
+
+        jumpList.SystemGroupKind = JumpListSystemGroupKind.None;
+
+        foreach (var entry in entries.Where(entry => entry.LastLaunch != null).OrderByDescending(entry => entry.LastLaunch))
+        {
+            JumpListItem item = JumpListItem.CreateWithArguments($"--launch {entry.Id}", entry.Name);
+            item.GroupName = "Последние запущенные";
+            item.Logo = new Uri("ms-appx:///Assets/app.ico");
+            jumpList.Items.Add(item);
+        }
+
+        await jumpList.SaveAsync();
+    }
+}

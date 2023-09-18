@@ -49,7 +49,7 @@ public sealed partial class RootPage : Page
             titleBar.Loaded += TitleBar_Loaded;
             titleBar.SizeChanged += TitleBar_SizeChanged;
 
-            var scaleAdjustment = DPIHelper.GetScaleAdjustment(hWnd);
+            var scaleAdjustment = WinApi.GetScaleAdjustment(hWnd);
             if (appWindow.TitleBar.LeftInset > 0)
             {
                 LeftInset = new GridLength(appWindow.TitleBar.LeftInset / scaleAdjustment);
@@ -123,6 +123,7 @@ public sealed partial class RootPage : Page
         else
         {
             frameMain.Content = notSelectedPage;
+            Page_OnChangeBackground(null, (null, AnimationDirection.None));
         }
         if (swMain.DisplayMode == SplitViewDisplayMode.Overlay)
         {
@@ -301,11 +302,25 @@ public sealed partial class RootPage : Page
 
     private void Page_OnStart(object? sender, DoomEntry entry)
     {
-        Start(entry);
+        LaunchEntry(entry);
     }
 
-    private async void Start(DoomEntry entry)
+    public void LaunchEntryFromId(string entryId)
     {
+        var entry = settings.Entries.FirstOrDefault(entry => entry.Id == entryId);
+        if (entry != null)
+        {
+            LaunchEntry(entry);
+        }
+    }
+
+    private bool isLaunched = false;
+    private async void LaunchEntry(DoomEntry entry)
+    {
+        if (isLaunched)
+        {
+            return;
+        }
         var gZDoomPath = Path.GetFullPath(entry.GZDoomPath, Path.Combine(dataFolderPath, "gzdoom"));
         if (!Settings.ValidateGZDoomPath(gZDoomPath))
         {
@@ -358,9 +373,10 @@ public sealed partial class RootPage : Page
         var process = Process.Start(processInfo);
         if (process != null)
         {
-            entry.LastLaunch = DateTime.Now;
+            isLaunched = true;
+            WinApi.SetForegroundWindow(process.MainWindowHandle);
 
-            WindowHelper.SetForegroundWindow(process.MainWindowHandle);
+            entry.LastLaunch = DateTime.Now;
 
             if (settings.CloseOnLaunch)
             {
@@ -371,7 +387,8 @@ public sealed partial class RootPage : Page
                 presenter.Minimize();
                 await process.WaitForExitAsync();
                 presenter.Restore();
-                WindowHelper.SetForegroundWindow(hWnd);
+                WinApi.SetForegroundWindow(hWnd);
+                isLaunched = false;
             }
         }
     }
@@ -410,6 +427,7 @@ public sealed partial class RootPage : Page
             var settingsPage = new SettingsPage(hWnd, settings, dataFolderPath);
             settingsPage.OnProgress += Page_OnProgress;
             frameMain.Content = settingsPage;
+            Page_OnChangeBackground(null, (null, AnimationDirection.None));
         }
     }
 

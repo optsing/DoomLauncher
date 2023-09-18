@@ -183,85 +183,82 @@
                     </Border>
                 </Grid>
             </SplitView.Pane>
-            <Grid>
+            <Grid CornerRadius="8,0,0,8" Background="{ThemeResource CustomColor}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="{x:Bind TitleBarHeight}" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <Border CornerRadius="8,0,0,8" Grid.RowSpan="2">
-                    <Image
-                        x:Name="imgBackground"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
-                        Opacity="0.25"
-                        Stretch="UniformToFill"
-                    >
-                        <Image.Resources>
-                            <Storyboard x:Name="sbShow">
-                                <DoubleAnimation
-                                    Storyboard.TargetName="imgBackground"
-                                    Storyboard.TargetProperty="Opacity"
-                                    From="0"
-                                    To="0.25"
-                                    Duration="{x:Bind SlideshowAnimationDuration}"
-                                />
-                            </Storyboard>
-                            <Storyboard x:Name="sbHide">
-                                <DoubleAnimation
-                                    Storyboard.TargetName="imgBackground"
-                                    Storyboard.TargetProperty="Opacity"
-                                    From="0.25"
-                                    To="0"
-                                    Duration="{x:Bind SlideshowAnimationDuration}"
-                                />      
-                            </Storyboard>
-                            <Storyboard x:Name="sbToLeft">
-                                <DoubleAnimation
-                                    Storyboard.TargetName="imgBackgroundTranslate"
-                                    Storyboard.TargetProperty="X"
-                                    From="0"
-                                    To="-200"
-                                    Duration="{x:Bind SlideshowAnimationDuration}"
-                                />
-                            </Storyboard>
-                            <Storyboard x:Name="sbToRight">
-                                <DoubleAnimation
-                                    Storyboard.TargetName="imgBackgroundTranslate"
-                                    Storyboard.TargetProperty="X"
-                                    From="0"
-                                    To="200"
-                                    Duration="{x:Bind SlideshowAnimationDuration}"
-                                />
-                            </Storyboard>
-                            <Storyboard x:Name="sbFromLeft">
-                                <DoubleAnimation
-                                    Storyboard.TargetName="imgBackgroundTranslate"
-                                    Storyboard.TargetProperty="X"
-                                    From="-200"
-                                    To="0"
-                                    Duration="{x:Bind SlideshowAnimationDuration}"
-                                />
-                            </Storyboard>
-                            <Storyboard x:Name="sbFromRight">
-                                <DoubleAnimation
-                                    Storyboard.TargetName="imgBackgroundTranslate"
-                                    Storyboard.TargetProperty="X"
-                                    From="200"
-                                    To="0"
-                                    Duration="{x:Bind SlideshowAnimationDuration}"
-                                />
-                            </Storyboard>
-                        </Image.Resources>
-                        <Image.RenderTransform>
-                            <TranslateTransform x:Name="imgBackgroundTranslate"/>
-                        </Image.RenderTransform>
-                    </Image>
-                </Border>
+                <Image
+                    Grid.RowSpan="2"
+                    x:Name="imgBackground"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Opacity="0.25"
+                    Stretch="UniformToFill"
+                >
+                    <Image.Resources>
+                        <Storyboard x:Name="sbShow">
+                            <DoubleAnimation
+                                Storyboard.TargetName="imgBackground"
+                                Storyboard.TargetProperty="Opacity"
+                                From="0"
+                                To="0.25"
+                                Duration="{x:Bind SlideshowAnimationDuration}"
+                            />
+                        </Storyboard>
+                        <Storyboard x:Name="sbHide">
+                            <DoubleAnimation
+                                Storyboard.TargetName="imgBackground"
+                                Storyboard.TargetProperty="Opacity"
+                                From="0.25"
+                                To="0"
+                                Duration="{x:Bind SlideshowAnimationDuration}"
+                            />
+                        </Storyboard>
+                        <Storyboard x:Name="sbToLeft">
+                            <DoubleAnimation
+                                Storyboard.TargetName="imgBackgroundTranslate"
+                                Storyboard.TargetProperty="X"
+                                From="0"
+                                To="-200"
+                                Duration="{x:Bind SlideshowAnimationDuration}"
+                            />
+                        </Storyboard>
+                        <Storyboard x:Name="sbToRight">
+                            <DoubleAnimation
+                                Storyboard.TargetName="imgBackgroundTranslate"
+                                Storyboard.TargetProperty="X"
+                                From="0"
+                                To="200"
+                                Duration="{x:Bind SlideshowAnimationDuration}"
+                            />
+                        </Storyboard>
+                        <Storyboard x:Name="sbFromLeft">
+                            <DoubleAnimation
+                                Storyboard.TargetName="imgBackgroundTranslate"
+                                Storyboard.TargetProperty="X"
+                                From="-200"
+                                To="0"
+                                Duration="{x:Bind SlideshowAnimationDuration}"
+                            />
+                        </Storyboard>
+                        <Storyboard x:Name="sbFromRight">
+                            <DoubleAnimation
+                                Storyboard.TargetName="imgBackgroundTranslate"
+                                Storyboard.TargetProperty="X"
+                                From="200"
+                                To="0"
+                                Duration="{x:Bind SlideshowAnimationDuration}"
+                            />
+                        </Storyboard>
+                    </Image.Resources>
+                    <Image.RenderTransform>
+                        <TranslateTransform x:Name="imgBackgroundTranslate"/>
+                    </Image.RenderTransform>
+                </Image>
                 <Frame
                     Grid.Row="1"
-                    CornerRadius="8,8,0,8"
                     x:Name="frameMain"
-                    Background="{ThemeResource CustomColor}"
                 />
             </Grid>
         </SplitView>

@@ -53,6 +53,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="CommandLineParser" Version="2.9.1" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
 		<PackageReference Include="CommunityToolkit.WinUI.Animations" Version="8.0.230907" />
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" Version="8.0.230907" />
