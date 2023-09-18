@@ -153,7 +153,12 @@ public partial class DoomEntry: ObservableObject
         set => SetProperty(ref longDescription, value);
     }
 
-    public string GZDoomPath { get; set; } = "";
+    private string gZDoomPath = "";
+    public string GZDoomPath
+    {
+        get => gZDoomPath;
+        set => SetProperty(ref gZDoomPath, value);
+    } 
 
     private string iWadFile = "";
     public string IWadFile

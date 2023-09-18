@@ -1,7 +1,7 @@
-﻿using System;
-using System.Runtime.InteropServices;
-using Microsoft.UI;
+﻿using Microsoft.UI;
 using Microsoft.UI.Windowing;
+using System;
+using System.Runtime.InteropServices;
 
 namespace DoomLauncher;
 public partial class DPIHelper
