@@ -113,10 +113,16 @@ public partial class App : Application
             if (appArgs.Data is Windows.ApplicationModel.Activation.ILaunchActivatedEventArgs launchArgs)
             {
                 var launchOptions = CommandLine.ParseCommandLine(launchArgs.Arguments);
-                if (launchOptions?.EntryId is string entryId)
+                if (launchOptions != null)
                 {
-                    bool forceClose = launchOptions?.CloseOnLaunch ?? false;
-                    rootPage.LaunchEntryFromId(entryId, forceClose);
+                    if (launchOptions.EntryId is string entryId)
+                    {
+                        rootPage.LaunchEntryFromId(entryId, launchOptions.ForceClose);
+                    }
+                    else if (launchOptions.EntryName is string entryName)
+                    {
+                        rootPage.LaunchEntryFromName(entryName, launchOptions.ForceClose);
+                    }
                 }
             }
         }

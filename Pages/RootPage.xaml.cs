@@ -314,6 +314,15 @@ public sealed partial class RootPage : Page
         }
     }
 
+    public void LaunchEntryFromName(string entryName, bool forceClose)
+    {
+        var entry = settings.Entries.FirstOrDefault(entry => entry.Name == entryName);
+        if (entry != null)
+        {
+            LaunchEntry(entry, forceClose);
+        }
+    }
+
     private bool isLaunched = false;
     private async void LaunchEntry(DoomEntry entry, bool forceClose)
     {
