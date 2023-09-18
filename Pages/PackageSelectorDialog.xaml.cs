@@ -14,24 +14,24 @@ namespace DoomLauncher;
 /// </summary>
 public sealed partial class PackageSelectorDialog : ContentDialog
 {
-    public PackageSelectorDialog(XamlRoot root, List<GZDoomFileAsset> assets)
+    public PackageSelectorDialog(XamlRoot root, List<GZDoomPackage> assets)
     {
         InitializeComponent();
         XamlRoot = root;
-        Assets = assets;
-        SelectedAsset = assets.FirstOrDefault();
+        OnlinePackage = assets;
+        SelectedPackage = assets.FirstOrDefault();
     }
 
-    public List<GZDoomFileAsset> Assets { get; }
+    private List<GZDoomPackage> OnlinePackage { get; }
 
-    public GZDoomFileAsset? SelectedAsset { get; set; }
+    private GZDoomPackage? SelectedPackage { get; set; }
 
-    public static async Task<GZDoomFileAsset?> ShowAsync(XamlRoot root, List<GZDoomFileAsset> assets)
+    public static async Task<GZDoomPackage?> ShowAsync(XamlRoot root, List<GZDoomPackage> packages)
     {
-        var dialog = new PackageSelectorDialog(root, assets);
+        var dialog = new PackageSelectorDialog(root, packages);
         if (ContentDialogResult.Primary == await dialog.ShowAsync())
         {
-            return dialog.SelectedAsset;
+            return dialog.SelectedPackage;
         }
         return null;
     }

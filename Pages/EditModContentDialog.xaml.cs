@@ -29,9 +29,9 @@ public sealed partial class EditModContentDialog : ContentDialog
         GZDoomPackages.AddRange(settings.GZDoomInstalls);
         GZDoomPackage = settings.GZDoomInstalls.FirstOrDefault(package => package.Path == initial.gZDoomPath, GZDoomPackages.First());
 
-        FilteredIWads = new() { new KeyValue("", "Не выбрано") };
-        FilteredIWads.AddRange(settings.IWadFiles.Select(iWadFile => new KeyValue(iWadFile, Settings.IWads.GetValueOrDefault(iWadFile.ToLower(), iWadFile))));
-        IWadFile = FilteredIWads.FirstOrDefault(iWad => iWad.Key == initial.iWadFile, FilteredIWads.First());
+        IWadFiles = new() { new KeyValue("", "Не выбрано") };
+        IWadFiles.AddRange(settings.IWadFiles.Select(iWadFile => new KeyValue(iWadFile, Settings.GetIWadTitle(iWadFile))));
+        IWadFile = IWadFiles.FirstOrDefault(iWad => iWad.Key == initial.iWadFile, IWadFiles.First());
 
         PrimaryButtonText = mode switch
         {
@@ -85,7 +85,7 @@ public sealed partial class EditModContentDialog : ContentDialog
         get; private set;
     }
 
-    public List<KeyValue> FilteredIWads
+    public List<KeyValue> IWadFiles
     {
         get;
     }

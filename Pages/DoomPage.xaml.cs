@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
@@ -19,31 +20,46 @@ namespace DoomLauncher;
 /// <summary>
 /// An empty page that can be used on its own or navigated to within a Frame.
 /// </summary>
+[INotifyPropertyChanged]
 public sealed partial class DoomPage : Page
 {
-    private readonly TimeSpan SlideshowAnimationDuration = TimeSpan.FromMilliseconds(150);
-    private readonly TimeSpan SlideshowInterval = TimeSpan.FromSeconds(10);
+    private readonly TimeSpan SlideshowInterval = TimeSpan.FromSeconds(1);
+    private readonly int TicksToSlideshow = 10;
+    [ObservableProperty]
+    private int currentTicksToSlideshow;
     private readonly DispatcherTimer timerSlideshow = new();
 
     private readonly DoomEntry entry;
     private readonly IntPtr hWnd;
     private readonly string modsFolderPath;
     private readonly string imagesFolderPath;
+    private readonly Settings settings;
 
-    public DoomPage(DoomEntry entry, IntPtr hWnd, string dataFolderPath)
+    public DoomPage(DoomEntry entry, IntPtr hWnd, Settings settings, string dataFolderPath)
     {
         InitializeComponent();
         this.entry = entry;
         this.hWnd = hWnd;
+        this.settings = settings;
         this.modsFolderPath = Path.Combine(dataFolderPath, "mods");
         this.imagesFolderPath = Path.Combine(dataFolderPath, "images");
 
         timerSlideshow.Interval = SlideshowInterval;
         timerSlideshow.Tick += Timer_Tick;
 
-        SetSelectedImageIndex(entry.SelectedImageIndex);
         SetSlideshow();
         RefillFileMenu();
+    }
+
+    private void Page_Loaded(object sender, RoutedEventArgs e)
+    {
+        SetSelectedImageIndex(entry.SelectedImageIndex, direction: AnimationDirection.None);
+    }
+
+    private void Page_Unloaded(object sender, RoutedEventArgs e)
+    {
+        timerSlideshow.Tick -= Timer_Tick;
+        timerSlideshow.Stop();
     }
 
     private async void RefillFileMenu()
@@ -90,6 +106,7 @@ public sealed partial class DoomPage : Page
     public event EventHandler<DoomEntry>? OnExport;
     public event EventHandler<DoomEntry>? OnRemove;
     public event EventHandler<string?>? OnProgress;
+    public event EventHandler<(BitmapImage? bitmap, AnimationDirection direction)>? OnChangeBackground;
 
     private void Start_Click(object sender, RoutedEventArgs e)
     {
@@ -156,12 +173,8 @@ public sealed partial class DoomPage : Page
         }
     }
 
-    private readonly SemaphoreSlim semaphoreAnimation = new(1, 1);
-
-    private async void SetSelectedImageIndex(int ind, bool toPrevious = false)
+    private async void SetSelectedImageIndex(int ind, AnimationDirection direction)
     {
-        BitmapImage? bitmap;
-        bool hasPrevBitmap = imgBackground.Source != null;
         if (entry.ImageFiles.Any())
         {
             if (ind < 0)
@@ -174,63 +187,37 @@ public sealed partial class DoomPage : Page
             }
             entry.SelectedImageIndex = ind;
             var imagePath = Path.GetFullPath(entry.ImageFiles[entry.SelectedImageIndex], imagesFolderPath);
-            bitmap = await BitmapHelper.CreateBitmapFromFile(imagePath);
+            var bitmap = await BitmapHelper.CreateBitmapFromFile(imagePath);
+            OnChangeBackground?.Invoke(this, (bitmap, direction));
         }
         else
         {
             entry.SelectedImageIndex = 0;
-            bitmap = null;
+            OnChangeBackground?.Invoke(this, (null, direction));
         }
-        await semaphoreAnimation.WaitAsync();
-        if (hasPrevBitmap)
-        {
-            if (bitmap != null)
-            {
-                if (toPrevious)
-                {
-                    sbToRight.Begin();
-                }
-                else
-                {
-                    sbToLeft.Begin();
-                }
-            }
-            sbHide.Begin();
-            await Task.Delay(SlideshowAnimationDuration);
-        }
-        imgBackground.Source = bitmap;
-        if (imgBackground.Source != null)
-        {
-            if (hasPrevBitmap)
-            {
-                if (toPrevious)
-                {
-                    sbFromLeft.Begin();
-                }
-                else
-                {
-                    sbFromRight.Begin();
-                }
-            }
-            sbShow.Begin();
-            await Task.Delay(SlideshowAnimationDuration);
-        }
-        semaphoreAnimation.Release();
     }
 
     private void PreviousBackground_Click(object sender, RoutedEventArgs e)
     {
-        SetSelectedImageIndex(entry.SelectedImageIndex - 1, toPrevious: true);
+        SetSelectedImageIndex(entry.SelectedImageIndex - 1, direction: AnimationDirection.Previous);
     }
 
     private void NextBackground_Click(object sender, RoutedEventArgs e)
     {
-        SetSelectedImageIndex(entry.SelectedImageIndex + 1);
+        SetSelectedImageIndex(entry.SelectedImageIndex + 1, direction: AnimationDirection.Next);
     }
 
     private void Timer_Tick(object? sender, object e)
     {
-        SetSelectedImageIndex(entry.SelectedImageIndex + 1);
+        if (CurrentTicksToSlideshow < TicksToSlideshow)
+        {
+            CurrentTicksToSlideshow += 1;
+        }
+        else
+        {
+            SetSelectedImageIndex(entry.SelectedImageIndex + 1, direction: AnimationDirection.Next);
+            CurrentTicksToSlideshow = 0;
+        }
     }
 
     private async Task AddFiles(IReadOnlyList<StorageFile> files)
@@ -258,13 +245,13 @@ public sealed partial class DoomPage : Page
             if (!entry.ModFiles.Contains(file.Name))
             {
                 entry.ImageFiles.Add(file.Name);
+                hasAddedImages = true;
             }
-            hasAddedImages = true;
         }
-        OnProgress?.Invoke(this, "");
+        OnProgress?.Invoke(this, null);
         if (hasAddedImages)
         {
-            SetSelectedImageIndex(entry.ImageFiles.Count - 1);
+            SetSelectedImageIndex(entry.ImageFiles.Count - 1, direction: AnimationDirection.Next);
             SetSlideshow();
         }
     }
@@ -300,13 +287,14 @@ public sealed partial class DoomPage : Page
     {
         if (entry.SelectedImageIndex >= 0 && entry.SelectedImageIndex < entry.ImageFiles.Count)
         {
+            IsSlideshowEnabled = false;
             var selectedImageIndex = entry.SelectedImageIndex;
             if (await AskDialog.ShowAsync(XamlRoot, "Удаление фона", $"Вы уверены, что хотите удалить текущий фон?", "Удалить", "Отмена"))
             {
                 entry.ImageFiles.RemoveAt(selectedImageIndex);
-                SetSelectedImageIndex(selectedImageIndex);
-                SetSlideshow();
+                SetSelectedImageIndex(selectedImageIndex, direction: AnimationDirection.Next);
             }
+            SetSlideshow();
         }
     }
 
@@ -402,23 +390,45 @@ public sealed partial class DoomPage : Page
         }
     }
 
+    private bool isSlideshowEnabled;
+    public bool IsSlideshowEnabled
+    {
+        get => isSlideshowEnabled;
+        set
+        {
+            if (SetProperty(ref isSlideshowEnabled, value))
+            {
+                if (value)
+                {
+                    timerSlideshow.Start();
+                }
+                else
+                {
+                    timerSlideshow.Stop();
+                }
+            }
+        }
+    } 
+
     private void SetSlideshow()
     {
-        var slideshow = entry.Slideshow && entry.ImageFiles.Count > 1;
-        btnSlideshowIcon.Glyph = slideshow ? "\uE769" : "\uE768";
-        if (slideshow)
-        {
-            timerSlideshow.Start();
-        }
-        else
-        {
-            timerSlideshow.Stop();
-        }
+        IsSlideshowEnabled = entry.Slideshow && entry.ImageFiles.Count > 1;
     }
 
     private void Slideshow_Click(object sender, RoutedEventArgs e)
     {
         entry.Slideshow = !entry.Slideshow;
+        CurrentTicksToSlideshow = 0;
         SetSlideshow();
+    }
+
+    private string GetGZDoomPackageTitle(string path)
+    {
+        var package = settings.GZDoomInstalls.FirstOrDefault(package => package.Path == path);
+        if (package == null)
+        {
+            return "Не выбрано";
+        }
+        return SettingsPage.GZDoomPackageToTitle(package);
     }
 }

@@ -13,10 +13,10 @@
     Style="{ThemeResource DefaultContentDialogStyle}"
 >
 
-    <ListView SelectedItem="{x:Bind SelectedAsset, Mode=TwoWay}" ItemsSource="{x:Bind Assets}">
+    <ListView SelectedItem="{x:Bind SelectedPackage, Mode=TwoWay}" ItemsSource="{x:Bind OnlinePackage}">
         <ListView.ItemTemplate>
-            <DataTemplate x:DataType="local:GZDoomFileAsset">
-                <TextBlock Text="{x:Bind Name}" />
+            <DataTemplate x:DataType="local:GZDoomPackage">
+                <TextBlock Text="{x:Bind local:SettingsPage.GZDoomPackageToTitle((local:GZDoomPackage))}" />
             </DataTemplate>
         </ListView.ItemTemplate>
     </ListView>

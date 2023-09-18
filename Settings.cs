@@ -36,7 +36,7 @@ public class Settings
         return !string.IsNullOrEmpty(path) && Path.GetExtension(path) == ".exe" && File.Exists(path);
     }
 
-    public static readonly Dictionary<string, string> IWads = new()
+    private static readonly Dictionary<string, string> IWads = new()
     {
         { "doom1.wad", "Doom (Shareware)" },
         { "doom.wad", "Ultimate Doom" },
@@ -54,6 +54,15 @@ public class Settings
         { "freedoom2.wad", "Freedoom: Phase 2" },
         { "freedm.wad", "FreeDM" },
     };
+
+    public static string GetIWadTitle(string iWadFile)
+    {
+        if (string.IsNullOrEmpty(iWadFile))
+        {
+            return "Не выбрано";
+        }
+        return IWads.GetValueOrDefault(iWadFile.ToLower(), iWadFile);
+    }
 
     public static readonly string[] SupportedModExtensions = new[] { ".pk3", ".wad", ".zip" };
     public static readonly string[] SupportedImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif", ".svg" };
@@ -145,20 +154,20 @@ public partial class DoomEntry: ObservableObject
     }
 
     public string GZDoomPath { get; set; } = "";
-    public string IWadFile { get; set; } = "";
+
+    private string iWadFile = "";
+    public string IWadFile
+    {
+        get => iWadFile;
+        set => SetProperty(ref iWadFile, value);
+    }
 
     public bool UniqueConfig { get; set; } = false;
     public bool UniqueSavesFolder { get; set; } = false;
 
     public string Id { get; set; } = "";
 
-    public int selectedImageIndex = 0;
-
-    public int SelectedImageIndex
-    {
-        get => selectedImageIndex;
-        set => SetProperty(ref selectedImageIndex, value);
-    }
+    public int SelectedImageIndex { get; set; } = 0;
 
     public bool Slideshow { get; set; } = true;
 

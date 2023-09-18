@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Windowing;
+﻿using Microsoft.UI.Input;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
@@ -9,6 +10,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
@@ -17,6 +19,11 @@ using Windows.Storage;
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace DoomLauncher;
+
+public enum AnimationDirection{
+    None, Previous, Next
+}
+
 /// <summary>
 /// An empty page that can be used on its own or navigated to within a Frame.
 /// </summary>
@@ -25,6 +32,8 @@ public sealed partial class RootPage : Page
     public GridLength LeftInset { get; } = new GridLength(0);
     public GridLength RightInset { get; } = new GridLength(0);
     public GridLength TitleBarHeight { get; } = new GridLength(48);
+
+    private readonly TimeSpan SlideshowAnimationDuration = TimeSpan.FromMilliseconds(150);
 
     public RootPage(AppWindow appWindow, Settings settings, IntPtr hWnd, string dataFolderPath)
     {
@@ -72,17 +81,18 @@ public sealed partial class RootPage : Page
     }
     private void SetDragRegion()
     {
-        var scaleAdjustment = XamlRoot.RasterizationScale;
-
-        var dragRect = new Windows.Graphics.RectInt32()
+        if (InputNonClientPointerSource.GetForWindowId(appWindow.Id) is InputNonClientPointerSource NonClientSource)
         {
-            X = (int)(titleBar.ActualOffset.X * scaleAdjustment),
-            Y = (int)(titleBar.ActualOffset.Y * scaleAdjustment),
-            Width = (int)(titleBar.ActualWidth * scaleAdjustment),
-            Height = (int)(titleBar.ActualHeight * scaleAdjustment),
-        };
-
-        appWindow.TitleBar.SetDragRectangles(new[] { dragRect });
+            var scaleAdjustment = XamlRoot.RasterizationScale;
+            var dragRect = new Windows.Graphics.RectInt32()
+            {
+                X = (int)(titleBar.ActualOffset.X * scaleAdjustment),
+                Y = (int)(titleBar.ActualOffset.Y * scaleAdjustment),
+                Width = (int)(titleBar.ActualWidth * scaleAdjustment),
+                Height = (int)(titleBar.ActualHeight * scaleAdjustment),
+            };
+            NonClientSource.SetRegionRects(NonClientRegionKind.Caption, new[] { dragRect });
+        }
     }
 
     private readonly IntPtr hWnd;
@@ -100,13 +110,14 @@ public sealed partial class RootPage : Page
         if (DoomList.SelectedItem is DoomEntry entry)
         {
             settings.SelectedModIndex = DoomList.SelectedIndex;
-            DoomPage page = new(entry, hWnd, dataFolderPath);
+            DoomPage page = new(entry, hWnd, settings, dataFolderPath);
             page.OnStart += Page_OnStart;
             page.OnEdit += Page_OnEdit;
             page.OnCopy += Page_OnCopy;
             page.OnExport += Page_OnExport;
             page.OnRemove += Page_OnRemove;
             page.OnProgress += Page_OnProgress;
+            page.OnChangeBackground += Page_OnChangeBackground;
             frameMain.Content = page;
         }
         else
@@ -117,6 +128,47 @@ public sealed partial class RootPage : Page
         {
             swMain.IsPaneOpen = false;
         }
+    }
+
+    private readonly SemaphoreSlim semaphoreAnimation = new(1, 1);
+    private async void Page_OnChangeBackground(object? sender, (Microsoft.UI.Xaml.Media.Imaging.BitmapImage? bitmap, AnimationDirection direction) e)
+    {
+        await semaphoreAnimation.WaitAsync();
+        bool hasPrevBitmap = imgBackground.Source != null;
+        if (hasPrevBitmap)
+        {
+            if (e.bitmap != null)
+            {
+                if (e.direction == AnimationDirection.Next)
+                {
+                    sbToLeft.Begin();
+                }
+                else if (e.direction == AnimationDirection.Previous)
+                {
+                    sbToRight.Begin();
+                }
+            }
+            sbHide.Begin();
+            await Task.Delay(SlideshowAnimationDuration);
+        }
+        imgBackground.Source = e.bitmap;
+        if (imgBackground.Source != null)
+        {
+            if (hasPrevBitmap)
+            {
+                if (e.direction == AnimationDirection.Next)
+                {
+                    sbFromRight.Begin();
+                }
+                else if (e.direction == AnimationDirection.Previous)
+                {
+                    sbFromLeft.Begin();
+                }
+            }
+            sbShow.Begin();
+            await Task.Delay(SlideshowAnimationDuration);
+        }
+        semaphoreAnimation.Release();
     }
 
     private void SetProgress(string? text)

@@ -20,14 +20,6 @@ namespace DoomLauncher;
 /// </summary>
 
 
-public class GZDoomFileAsset
-{
-    public string Name { get; set; } = "";
-    public Version? Version { get; set; } = null;
-    public AssetArch Arch { get; set; } = AssetArch.unknown;
-    public string DownloadUrl { get; set; } = "";
-}
-
 public enum AssetArch
 {
     x64, x86, arm64, x64legacy, x86legacy, unknown, manual, notSelected
@@ -88,7 +80,7 @@ public sealed partial class SettingsPage : Page
         _ => " unknown",
     };
 
-    private static string AssetToFolderName(GZDoomFileAsset asset) => (asset.Version?.ToString() ?? "unknown") + "-" + ArchToString(asset.Arch);
+    private static string PackageToFolderName(GZDoomPackage package) => (package.Version?.ToString() ?? "unknown") + "-" + ArchToString(package.Arch);
 
     public static string ArchToString(AssetArch arch) => arch switch
     {
@@ -116,7 +108,7 @@ public sealed partial class SettingsPage : Page
     {
         OnProgress?.Invoke(this, "Получение списка версий");
         var entries = await Settings.WebAPI.GetGZDoomGitHubReleases();
-        var assets = new List<GZDoomFileAsset>();
+        var onlinePackages = new List<GZDoomPackage>();
         foreach (var entry in entries)
         {
             foreach (var asset in entry.Assets)
@@ -139,21 +131,20 @@ public sealed partial class SettingsPage : Page
                     var version = ParseVersion(asset.Name);
                     if (!settings.GZDoomInstalls.Any(package => package.Version == version && package.Arch == arch))
                     {
-                        var newAsset = new GZDoomFileAsset()
+                        var newAsset = new GZDoomPackage()
                         {
-                            Name = $"GZDoom {version?.ToString() ?? "unknown"}{ArchToTitle(arch)}",
+                            Path = asset.DownloadUrl,
                             Arch = arch,
                             Version = version,
-                            DownloadUrl = asset.DownloadUrl,
                         };
-                        assets.Add(newAsset);
+                        onlinePackages.Add(newAsset);
                     }
                 }
             }
         }
         OnProgress?.Invoke(this, null);
         {
-            var newAsset = await PackageSelectorDialog.ShowAsync(XamlRoot, assets.OrderByDescending(asset => asset.Version).ThenBy(asset => asset.Arch).ToList());
+            var newAsset = await PackageSelectorDialog.ShowAsync(XamlRoot, onlinePackages.OrderByDescending(package => package.Version).ThenBy(package => package.Arch).ToList());
             if (newAsset != null)
             {
                 await DownloadPackage(newAsset);
@@ -161,16 +152,16 @@ public sealed partial class SettingsPage : Page
         }
     }
 
-    private async Task DownloadPackage(GZDoomFileAsset asset)
+    private async Task DownloadPackage(GZDoomPackage package)
     {
-        if (!string.IsNullOrEmpty(asset.DownloadUrl))
+        if (!string.IsNullOrEmpty(package.Path))
         {
             OnProgress?.Invoke(this, "Загрузка и извлечение архива");
             try
             {
-                using var stream = await Settings.WebAPI.DownloadUrl(asset.DownloadUrl);
+                using var stream = await Settings.WebAPI.DownloadUrl(package.Path);
                 using var zipArchive = new ZipArchive(stream, ZipArchiveMode.Read);
-                var folderName = AssetToFolderName(asset);
+                var folderName = PackageToFolderName(package);
                 var targetPath = Path.Combine(packagesFolderPath, folderName);
                 await Task.Run(
                     () => zipArchive.ExtractToDirectory(targetPath, overwriteFiles: true)
@@ -178,8 +169,8 @@ public sealed partial class SettingsPage : Page
                 var newPackage = new GZDoomPackage()
                 {
                     Path = Path.Combine(folderName, "gzdoom.exe"),
-                    Version = asset.Version,
-                    Arch = asset.Arch,
+                    Version = package.Version,
+                    Arch = package.Arch,
                 };
                 settings.GZDoomInstalls.Add(newPackage);
             }
@@ -277,7 +268,7 @@ public sealed partial class SettingsPage : Page
         {
             if (el.DataContext is GZDoomPackage package)
             {
-                var title = GZDoomPackageToTitle(package.Version, package.Arch);
+                var title = GZDoomPackageToTitle(package);
                 if (await AskDialog.ShowAsync(XamlRoot, "Удаление ссылки", $"Вы уверены, что хотите удалить ссылку на '{title}'?", "Удалить", "Отмена"))
                 {
                     settings.GZDoomInstalls.Remove(package);
@@ -303,7 +294,7 @@ public sealed partial class SettingsPage : Page
         {
             if (el.DataContext is string iWadFile)
             {
-                var title = IWadFileToTitle(iWadFile);
+                var title = Settings.GetIWadTitle(iWadFile);
                 if (await AskDialog.ShowAsync(XamlRoot, "Удаление ссылки", $"Вы уверены, что хотите удалить ссылку на '{title}'?", "Удалить", "Отмена"))
                 {
                     settings.IWadFiles.Remove(iWadFile);
@@ -312,18 +303,13 @@ public sealed partial class SettingsPage : Page
         }
     }
 
-    public static string GZDoomPackageToTitle(Version? version, AssetArch arch)
+    public static string GZDoomPackageToTitle(GZDoomPackage? package)
     {
-        if (arch == AssetArch.notSelected)
+        if (package == null || package.Arch == AssetArch.notSelected)
         {
             return "Не выбрано";
         }
-        return $"GZDoom {version?.ToString() ?? "unknown"}{ArchToTitle(arch)}";
-    }
-
-    public static string IWadFileToTitle(string iWadFileName)
-    {
-        return Settings.IWads.GetValueOrDefault(iWadFileName.ToLower(), iWadFileName);
+        return (package.Version?.ToString() ?? "unknown") + ArchToTitle(package.Arch);
     }
 
     [GeneratedRegex("(\\d+)[.-](\\d+)[.-](\\d+)")]

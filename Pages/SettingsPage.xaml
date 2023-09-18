@@ -38,7 +38,7 @@
                         <DataTemplate x:DataType="local:GZDoomPackage">
                             <Grid ColumnDefinitions="*,Auto,Auto">
                                 <TextBlock
-                                    Text="{x:Bind local:SettingsPage.GZDoomPackageToTitle(Version, Arch), Mode=OneWay}"
+                                    Text="{x:Bind local:SettingsPage.GZDoomPackageToTitle((local:GZDoomPackage)), Mode=OneWay}"
                                     VerticalAlignment="Center"
                                 />
                                 <Button
@@ -98,7 +98,7 @@
                         <DataTemplate x:DataType="x:String">
                             <Grid ColumnDefinitions="*,Auto,Auto">
                                 <TextBlock
-                                    Text="{x:Bind local:SettingsPage.IWadFileToTitle((x:String))}"
+                                    Text="{x:Bind local:Settings.GetIWadTitle((x:String))}"
                                     VerticalAlignment="Center"
                                 />
                                 <Button

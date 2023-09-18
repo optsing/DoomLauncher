@@ -6,84 +6,22 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="using:DoomLauncher"
     xmlns:animations="using:CommunityToolkit.WinUI.Animations"
+    xmlns:converters="using:CommunityToolkit.WinUI.Converters"
     d:DataContext="{d:DesignInstance Type=local:DoomEntry}"
     mc:Ignorable="d"
     Background="Transparent"
+    Loaded="Page_Loaded"
+    Unloaded="Page_Unloaded"
 >
+    <Page.Resources>
+        <converters:BoolToObjectConverter x:Key="SlideshowGlyph" TrueValue="&#xE769;" FalseValue="&#xE768;"/>
+    </Page.Resources>
     <Grid
         RowDefinitions="Auto,*,Auto,Auto"
         AllowDrop="True"
         DragEnter="Root_DragEnter"
         DragLeave="Root_DragLeave"
     >
-        <Image
-            Grid.RowSpan="4"
-            x:Name="imgBackground"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            Opacity="0.25"
-            Stretch="UniformToFill"
-        >
-            <Image.Resources>
-                <Storyboard x:Name="sbShow">
-                    <DoubleAnimation
-                        Storyboard.TargetName="imgBackground"
-                        Storyboard.TargetProperty="Opacity"
-                        From="0"
-                        To="0.25"
-                        Duration="{x:Bind SlideshowAnimationDuration}"
-                    />
-                </Storyboard>
-                <Storyboard x:Name="sbHide">
-                    <DoubleAnimation
-                        Storyboard.TargetName="imgBackground"
-                        Storyboard.TargetProperty="Opacity"
-                        From="0.25"
-                        To="0"
-                        Duration="{x:Bind SlideshowAnimationDuration}"
-                    />
-                </Storyboard>
-                <Storyboard x:Name="sbToLeft">
-                    <DoubleAnimation
-                        Storyboard.TargetName="imgBackgroundTranslate"
-                        Storyboard.TargetProperty="X"
-                        From="0"
-                        To="-200"
-                        Duration="{x:Bind SlideshowAnimationDuration}"
-                    />
-                </Storyboard>
-                <Storyboard x:Name="sbToRight">
-                    <DoubleAnimation
-                        Storyboard.TargetName="imgBackgroundTranslate"
-                        Storyboard.TargetProperty="X"
-                        From="0"
-                        To="200"
-                        Duration="{x:Bind SlideshowAnimationDuration}"
-                    />
-                </Storyboard>
-                <Storyboard x:Name="sbFromLeft">
-                    <DoubleAnimation
-                        Storyboard.TargetName="imgBackgroundTranslate"
-                        Storyboard.TargetProperty="X"
-                        From="-200"
-                        To="0"
-                        Duration="{x:Bind SlideshowAnimationDuration}"
-                    />
-                </Storyboard>
-                <Storyboard x:Name="sbFromRight">
-                    <DoubleAnimation
-                        Storyboard.TargetName="imgBackgroundTranslate"
-                        Storyboard.TargetProperty="X"
-                        From="200"
-                        To="0"
-                        Duration="{x:Bind SlideshowAnimationDuration}"
-                    />
-                </Storyboard>
-            </Image.Resources>
-            <Image.RenderTransform>
-                <TranslateTransform x:Name="imgBackgroundTranslate"/>
-            </Image.RenderTransform>
-        </Image>
         <StackPanel
             Grid.RowSpan="4"
             Orientation="Horizontal"
@@ -203,19 +141,21 @@
             CornerRadius="8"
         >
             <StackPanel
+                Margin="8"
                 Orientation="Vertical"
             >
+                <TextBlock FontSize="18">
+                    <Run Text="{x:Bind GetGZDoomPackageTitle(entry.GZDoomPath), Mode=OneWay}"
+                    /> • <Run Text="{x:Bind local:Settings.GetIWadTitle(entry.IWadFile), Mode=OneWay}" />
+                </TextBlock>
+                <TextBlock FontSize="16">
+                    Последний запуск: <Run Text="{x:Bind local:XamlHelper.DateToText(entry.LastLaunch), Mode=OneWay}"/>
+                </TextBlock>
                 <TextBlock
-                    Margin="8"
                     FontSize="16"
-                    Text="{x:Bind local:XamlHelper.LastLaunchToText(entry.LastLaunch), Mode=OneWay}"
-                    TextWrapping="WrapWholeWords"
-                />
-                <TextBlock
-                    Margin="8"
-                    FontSize="16"
+                    Margin="0,16,0,0"
                     Text="{x:Bind entry.LongDescription, Mode=OneWay}"
-                    Visibility="{x:Bind local:XamlHelper.HasText(entry.LongDescription)}"
+                    Visibility="{x:Bind local:XamlHelper.HasText(entry.LongDescription), Mode=OneWay}"
                     TextWrapping="WrapWholeWords"
                 />
             </StackPanel>
@@ -235,16 +175,6 @@
                 <FontIcon Glyph="&#xE710;" FontSize="16" />
             </Button>
             <Button
-                ToolTipService.ToolTip="Слайд-шоу"
-                Click="Slideshow_Click"
-                Style="{ThemeResource EllipsisButton}"
-                Height="40"
-                Width="40"
-                IsEnabled="{x:Bind local:XamlHelper.HasMoreItems(entry.ImageFiles.Count, 1), Mode=OneWay}"
-            >
-                <FontIcon x:Name="btnSlideshowIcon" FontSize="16" />
-            </Button>
-            <Button
                 ToolTipService.ToolTip="Предыдущий фон"
                 Click="PreviousBackground_Click" 
                 Style="{ThemeResource EllipsisButton}"
@@ -253,6 +183,30 @@
                 IsEnabled="{x:Bind local:XamlHelper.HasMoreItems(entry.ImageFiles.Count, 1), Mode=OneWay}"
             >
                 <FontIcon Glyph="&#xE892;" FontSize="16" />
+            </Button>
+            <Button
+                ToolTipService.ToolTip="Слайд-шоу"
+                Click="Slideshow_Click"
+                Style="{ThemeResource EllipsisButton}"
+                Height="40"
+                Width="40"
+                IsEnabled="{x:Bind local:XamlHelper.HasMoreItems(entry.ImageFiles.Count, 1), Mode=OneWay}"
+            >
+                <Grid>
+                    <ProgressRing
+                        Visibility="{x:Bind IsSlideshowEnabled, Mode=OneWay}"
+                        IsIndeterminate="False"
+                        Minimum="0"
+                        Maximum="{x:Bind TicksToSlideshow}"
+                        Value="{x:Bind CurrentTicksToSlideshow, Mode=OneWay}"
+                        Width="26"
+                        Height="26"
+                    />
+                    <FontIcon
+                        Glyph="{x:Bind IsSlideshowEnabled, Converter={StaticResource SlideshowGlyph}, Mode=OneWay}"
+                        FontSize="16"
+                    />
+                </Grid>
             </Button>
             <Button
                 ToolTipService.ToolTip="Следующий фон"

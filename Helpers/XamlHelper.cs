@@ -25,8 +25,8 @@ static class XamlHelper
         return itemsCount == 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
-    public static string LastLaunchToText(DateTime? lastLaunch)
+    public static string DateToText(DateTime? lastLaunch)
     {
-        return $"Последний запуск: {lastLaunch?.ToString() ?? "Никогда"}";
+        return lastLaunch?.ToString() ?? "Никогда";
     }
 }

@@ -52,7 +52,7 @@
             >
                 <ComboBox.ItemTemplate>
                     <DataTemplate x:DataType="local:GZDoomPackage">
-                        <TextBlock Text="{x:Bind local:SettingsPage.GZDoomPackageToTitle(Version, Arch)}" />
+                        <TextBlock Text="{x:Bind local:SettingsPage.GZDoomPackageToTitle((local:GZDoomPackage))}" />
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
@@ -61,7 +61,7 @@
                 HorizontalAlignment="Stretch"
                 Margin="0,8,0,8"
                 SelectedItem="{x:Bind IWadFile, Mode=TwoWay}"
-                ItemsSource="{x:Bind FilteredIWads}"
+                ItemsSource="{x:Bind IWadFiles}"
             >
                 <ComboBox.ItemTemplate>
                     <DataTemplate x:DataType="local:KeyValue">
