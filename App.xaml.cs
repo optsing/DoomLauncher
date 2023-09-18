@@ -115,7 +115,8 @@ public partial class App : Application
                 var launchOptions = CommandLine.ParseCommandLine(launchArgs.Arguments);
                 if (launchOptions?.EntryId is string entryId)
                 {
-                    rootPage.LaunchEntryFromId(entryId);
+                    bool forceClose = launchOptions?.CloseOnLaunch ?? false;
+                    rootPage.LaunchEntryFromId(entryId, forceClose);
                 }
             }
         }

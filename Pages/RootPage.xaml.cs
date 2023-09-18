@@ -302,20 +302,20 @@ public sealed partial class RootPage : Page
 
     private void Page_OnStart(object? sender, DoomEntry entry)
     {
-        LaunchEntry(entry);
+        LaunchEntry(entry, forceClose: false);
     }
 
-    public void LaunchEntryFromId(string entryId)
+    public void LaunchEntryFromId(string entryId, bool forceClose)
     {
         var entry = settings.Entries.FirstOrDefault(entry => entry.Id == entryId);
         if (entry != null)
         {
-            LaunchEntry(entry);
+            LaunchEntry(entry, forceClose);
         }
     }
 
     private bool isLaunched = false;
-    private async void LaunchEntry(DoomEntry entry)
+    private async void LaunchEntry(DoomEntry entry, bool forceClose)
     {
         if (isLaunched)
         {
@@ -378,7 +378,7 @@ public sealed partial class RootPage : Page
 
             entry.LastLaunch = DateTime.Now;
 
-            if (settings.CloseOnLaunch)
+            if (settings.CloseOnLaunch || forceClose)
             {
                 Application.Current.Exit();
             }

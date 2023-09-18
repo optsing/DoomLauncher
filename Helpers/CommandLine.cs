@@ -11,6 +11,9 @@ public class LaunchOptions
 {
     [Option("launch", Required = false, HelpText = "Entry id to launch")]
     public string? EntryId { get; set; }
+
+    [Option("force-close", Required = false, HelpText = "Force close on launch")]
+    public bool CloseOnLaunch { get; set; }
 }
 
 internal static class CommandLine
