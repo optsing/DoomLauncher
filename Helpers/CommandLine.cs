@@ -7,15 +7,16 @@ using System.Threading.Tasks;
 
 namespace DoomLauncher;
 
+[Verb("launch", HelpText = "Launch entry on app start")]
 public class LaunchOptions
 {
-    [Option("launch", Required = false, HelpText = "Entry id to launch on start")]
+    [Option("id", Group = "Entry", HelpText = "Entry id to launch")]
     public string? EntryId { get; set; }
 
-    [Option("launch-name", Required = false, HelpText = "Entry name to launch on start")]
+    [Option("name", Group = "Entry", HelpText = "Entry name to launch")]
     public string? EntryName { get; set; }
 
-    [Option("force-close", Required = false, HelpText = "Force close after launch on start")]
+    [Option("force-close", Required = false, HelpText = "Force close after launch")]
     public bool ForceClose { get; set; }
 }
 

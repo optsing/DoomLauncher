@@ -1,12 +1,12 @@
 {
   "profiles": {
     "DoomLauncher (Package)": {
-      "commandName": "MsixPackage",
+      "commandName": "MsixPackage"
       //"commandLineArgs": "--launch 8ff92b41-9e28-4cd9-b5d5-d9c21b93ac38"
     },
     "DoomLauncher (Unpackaged)": {
-      "commandName": "Project",
-      //"commandLineArgs": "--launch 8ff92b41-9e28-4cd9-b5d5-d9c21b93ac38"
+      "commandName": "Project"
+      //"commandLineArgs": "launch --id 8ff92b41-9e28-4cd9-b5d5-d9c21b93ac38"
     }
   }
 }

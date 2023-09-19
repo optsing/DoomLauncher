@@ -17,7 +17,7 @@ internal class JumpListHelper
 
         foreach (var entry in entries.Where(entry => entry.LastLaunch != null).OrderByDescending(entry => entry.LastLaunch))
         {
-            JumpListItem item = JumpListItem.CreateWithArguments($"--launch {entry.Id}", entry.Name);
+            JumpListItem item = JumpListItem.CreateWithArguments($"launch --id {entry.Id}", entry.Name);
             item.GroupName = "Последние запущенные";
             item.Logo = new Uri("ms-appx:///Assets/app.ico");
             jumpList.Items.Add(item);
