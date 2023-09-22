@@ -4,7 +4,8 @@ using System.IO;
 
 namespace DoomLauncher;
 
-public enum LaunchResult {
+public enum LaunchResult
+{
     Success, AlreadyLaunched, NotLaunched, PathNotValid
 }
 

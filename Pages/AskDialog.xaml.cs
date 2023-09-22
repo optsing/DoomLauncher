@@ -26,7 +26,15 @@ public sealed partial class AskDialog : ContentDialog
 
     public static async Task<bool> ShowAsync(XamlRoot xamlRoot, string title, string text, string primaryButton, string closeButton)
     {
-        var dialog = new AskDialog(xamlRoot, title, text, primaryButton, closeButton);
-        return ContentDialogResult.Primary == await dialog.ShowAsync();
+        try
+        {
+            var dialog = new AskDialog(xamlRoot, title, text, primaryButton, closeButton);
+            return ContentDialogResult.Primary == await dialog.ShowAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return false;
+        }
     }
 }

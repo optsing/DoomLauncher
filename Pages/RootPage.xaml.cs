@@ -4,7 +4,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -20,7 +19,8 @@ using Windows.Storage;
 
 namespace DoomLauncher;
 
-public enum AnimationDirection{
+public enum AnimationDirection
+{
     None, Previous, Next
 }
 
@@ -322,11 +322,18 @@ public sealed partial class RootPage : Page
     private async void LaunchEntry(DoomEntry entry, bool forceClose)
     {
         var result = LaunchHelper.LaunchEntry(entry, dataFolderPath);
-        if (result == LaunchResult.PathNotValid)
+        if (result == LaunchResult.Success && LaunchHelper.CurrentProcess != null)
         {
-            if (await AskDialog.ShowAsync(XamlRoot, "Не выбран GZDoom", "Выберите нужную версию GZDoom в настройках сборки", "Перейти в настройки", "Отмена"))
+            if (Settings.Current.CloseOnLaunch || forceClose)
             {
-                await EditMod(entry);
+                Application.Current.Exit();
+            }
+            else if (appWindow.Presenter is OverlappedPresenter presenter)
+            {
+                presenter.Minimize();
+                await LaunchHelper.CurrentProcess.WaitForExitAsync();
+                presenter.Restore();
+                WinApi.SetForegroundWindow(hWnd);
             }
         }
         else if (result == LaunchResult.AlreadyLaunched && LaunchHelper.CurrentProcess != null)
@@ -340,18 +347,11 @@ public sealed partial class RootPage : Page
                 }
             }
         }
-        else if (result == LaunchResult.Success && LaunchHelper.CurrentProcess != null)
+        else if (result == LaunchResult.PathNotValid)
         {
-            if (Settings.Current.CloseOnLaunch || forceClose)
+            if (await AskDialog.ShowAsync(XamlRoot, "Не выбран GZDoom", "Выберите нужную версию GZDoom в настройках сборки", "Перейти в настройки", "Отмена"))
             {
-                Application.Current.Exit();
-            }
-            else if (appWindow.Presenter is OverlappedPresenter presenter)
-            {
-                presenter.Minimize();
-                await LaunchHelper.CurrentProcess.WaitForExitAsync();
-                presenter.Restore();
-                WinApi.SetForegroundWindow(hWnd);
+                await EditMod(entry);
             }
         }
         else
@@ -389,7 +389,8 @@ public sealed partial class RootPage : Page
 
     private void SettingsButton_Click(object sender, RoutedEventArgs e)
     {
-        if (frameMain.Content is not SettingsPage) {
+        if (frameMain.Content is not SettingsPage)
+        {
             DoomList.SelectedItem = null;
             var settingsPage = new SettingsPage(hWnd, dataFolderPath);
             settingsPage.OnProgress += Page_OnProgress;
