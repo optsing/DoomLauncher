@@ -35,12 +35,11 @@ public sealed partial class RootPage : Page
 
     private readonly TimeSpan SlideshowAnimationDuration = TimeSpan.FromMilliseconds(150);
 
-    public RootPage(AppWindow appWindow, Settings settings, IntPtr hWnd, string dataFolderPath)
+    public RootPage(AppWindow appWindow, IntPtr hWnd, string dataFolderPath)
     {
         InitializeComponent();
 
         this.appWindow = appWindow;
-        this.settings = settings;
         this.hWnd = hWnd;
         this.dataFolderPath = dataFolderPath;
 
@@ -65,7 +64,7 @@ public sealed partial class RootPage : Page
         }
 
         frameMain.Content = notSelectedPage;
-        DoomList.SelectedIndex = settings.SelectedModIndex;
+        DoomList.SelectedIndex = Settings.Current.SelectedModIndex;
     }
 
     public event EventHandler? OnSave;
@@ -98,9 +97,6 @@ public sealed partial class RootPage : Page
     private readonly IntPtr hWnd;
     private readonly string dataFolderPath;
 
-
-    private readonly Settings settings;
-
     private readonly NotSelectedPage notSelectedPage = new();
 
     private readonly AppWindow appWindow;
@@ -109,8 +105,8 @@ public sealed partial class RootPage : Page
     {
         if (DoomList.SelectedItem is DoomEntry entry)
         {
-            settings.SelectedModIndex = DoomList.SelectedIndex;
-            DoomPage page = new(entry, hWnd, settings, dataFolderPath);
+            Settings.Current.SelectedModIndex = DoomList.SelectedIndex;
+            DoomPage page = new(entry, hWnd, dataFolderPath);
             page.OnStart += Page_OnStart;
             page.OnEdit += Page_OnEdit;
             page.OnCopy += Page_OnCopy;
@@ -258,7 +254,7 @@ public sealed partial class RootPage : Page
     {
         if (await AskDialog.ShowAsync(XamlRoot, "Удаление сборки", $"Вы уверены, что хотите удалить сборку '{entry.Name}'?", "Удалить", "Отмена"))
         {
-            settings.Entries.Remove(entry);
+            Settings.Current.Entries.Remove(entry);
             OnSave?.Invoke(this, new EventArgs());
         }
     }
@@ -295,7 +291,7 @@ public sealed partial class RootPage : Page
             ModFiles = new(entry.ModFiles),
             ImageFiles = new(entry.ImageFiles),
         };
-        settings.Entries.Add(newEntry);
+        Settings.Current.Entries.Add(newEntry);
         DoomList.SelectedItem = newEntry;
         OnSave?.Invoke(this, new EventArgs());
     }
@@ -307,7 +303,7 @@ public sealed partial class RootPage : Page
 
     public void LaunchEntryFromId(string entryId, bool forceClose)
     {
-        var entry = settings.Entries.FirstOrDefault(entry => entry.Id == entryId);
+        var entry = Settings.Current.Entries.FirstOrDefault(entry => entry.Id == entryId);
         if (entry != null)
         {
             LaunchEntry(entry, forceClose);
@@ -316,7 +312,7 @@ public sealed partial class RootPage : Page
 
     public void LaunchEntryFromName(string entryName, bool forceClose)
     {
-        var entry = settings.Entries.FirstOrDefault(entry => entry.Name == entryName);
+        var entry = Settings.Current.Entries.FirstOrDefault(entry => entry.Name == entryName);
         if (entry != null)
         {
             LaunchEntry(entry, forceClose);
@@ -387,7 +383,7 @@ public sealed partial class RootPage : Page
 
             entry.LastLaunch = DateTime.Now;
 
-            if (settings.CloseOnLaunch || forceClose)
+            if (Settings.Current.CloseOnLaunch || forceClose)
             {
                 Application.Current.Exit();
             }
@@ -404,7 +400,7 @@ public sealed partial class RootPage : Page
 
     public async Task<EditModDialogResult?> AddOrEditModDialogShow(EditModDialogResult initial, EditDialogMode mode)
     {
-        var dialog = new EditModContentDialog(XamlRoot, initial, settings, mode);
+        var dialog = new EditModContentDialog(XamlRoot, initial, mode);
         if (ContentDialogResult.Primary == await dialog.ShowAsync())
         {
             var modFiles = dialog.ModFiles.Where(tc => tc.IsChecked).Select(tc => tc.Title).ToList();
@@ -433,7 +429,7 @@ public sealed partial class RootPage : Page
     {
         if (frameMain.Content is not SettingsPage) {
             DoomList.SelectedItem = null;
-            var settingsPage = new SettingsPage(hWnd, settings, dataFolderPath);
+            var settingsPage = new SettingsPage(hWnd, dataFolderPath);
             settingsPage.OnProgress += Page_OnProgress;
             frameMain.Content = settingsPage;
             Page_OnChangeBackground(null, (null, AnimationDirection.None));
@@ -466,7 +462,7 @@ public sealed partial class RootPage : Page
             var newEntry = await CreateModFromFiles(mods, images, withConfirm: true);
             if (newEntry != null)
             {
-                settings.Entries.Add(newEntry);
+                Settings.Current.Entries.Add(newEntry);
                 DoomList.SelectedItem = newEntry;
                 OnSave?.Invoke(this, new EventArgs());
             }
@@ -490,7 +486,7 @@ public sealed partial class RootPage : Page
                 UniqueSavesFolder = result.uniqueSavesFolder,
                 SelectedImageIndex = 0,
             };
-            settings.Entries.Add(newEntry);
+            Settings.Current.Entries.Add(newEntry);
             DoomList.SelectedItem = newEntry;
             OnSave?.Invoke(this, new EventArgs());
         }
@@ -588,7 +584,7 @@ public sealed partial class RootPage : Page
             var newEntry = await ImportModFile(file, withConfirm);
             if (newEntry != null)
             {
-                settings.Entries.Add(newEntry);
+                Settings.Current.Entries.Add(newEntry);
                 lastAddedEntry = newEntry;
             }
         }
@@ -608,7 +604,7 @@ public sealed partial class RootPage : Page
             var newEntry = await ImportModFileFromDoomWorld(wadInfo, withConfirm);
             if (newEntry != null)
             {
-                settings.Entries.Add(newEntry);
+                Settings.Current.Entries.Add(newEntry);
                 DoomList.SelectedItem = newEntry;
                 OnSave?.Invoke(this, new EventArgs());
             }
@@ -950,7 +946,7 @@ public sealed partial class RootPage : Page
                     var newEntry = await CreateModFromFiles(mods, images, withConfirm: true);
                     if (newEntry != null)
                     {
-                        settings.Entries.Add(newEntry);
+                        Settings.Current.Entries.Add(newEntry);
                         DoomList.SelectedItem = newEntry;
                         OnSave?.Invoke(this, new EventArgs());
                     }

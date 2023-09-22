@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
 using System;
+using System.Collections.ObjectModel;
 
 namespace DoomLauncher;
 
@@ -28,5 +29,15 @@ static class XamlHelper
     public static string DateToText(DateTime? lastLaunch)
     {
         return lastLaunch?.ToString() ?? "Никогда";
+    }
+
+    public static string FileInFavoritesGlyph(Collection<string> list, string value)
+    {
+        return list.Contains(value) ? "\uE735" : "\uE734";
+    }
+
+    public static string FileInFavoritesTooltip(Collection<string> list, string value)
+    {
+        return list.Contains(value) ? "Удалить из избранного" : "Добавить в избранное";
     }
 }

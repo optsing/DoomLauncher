@@ -12,25 +12,22 @@ namespace DoomLauncher;
 /// </summary>
 public sealed partial class EditModContentDialog : ContentDialog
 {
-    private Settings settings;
-
-    public EditModContentDialog(XamlRoot root, EditModDialogResult initial, Settings settings, EditDialogMode mode)
+    public EditModContentDialog(XamlRoot root, EditModDialogResult initial, EditDialogMode mode)
     {
         InitializeComponent();
         XamlRoot = root;
         ModName = initial.name;
         ModDescription = initial.description;
         ModLongDescription = initial.longDescription;
-        this.settings = settings;
         UniqueConfig = initial.uniqueConfig;
         UniqueSavesFolder = initial.uniqueSavesFolder;
 
         GZDoomPackages = new List<GZDoomPackage>() { new GZDoomPackage { Path = "", Arch = AssetArch.notSelected } };
-        GZDoomPackages.AddRange(settings.GZDoomInstalls);
-        GZDoomPackage = settings.GZDoomInstalls.FirstOrDefault(package => package.Path == initial.gZDoomPath, GZDoomPackages.First());
+        GZDoomPackages.AddRange(Settings.Current.GZDoomInstalls);
+        GZDoomPackage = Settings.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == initial.gZDoomPath, GZDoomPackages.First());
 
         IWadFiles = new() { new KeyValue("", "Не выбрано") };
-        IWadFiles.AddRange(settings.IWadFiles.Select(iWadFile => new KeyValue(iWadFile, Settings.GetIWadTitle(iWadFile))));
+        IWadFiles.AddRange(Settings.Current.IWadFiles.Select(iWadFile => new KeyValue(iWadFile, Settings.GetIWadTitle(iWadFile))));
         IWadFile = IWadFiles.FirstOrDefault(iWad => iWad.Key == initial.iWadFile, IWadFiles.First());
 
         PrimaryButtonText = mode switch

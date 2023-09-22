@@ -21,6 +21,7 @@ public class Settings
 {
     public ObservableCollection<GZDoomPackage> GZDoomInstalls { get; set; } = new();
     public ObservableCollection<string> IWadFiles { get; set; } = new();
+    public ObservableCollection<string> FavoriteFiles { get; set; } = new();
     public bool CloseOnLaunch { get; set; } = false;
     public int SelectedModIndex { get; set; } = 0;
     public ObservableCollection<DoomEntry> Entries { get; set; } = new();
@@ -30,6 +31,7 @@ public class Settings
     public int? WindowWidth { get; set; } = null;
     public int? WindowHeight { get; set; } = null;
     public bool WindowMaximized { get; set; } = false;
+    public static Settings Current { get; set; } = new();
 
     public static bool ValidateGZDoomPath(string path)
     {

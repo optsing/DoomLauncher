@@ -32,14 +32,12 @@ public sealed partial class DoomPage : Page
     private readonly IntPtr hWnd;
     private readonly string modsFolderPath;
     private readonly string imagesFolderPath;
-    private readonly Settings settings;
 
-    public DoomPage(DoomEntry entry, IntPtr hWnd, Settings settings, string dataFolderPath)
+    public DoomPage(DoomEntry entry, IntPtr hWnd, string dataFolderPath)
     {
         InitializeComponent();
         this.entry = entry;
         this.hWnd = hWnd;
-        this.settings = settings;
         this.modsFolderPath = Path.Combine(dataFolderPath, "mods");
         this.imagesFolderPath = Path.Combine(dataFolderPath, "images");
 
@@ -47,7 +45,6 @@ public sealed partial class DoomPage : Page
         timerSlideshow.Tick += Timer_Tick;
 
         SetSlideshow();
-        RefillFileMenu();
     }
 
     private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -61,39 +58,50 @@ public sealed partial class DoomPage : Page
         timerSlideshow.Stop();
     }
 
-    private async void RefillFileMenu()
+    private void MenuFlyout_Opening(object sender, object e)
     {
-        mfAppendFile.Items.Clear();
-        var browseItem = new MenuFlyoutItem()
+        if (sender is MenuFlyout menu)
         {
-            Text = "Выбрать файлы",
-            Icon = new FontIcon()
+            menu.Items.Clear();
+            var browseItem = new MenuFlyoutItem()
             {
-                Glyph = "\uEC50",
-            }
-        };
-        browseItem.Click += Append_Click;
-        mfAppendFile.Items.Add(browseItem);
-        if (Directory.Exists(modsFolderPath))
-        {
-            var folder = await StorageFolder.GetFolderFromPathAsync(modsFolderPath);
-            var files = (await folder.GetFilesAsync())
-                .Where(file => !entry.ModFiles.Any(path => path == file.Path));
-
-            if (files.Any())
-            { 
-                mfAppendFile.Items.Add(new MenuFlyoutSeparator());
-                foreach (var file in files)
+                Text = "Выбрать файлы",
+                Icon = new FontIcon()
+                {
+                    Glyph = "\uEC50",
+                    FontSize = 16,
+                }
+            };
+            browseItem.Click += Append_Click;
+            menu.Items.Add(browseItem);
+            var filePathes = Settings.Current.FavoriteFiles
+                .Where(favPath => !entry.ModFiles.Any(path => path == favPath));
+            if (filePathes.Any())
+            {
+                menu.Items.Add(new MenuFlyoutSeparator());
+                menu.Items.Add(new MenuFlyoutItem()
+                {
+                    Text="Избранное",
+                    IsEnabled = false,
+                    Icon = new FontIcon()
+                    {
+                        Glyph = "\uE735",
+                        FontSize = 16,
+                    }
+                });
+                foreach (var filePath in filePathes)
                 {
                     var item = new MenuFlyoutItem()
                     {
-                        Text = GetFileTitle(file.Path),
+                        Text = GetFileTitle(filePath),
                     };
                     item.Click += async (object sender, RoutedEventArgs e) =>
                     {
+                        var fullPath = Path.GetFullPath(filePath, modsFolderPath);
+                        var file = await StorageFile.GetFileFromPathAsync(fullPath);
                         await AddFiles(new StorageFile[] { file });
                     };
-                    mfAppendFile.Items.Add(item);
+                    menu.Items.Add(item);
                 }
             }
         }
@@ -231,7 +239,6 @@ public sealed partial class DoomPage : Page
             }
         }
         OnProgress?.Invoke(this, null);
-        RefillFileMenu();
     }
 
     private async Task AddImages(IReadOnlyList<StorageFile> files)
@@ -266,6 +273,23 @@ public sealed partial class DoomPage : Page
         }
     }
 
+    private void ToggleFavoriteFile_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement el)
+        {
+            if (el.DataContext is string filePath)
+            {
+                if (Settings.Current.FavoriteFiles.Contains(filePath))
+                {
+                    Settings.Current.FavoriteFiles.Remove(filePath);
+                } else
+                {
+                    Settings.Current.FavoriteFiles.Add(filePath);
+                }
+            }
+        }
+    }
+
     private async void RemoveFile_Click(object sender, RoutedEventArgs e)
     {
         if (sender is FrameworkElement el)
@@ -276,7 +300,6 @@ public sealed partial class DoomPage : Page
                 if (await AskDialog.ShowAsync(XamlRoot, "Удаление ссылки на файл", $"Вы уверены, что хотите удалить ссылку на файл '{fileName}'?", "Удалить", "Отмена"))
                 {
                     entry.ModFiles.Remove(filePath);
-                    RefillFileMenu();
                 }
             }
         }
@@ -423,7 +446,7 @@ public sealed partial class DoomPage : Page
 
     private string GetGZDoomPackageTitle(string path)
     {
-        var package = settings.GZDoomInstalls.FirstOrDefault(package => package.Path == path);
+        var package = Settings.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == path);
         if (package == null)
         {
             return "Не выбрано";

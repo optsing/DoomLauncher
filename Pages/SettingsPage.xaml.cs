@@ -31,13 +31,11 @@ public sealed partial class SettingsPage : Page
     private readonly string appVersion;
     private readonly string packagesFolderPath;
     private readonly string iWadFolderPath;
-    private readonly Settings settings;
 
-    public SettingsPage(IntPtr hWnd, Settings settings, string dataFolderPath)
+    public SettingsPage(IntPtr hWnd, string dataFolderPath)
     {
         this.InitializeComponent();
         this.hWnd = hWnd;
-        this.settings = settings;
         packagesFolderPath = Path.Combine(dataFolderPath, "gzdoom");
         iWadFolderPath = Path.Combine(dataFolderPath, "iwads");
         try
@@ -129,7 +127,7 @@ public sealed partial class SettingsPage : Page
                         arch = isLegacy ? AssetArch.x64legacy : AssetArch.x64;
                     }
                     var version = ParseVersion(asset.Name);
-                    if (!settings.GZDoomInstalls.Any(package => package.Version == version && package.Arch == arch))
+                    if (!Settings.Current.GZDoomInstalls.Any(package => package.Version == version && package.Arch == arch))
                     {
                         var newAsset = new GZDoomPackage()
                         {
@@ -172,7 +170,7 @@ public sealed partial class SettingsPage : Page
                     Version = package.Version,
                     Arch = package.Arch,
                 };
-                settings.GZDoomInstalls.Add(newPackage);
+                Settings.Current.GZDoomInstalls.Add(newPackage);
             }
             finally
             {
@@ -195,7 +193,7 @@ public sealed partial class SettingsPage : Page
         if (file != null && Settings.ValidateGZDoomPath(file.Path))
         {
             var version = GetFileVersion(file.Path) is string s ? ParseVersion(s) : null;
-            if (settings.GZDoomInstalls.FirstOrDefault(package => package.Path == file.Path) is GZDoomPackage package)
+            if (Settings.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == file.Path) is GZDoomPackage package)
             {
                 package.Version = version;
             }
@@ -207,7 +205,7 @@ public sealed partial class SettingsPage : Page
                     Version = version,
                     Arch = AssetArch.manual,
                 };
-                settings.GZDoomInstalls.Add(newPackage);
+                Settings.Current.GZDoomInstalls.Add(newPackage);
             }
         }
     }
@@ -238,9 +236,9 @@ public sealed partial class SettingsPage : Page
         {
             OnProgress?.Invoke(this, $"Копирование: {file.Name}");
             await Settings.CopyFileWithConfirmation(XamlRoot, file, iWadFolderPath);
-            if (!settings.IWadFiles.Contains(file.Name))
+            if (!Settings.Current.IWadFiles.Contains(file.Name))
             {
-                settings.IWadFiles.Add(file.Name);
+                Settings.Current.IWadFiles.Add(file.Name);
             }
         }
         OnProgress?.Invoke(this, null);
@@ -271,7 +269,7 @@ public sealed partial class SettingsPage : Page
                 var title = GZDoomPackageToTitle(package);
                 if (await AskDialog.ShowAsync(XamlRoot, "Удаление ссылки", $"Вы уверены, что хотите удалить ссылку на '{title}'?", "Удалить", "Отмена"))
                 {
-                    settings.GZDoomInstalls.Remove(package);
+                    Settings.Current.GZDoomInstalls.Remove(package);
                 }
             }
         }
@@ -297,7 +295,7 @@ public sealed partial class SettingsPage : Page
                 var title = Settings.GetIWadTitle(iWadFile);
                 if (await AskDialog.ShowAsync(XamlRoot, "Удаление ссылки", $"Вы уверены, что хотите удалить ссылку на '{title}'?", "Удалить", "Отмена"))
                 {
-                    settings.IWadFiles.Remove(iWadFile);
+                    Settings.Current.IWadFiles.Remove(iWadFile);
                 }
             }
         }

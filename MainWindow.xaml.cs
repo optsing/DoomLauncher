@@ -55,33 +55,31 @@ public sealed partial class MainWindow : Window
         if (File.Exists(configFilePath))
         {
             var text = File.ReadAllText(configFilePath);
-            settings = JsonSerializer.Deserialize<Settings>(text, JsonSettingsContext.Default.Settings) ?? new();
+            if (JsonSerializer.Deserialize(text, JsonSettingsContext.Default.Settings) is Settings settings) {
+                Settings.Current = settings;
+            }
             var backupConfigFilePath = Path.Combine(dataFolderPath, "config.old.json");
             File.Copy(configFilePath, backupConfigFilePath, true);
         }
-        else
-        {
-            settings = new();
-        }
 
-        if (settings.WindowX != null && settings.WindowY != null && settings.WindowWidth != null && settings.WindowHeight != null)
+        if (Settings.Current.WindowX != null && Settings.Current.WindowY != null && Settings.Current.WindowWidth != null && Settings.Current.WindowHeight != null)
         {
             AppWindow.MoveAndResize(new()
             {
-                X = (int)settings.WindowX,
-                Y = (int)settings.WindowY,
-                Width = (int)settings.WindowWidth,
-                Height = (int)settings.WindowHeight,
+                X = (int)Settings.Current.WindowX,
+                Y = (int)Settings.Current.WindowY,
+                Width = (int)Settings.Current.WindowWidth,
+                Height = (int)Settings.Current.WindowHeight,
             });
         }
-        if (settings.WindowMaximized && AppWindow.Presenter is OverlappedPresenter presenter)
+        if (Settings.Current.WindowMaximized && AppWindow.Presenter is OverlappedPresenter presenter)
         {
             presenter.Maximize();
         }
 
         AppWindow.Changed += AppWindow_Changed;
 
-        rootPage = new RootPage(AppWindow, settings, hWnd, dataFolderPath);
+        rootPage = new RootPage(AppWindow, hWnd, dataFolderPath);
         rootPage.OnSave += RootPage_OnSave;
         frameRoot.Content = rootPage;
     }
@@ -97,23 +95,21 @@ public sealed partial class MainWindow : Window
         {
             if (presenter.State == OverlappedPresenterState.Maximized)
             {
-                settings.WindowMaximized = true;
+                Settings.Current.WindowMaximized = true;
             }
             else if (presenter.State != OverlappedPresenterState.Minimized)
             {
-                settings.WindowMaximized = false;
-                settings.WindowX = sender.Position.X;
-                settings.WindowY = sender.Position.Y;
-                settings.WindowWidth = sender.Size.Width;
-                settings.WindowHeight = sender.Size.Height;
+                Settings.Current.WindowMaximized = false;
+                Settings.Current.WindowX = sender.Position.X;
+                Settings.Current.WindowY = sender.Position.Y;
+                Settings.Current.WindowWidth = sender.Size.Width;
+                Settings.Current.WindowHeight = sender.Size.Height;
             }
         }
     }
 
     private readonly string dataFolderPath;
     private readonly string configFilePath;
-
-    private readonly Settings settings;
 
     private void MainWindow_Closed(object sender, WindowEventArgs args)
     {
@@ -122,7 +118,7 @@ public sealed partial class MainWindow : Window
 
     public void Save()
     {
-        var text = JsonSerializer.Serialize<Settings>(settings, JsonSettingsContext.Default.Settings);
+        var text = JsonSerializer.Serialize(Settings.Current, JsonSettingsContext.Default.Settings);
         File.WriteAllText(configFilePath, text);
     }
 }

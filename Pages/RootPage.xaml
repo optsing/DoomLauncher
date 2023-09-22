@@ -87,7 +87,7 @@
                         SelectionMode="Single"
                         Grid.Row="2"
                         VerticalAlignment="Stretch"
-                        ItemsSource="{x:Bind settings.Entries}"
+                        ItemsSource="{x:Bind local:Settings.Current.Entries}"
                         SelectionChanged="DoomList_SelectionChanged"
                         CanReorderItems="True"
                         AllowDrop="True"
