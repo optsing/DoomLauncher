@@ -29,7 +29,7 @@
 		<DefaultLanguage>ru-RU</DefaultLanguage>
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<WindowsPackageType>None</WindowsPackageType>
+		<!--<WindowsPackageType>None</WindowsPackageType>-->
 		<UseRidGraph>true</UseRidGraph>
 	</PropertyGroup>
 	

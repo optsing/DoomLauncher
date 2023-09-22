@@ -319,70 +319,29 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private bool isLaunched = false;
     private async void LaunchEntry(DoomEntry entry, bool forceClose)
     {
-        if (isLaunched)
-        {
-            return;
-        }
-        var gZDoomPath = Path.GetFullPath(entry.GZDoomPath, Path.Combine(dataFolderPath, "gzdoom"));
-        if (!Settings.ValidateGZDoomPath(gZDoomPath))
+        var result = LaunchHelper.LaunchEntry(entry, dataFolderPath);
+        if (result == LaunchResult.PathNotValid)
         {
             if (await AskDialog.ShowAsync(XamlRoot, "Не выбран GZDoom", "Выберите нужную версию GZDoom в настройках сборки", "Перейти в настройки", "Отмена"))
             {
                 await EditMod(entry);
             }
-            return;
         }
-        ProcessStartInfo processInfo = new()
+        else if (result == LaunchResult.AlreadyLaunched && LaunchHelper.CurrentProcess != null)
         {
-            FileName = gZDoomPath,
-            WorkingDirectory = Path.GetDirectoryName(gZDoomPath),
-        };
-        if (entry.UniqueConfig)
-        {
-            var entryFolderPath = Path.Combine(dataFolderPath, "entries", entry.Id);
-            if (!Directory.Exists(entryFolderPath))
+            if (await AskDialog.ShowAsync(XamlRoot, "Игра уже запущена", "Закройте текущую игру, чтобы запустить новую", "Переключить на игру", "Отмена"))
             {
-                Directory.CreateDirectory(entryFolderPath);
-            }
-            var configPath = Path.Combine(entryFolderPath, "config.ini");
-            processInfo.ArgumentList.Add("-config");
-            processInfo.ArgumentList.Add(configPath);
-        }
-        if (entry.UniqueSavesFolder)
-        {
-            var entrySavesFolderPath = Path.Combine(dataFolderPath, "entries", entry.Id, "saves");
-            if (!Directory.Exists(entrySavesFolderPath))
-            {
-                Directory.CreateDirectory(entrySavesFolderPath);
-            }
-            processInfo.ArgumentList.Add("-savedir");
-            processInfo.ArgumentList.Add(entrySavesFolderPath);
-        }
-        if (!string.IsNullOrEmpty(entry.IWadFile))
-        {
-            processInfo.ArgumentList.Add("-iwad");
-            processInfo.ArgumentList.Add(Path.GetFullPath(entry.IWadFile, Path.Combine(dataFolderPath, "iwads")));
-        }
-        if (entry.ModFiles.Count > 0)
-        {
-            processInfo.ArgumentList.Add("-file");
-            var modsFolderPath = Path.Combine(dataFolderPath, "mods");
-            foreach (var filePath in entry.ModFiles)
-            {
-                processInfo.ArgumentList.Add(Path.GetFullPath(filePath, modsFolderPath));
+                WinApi.SetForegroundWindow(LaunchHelper.CurrentProcess.MainWindowHandle);
+                if (appWindow.Presenter is OverlappedPresenter presenter)
+                {
+                    presenter.Minimize();
+                }
             }
         }
-        var process = Process.Start(processInfo);
-        if (process != null)
+        else if (result == LaunchResult.Success && LaunchHelper.CurrentProcess != null)
         {
-            isLaunched = true;
-            WinApi.SetForegroundWindow(process.MainWindowHandle);
-
-            entry.LastLaunch = DateTime.Now;
-
             if (Settings.Current.CloseOnLaunch || forceClose)
             {
                 Application.Current.Exit();
@@ -390,11 +349,14 @@ public sealed partial class RootPage : Page
             else if (appWindow.Presenter is OverlappedPresenter presenter)
             {
                 presenter.Minimize();
-                await process.WaitForExitAsync();
+                await LaunchHelper.CurrentProcess.WaitForExitAsync();
                 presenter.Restore();
                 WinApi.SetForegroundWindow(hWnd);
-                isLaunched = false;
             }
+        }
+        else
+        {
+            await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске игры", "Не удалось запустить новую игру", "", "Отмена");
         }
     }
 

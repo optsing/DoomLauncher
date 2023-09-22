@@ -74,22 +74,20 @@ public sealed partial class DoomPage : Page
             };
             browseItem.Click += Append_Click;
             menu.Items.Add(browseItem);
-            var filePathes = Settings.Current.FavoriteFiles
-                .Where(favPath => !entry.ModFiles.Any(path => path == favPath));
-            if (filePathes.Any())
+            menu.Items.Add(new MenuFlyoutSeparator());
+            menu.Items.Add(new MenuFlyoutItem()
             {
-                menu.Items.Add(new MenuFlyoutSeparator());
-                menu.Items.Add(new MenuFlyoutItem()
+                Text = "Избранное",
+                IsEnabled = false,
+                Icon = new FontIcon()
                 {
-                    Text="Избранное",
-                    IsEnabled = false,
-                    Icon = new FontIcon()
-                    {
-                        Glyph = "\uE735",
-                        FontSize = 16,
-                    }
-                });
-                foreach (var filePath in filePathes)
+                    Glyph = "\uE735",
+                    FontSize = 16,
+                }
+            });
+            if (Settings.Current.FavoriteFiles.Any())
+            {
+                foreach (var filePath in Settings.Current.FavoriteFiles)
                 {
                     var item = new MenuFlyoutItem()
                     {
@@ -98,11 +96,22 @@ public sealed partial class DoomPage : Page
                     item.Click += async (object sender, RoutedEventArgs e) =>
                     {
                         var fullPath = Path.GetFullPath(filePath, modsFolderPath);
-                        var file = await StorageFile.GetFileFromPathAsync(fullPath);
-                        await AddFiles(new StorageFile[] { file });
+                        if (File.Exists(fullPath))
+                        {
+                            var file = await StorageFile.GetFileFromPathAsync(fullPath);
+                            await AddFiles(new StorageFile[] { file });
+                        }
                     };
                     menu.Items.Add(item);
                 }
+            }
+            else
+            {
+                menu.Items.Add(new MenuFlyoutItem()
+                {
+                    Text = "(пусто)",
+                    IsEnabled = false,
+                });
             }
         }
     }
