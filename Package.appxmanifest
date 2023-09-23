@@ -62,7 +62,7 @@
 			<uap:Protocol Name="idgames" />
 		</uap:Extension>
 		<uap:Extension Category="windows.protocol">
-			<uap:Protocol Name="gzdl" />
+			<uap:Protocol Name="gzdoomlauncher" />
 		</uap:Extension>
 	  </Extensions>
     </Application>

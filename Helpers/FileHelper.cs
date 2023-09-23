@@ -63,7 +63,7 @@ internal static class FileHelper
 
     public static async Task CreateEntryShortcut(DoomEntry entry, StorageFile file)
     {
-        await FileIO.WriteTextAsync(file, $"[InternetShortcut]\nURL=gzdl://launch/?id={entry.Id}\n");
+        await FileIO.WriteTextAsync(file, $"[InternetShortcut]\nURL=gzdoomlauncher://launch/?id={entry.Id}\n");
     }
 
     private static readonly Dictionary<string, string> IWads = new()

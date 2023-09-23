@@ -88,7 +88,7 @@ public partial class App : Application
                 {
                     await rootPage.ImportEntryFromDoomWorldId(uri.Host, withConfirm: true);
                 }
-                else if (uri.Scheme == "gzdl")
+                else if (uri.Scheme == "gzdoomlauncher")
                 {
                     if (uri.Host == "launch")
                     {
