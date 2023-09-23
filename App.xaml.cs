@@ -1,9 +1,11 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Windowing;
+using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppLifecycle;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Web;
 using Windows.Storage;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -68,13 +70,16 @@ public partial class App : Application
 
     private void MainInstance_Activated(object? sender, AppActivationArguments e)
     {
-        if (m_window != null)
-        {
-            WinApi.SetForegroundWindow(m_window.hWnd);
-            m_window.dispatcher.TryEnqueue(
-                () => ParseAppArgs(m_window.rootPage, e)
-            );
-        }
+        m_window?.dispatcher.TryEnqueue(() =>
+            {
+                if (m_window.AppWindow.Presenter is OverlappedPresenter presenter)
+                {
+                    presenter.Restore();
+                }
+                WinApi.SetForegroundWindow(m_window.hWnd);
+                ParseAppArgs(m_window.rootPage, e);
+            }
+        );
     }
 
     private static async void ParseAppArgs(RootPage rootPage, AppActivationArguments appArgs)
@@ -83,7 +88,27 @@ public partial class App : Application
         {
             if (appArgs.Data is Windows.ApplicationModel.Activation.ProtocolActivatedEventArgs protocolArgs)
             {
-                await rootPage.ImportEntryFromDoomWorldId(protocolArgs.Uri.Host, withConfirm: true);
+                var uri = protocolArgs.Uri;
+                if (uri.Scheme == "idgames")
+                {
+                    await rootPage.ImportEntryFromDoomWorldId(uri.Host, withConfirm: true);
+                }
+                else if (uri.Scheme == "gzdl")
+                {
+                    if (uri.Host == "launch")
+                    {
+                        var query = HttpUtility.ParseQueryString(uri.Query);
+                        var forceClose = query.GetValues(null)?.Contains("force-close") ?? false;
+                        if (query["id"] is string entryId)
+                        {
+                            rootPage.LaunchEntryById(entryId, forceClose);
+                        }
+                        else if (query["name"] is string entryName)
+                        {
+                            rootPage.LaunchEntryByName(entryName, forceClose);
+                        }
+                    }
+                }
             }
         }
         else if (appArgs.Kind == ExtendedActivationKind.File)
@@ -117,11 +142,11 @@ public partial class App : Application
                 {
                     if (launchOptions.EntryId is string entryId)
                     {
-                        rootPage.LaunchEntryFromId(entryId, launchOptions.ForceClose);
+                        rootPage.LaunchEntryById(entryId, launchOptions.ForceClose);
                     }
                     else if (launchOptions.EntryName is string entryName)
                     {
-                        rootPage.LaunchEntryFromName(entryName, launchOptions.ForceClose);
+                        rootPage.LaunchEntryByName(entryName, launchOptions.ForceClose);
                     }
                 }
             }

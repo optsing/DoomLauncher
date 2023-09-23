@@ -301,7 +301,7 @@ public sealed partial class RootPage : Page
         LaunchEntry(entry, forceClose: false);
     }
 
-    public void LaunchEntryFromId(string entryId, bool forceClose)
+    public void LaunchEntryById(string entryId, bool forceClose)
     {
         var entry = Settings.Current.Entries.FirstOrDefault(entry => entry.Id == entryId);
         if (entry != null)
@@ -310,7 +310,7 @@ public sealed partial class RootPage : Page
         }
     }
 
-    public void LaunchEntryFromName(string entryName, bool forceClose)
+    public void LaunchEntryByName(string entryName, bool forceClose)
     {
         var entry = Settings.Current.Entries.FirstOrDefault(entry => entry.Name == entryName);
         if (entry != null)
@@ -328,11 +328,17 @@ public sealed partial class RootPage : Page
             {
                 Application.Current.Exit();
             }
-            else if (appWindow.Presenter is OverlappedPresenter presenter)
+            else
             {
-                presenter.Minimize();
+                if (appWindow.Presenter is OverlappedPresenter minimizePresenter)
+                {
+                    minimizePresenter.Minimize();
+                }
                 await LaunchHelper.CurrentProcess.WaitForExitAsync();
-                presenter.Restore();
+                if (appWindow.Presenter is OverlappedPresenter maximizePresenter)
+                {
+                    maximizePresenter.Restore();
+                }
                 WinApi.SetForegroundWindow(hWnd);
             }
         }

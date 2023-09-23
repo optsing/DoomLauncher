@@ -61,6 +61,9 @@
 	    <uap:Extension Category="windows.protocol">
 			<uap:Protocol Name="idgames" />
 		</uap:Extension>
+		<uap:Extension Category="windows.protocol">
+			<uap:Protocol Name="gzdl" />
+		</uap:Extension>
 	  </Extensions>
     </Application>
   </Applications>
