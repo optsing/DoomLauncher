@@ -70,7 +70,6 @@ internal static class LaunchHelper
             return LaunchResult.NotLaunched;
         }
 
-        entry.LastLaunch = DateTime.Now;
         WinApi.SetForegroundWindow(CurrentProcess.MainWindowHandle);
         return LaunchResult.Success;
     }

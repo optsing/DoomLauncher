@@ -129,7 +129,7 @@ public partial class App : Application
                 }
                 if (files.Count > 0)
                 {
-                    await rootPage.ImportEntriesFromFiles(files, withConfirm: true);
+                    await rootPage.ImportEntriesFromGZDLFiles(files, withConfirm: true);
                 }
             }
         }

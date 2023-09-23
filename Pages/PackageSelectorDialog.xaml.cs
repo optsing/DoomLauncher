@@ -14,10 +14,10 @@ namespace DoomLauncher;
 /// </summary>
 public sealed partial class PackageSelectorDialog : ContentDialog
 {
-    public PackageSelectorDialog(XamlRoot root, List<GZDoomPackage> assets)
+    public PackageSelectorDialog(XamlRoot xamlRoot, List<GZDoomPackage> assets)
     {
         InitializeComponent();
-        XamlRoot = root;
+        XamlRoot = xamlRoot;
         OnlinePackage = assets;
         SelectedPackage = assets.FirstOrDefault();
     }

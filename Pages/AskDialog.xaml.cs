@@ -14,10 +14,10 @@ public sealed partial class AskDialog : ContentDialog
 {
     public string Text { get; set; }
 
-    public AskDialog(XamlRoot root, string title, string text, string primaryButton, string closeButton)
+    public AskDialog(XamlRoot xamlRoot, string title, string text, string primaryButton, string closeButton)
     {
         this.InitializeComponent();
-        this.XamlRoot = root;
+        this.XamlRoot = xamlRoot;
         this.Title = title;
         this.Text = text;
         this.PrimaryButtonText = primaryButton;

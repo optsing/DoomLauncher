@@ -10,10 +10,10 @@ namespace DoomLauncher;
 /// </summary>
 public sealed partial class EditFileDialog : ContentDialog
 {
-    public EditFileDialog(XamlRoot root, object properties)
+    public EditFileDialog(XamlRoot xamlRoot, object properties)
     {
         InitializeComponent();
-        XamlRoot = root;
+        XamlRoot = xamlRoot;
         FileDescription = "";
     }
 

@@ -8,14 +8,14 @@ namespace DoomLauncher;
 
 internal class JumpListHelper
 {
-    public static async Task UpdateJumpList(IEnumerable<DoomEntry> entries)
+    public static async Task Update()
     {
         JumpList jumpList = await JumpList.LoadCurrentAsync();
         jumpList.Items.Clear();
 
         jumpList.SystemGroupKind = JumpListSystemGroupKind.None;
 
-        foreach (var entry in entries.Where(entry => entry.LastLaunch != null).OrderByDescending(entry => entry.LastLaunch))
+        foreach (var entry in Settings.Current.Entries.Where(entry => entry.LastLaunch != null).OrderByDescending(entry => entry.LastLaunch))
         {
             JumpListItem item = JumpListItem.CreateWithArguments($"launch --id {entry.Id}", entry.Name);
             item.GroupName = "Последние запущенные";
