@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 
 namespace DoomLauncher;
@@ -69,8 +68,6 @@ internal static class LaunchHelper
         {
             return LaunchResult.NotLaunched;
         }
-
-        WinApi.SetForegroundWindow(CurrentProcess.MainWindowHandle);
         return LaunchResult.Success;
     }
 }

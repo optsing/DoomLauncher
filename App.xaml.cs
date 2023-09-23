@@ -1,5 +1,4 @@
-﻿using Microsoft.UI.Windowing;
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppLifecycle;
 using System;
 using System.Collections.Generic;
@@ -72,11 +71,7 @@ public partial class App : Application
     {
         m_window?.dispatcher.TryEnqueue(() =>
             {
-                if (m_window.AppWindow.Presenter is OverlappedPresenter presenter)
-                {
-                    presenter.Restore();
-                }
-                WinApi.SetForegroundWindow(m_window.hWnd);
+                m_window.rootPage.RestoreAndSwitchToThisWindow();
                 ParseAppArgs(m_window.rootPage, e);
             }
         );

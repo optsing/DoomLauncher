@@ -97,7 +97,7 @@ public sealed partial class MainWindow : Window
             {
                 Settings.Current.WindowMaximized = true;
             }
-            else if (presenter.State != OverlappedPresenterState.Minimized)
+            else if (presenter.State == OverlappedPresenterState.Restored)
             {
                 Settings.Current.WindowMaximized = false;
                 Settings.Current.WindowX = sender.Position.X;

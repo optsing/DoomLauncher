@@ -5,10 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Text.Json;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
@@ -351,27 +348,16 @@ public sealed partial class RootPage : Page
             }
             else
             {
-                if (appWindow.Presenter is OverlappedPresenter minimizePresenter)
-                {
-                    minimizePresenter.Minimize();
-                }
+                MinimizeAndSwitchToAnotherWindow(LaunchHelper.CurrentProcess.MainWindowHandle);
                 await LaunchHelper.CurrentProcess.WaitForExitAsync();
-                if (appWindow.Presenter is OverlappedPresenter maximizePresenter)
-                {
-                    maximizePresenter.Restore();
-                }
-                WinApi.SetForegroundWindow(hWnd);
+                RestoreAndSwitchToThisWindow();
             }
         }
         else if (result == LaunchResult.AlreadyLaunched && LaunchHelper.CurrentProcess != null)
         {
             if (await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске", "Игра уже запущена, закройте текущую игру", "Переключить на игру", "Отмена"))
             {
-                WinApi.SetForegroundWindow(LaunchHelper.CurrentProcess.MainWindowHandle);
-                if (appWindow.Presenter is OverlappedPresenter presenter)
-                {
-                    presenter.Minimize();
-                }
+                MinimizeAndSwitchToAnotherWindow(LaunchHelper.CurrentProcess.MainWindowHandle);
             }
         }
         else if (result == LaunchResult.PathNotValid)
@@ -385,6 +371,31 @@ public sealed partial class RootPage : Page
         {
             await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске", "Не удалось запустить новую игру", "", "Отмена");
         }
+    }
+
+    public void MinimizeAndSwitchToAnotherWindow(IntPtr anotherHWnd)
+    {
+        if (appWindow.Presenter is OverlappedPresenter presenter)
+        {
+            presenter.Minimize();
+        }
+        WinApi.SetForegroundWindow(anotherHWnd);
+    }
+
+    public void RestoreAndSwitchToThisWindow()
+    {
+        if (appWindow.Presenter is OverlappedPresenter presenter && presenter.State == OverlappedPresenterState.Minimized)
+        {
+            if (Settings.Current.WindowMaximized)
+            {
+                presenter.Maximize();
+            }
+            else
+            {
+                presenter.Restore();
+            }
+        }
+        WinApi.SetForegroundWindow(hWnd);
     }
 
     private void ButtonMenu_Click(object sender, RoutedEventArgs e)
