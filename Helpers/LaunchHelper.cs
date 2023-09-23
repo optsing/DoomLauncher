@@ -19,7 +19,7 @@ internal static class LaunchHelper
             return LaunchResult.AlreadyLaunched;
         }
         var gZDoomPath = Path.GetFullPath(entry.GZDoomPath, Path.Combine(dataFolderPath, "gzdoom"));
-        if (!Settings.ValidateGZDoomPath(gZDoomPath))
+        if (!FileHelper.ValidateGZDoomPath(gZDoomPath))
         {
             return LaunchResult.PathNotValid;
         }

@@ -4,9 +4,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:local="using:DoomLauncher"
     xmlns:animations="using:CommunityToolkit.WinUI.Animations"
     xmlns:converters="using:CommunityToolkit.WinUI.Converters"
+    xmlns:local="using:DoomLauncher"
     d:DataContext="{d:DesignInstance Type=local:DoomEntry}"
     mc:Ignorable="d"
     Background="Transparent"
@@ -69,6 +69,11 @@
                         <MenuFlyoutItem Text="Дублировать" Click="CopyMod_Click">
                             <MenuFlyoutItem.Icon>
                                 <SymbolIcon Symbol="Copy" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="Создать ярлык" Click="CreateShortcut_Click">
+                            <MenuFlyoutItem.Icon>
+                                <SymbolIcon Symbol="Link" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
                         <MenuFlyoutItem Text="Экспортировать" Click="ExportMod_Click">
@@ -153,8 +158,8 @@
                 Orientation="Vertical"
             >
                 <TextBlock FontSize="18">
-                    <Run Text="{x:Bind GetGZDoomPackageTitle(entry.GZDoomPath), Mode=OneWay}"
-                    /> • <Run Text="{x:Bind local:Settings.GetIWadTitle(entry.IWadFile), Mode=OneWay}" />
+                    <Run Text="{x:Bind GZDoomPathToTitle(entry.GZDoomPath), Mode=OneWay}"
+                    /> • <Run Text="{x:Bind local:FileHelper.GetIWadTitle(entry.IWadFile), Mode=OneWay}" />
                 </TextBlock>
                 <TextBlock FontSize="16">
                     Последний запуск: <Run Text="{x:Bind local:XamlHelper.DateToText(entry.LastLaunch), Mode=OneWay}"/>

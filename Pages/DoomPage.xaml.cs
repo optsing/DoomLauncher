@@ -120,6 +120,7 @@ public sealed partial class DoomPage : Page
     public event EventHandler<DoomEntry>? OnEdit;
     public event EventHandler<DoomEntry>? OnCopy;
     public event EventHandler<DoomEntry>? OnExport;
+    public event EventHandler<DoomEntry>? OnCreateShortcut;
     public event EventHandler<DoomEntry>? OnRemove;
     public event EventHandler<string?>? OnProgress;
     public event EventHandler<(BitmapImage? bitmap, AnimationDirection direction)>? OnChangeBackground;
@@ -137,6 +138,11 @@ public sealed partial class DoomPage : Page
     private void CopyMod_Click(object sender, RoutedEventArgs e)
     {
         OnCopy?.Invoke(this, entry);
+    }
+
+    private void CreateShortcut_Click(object sender, RoutedEventArgs e)
+    {
+        OnCreateShortcut?.Invoke(this, entry);
     }
 
     private void ExportMod_Click(object sender, RoutedEventArgs e)
@@ -157,7 +163,7 @@ public sealed partial class DoomPage : Page
         WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
 
         // Now we can use the picker object as normal
-        foreach (var fileExtension in Settings.SupportedModExtensions)
+        foreach (var fileExtension in FileHelper.SupportedModExtensions)
         {
             picker.FileTypeFilter.Add(fileExtension);
         }
@@ -177,7 +183,7 @@ public sealed partial class DoomPage : Page
         WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
 
         // Now we can use the picker object as normal
-        foreach (var fileExtension in Settings.SupportedImageExtensions)
+        foreach (var fileExtension in FileHelper.SupportedImageExtensions)
         {
             picker.FileTypeFilter.Add(fileExtension);
         }
@@ -241,7 +247,7 @@ public sealed partial class DoomPage : Page
         foreach (var file in files)
         {
             OnProgress?.Invoke(this, $"Копирование: {file.Name}");
-            await Settings.CopyFileWithConfirmation(XamlRoot, file, modsFolderPath);
+            await FileHelper.CopyFileWithConfirmation(XamlRoot, file, modsFolderPath);
             if (!entry.ModFiles.Contains(file.Name))
             {
                 entry.ModFiles.Add(file.Name);
@@ -256,7 +262,7 @@ public sealed partial class DoomPage : Page
         foreach (var file in files)
         {
             OnProgress?.Invoke(this, $"Копирование: {file.Name}");
-            await Settings.CopyFileWithConfirmation(XamlRoot, file, imagesFolderPath);
+            await FileHelper.CopyFileWithConfirmation(XamlRoot, file, imagesFolderPath);
             if (!entry.ModFiles.Contains(file.Name))
             {
                 entry.ImageFiles.Add(file.Name);
@@ -355,7 +361,7 @@ public sealed partial class DoomPage : Page
                     if (item is StorageFile file)
                     {
                         var ext = Path.GetExtension(file.Name).ToLowerInvariant();
-                        if (Settings.SupportedModExtensions.Contains(ext) || Settings.SupportedImageExtensions.Contains(ext))
+                        if (FileHelper.SupportedModExtensions.Contains(ext) || FileHelper.SupportedImageExtensions.Contains(ext))
                         {
                             DropHelper.Visibility = Visibility.Visible;
                             return;
@@ -395,11 +401,11 @@ public sealed partial class DoomPage : Page
                     if (item is StorageFile file)
                     {
                         var ext = Path.GetExtension(file.Name).ToLowerInvariant();
-                        if (Settings.SupportedModExtensions.Contains(ext))
+                        if (FileHelper.SupportedModExtensions.Contains(ext))
                         {
                             mods.Add(file);
                         }
-                        else if (Settings.SupportedImageExtensions.Contains(ext))
+                        else if (FileHelper.SupportedImageExtensions.Contains(ext))
                         {
                             images.Add(file);
                         }
@@ -453,13 +459,13 @@ public sealed partial class DoomPage : Page
         SetSlideshow();
     }
 
-    private string GetGZDoomPackageTitle(string path)
+    private string GZDoomPathToTitle(string path)
     {
         var package = Settings.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == path);
         if (package == null)
         {
             return "Не выбрано";
         }
-        return SettingsPage.GZDoomPackageToTitle(package);
+        return FileHelper.GZDoomPackageToTitle(package);
     }
 }

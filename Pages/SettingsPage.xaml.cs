@@ -15,10 +15,6 @@ using Windows.ApplicationModel;
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace DoomLauncher;
-/// <summary>
-/// An empty page that can be used on its own or navigated to within a Frame.
-/// </summary>
-
 
 public enum AssetArch
 {
@@ -67,45 +63,10 @@ public sealed partial class SettingsPage : Page
         return null;
     }
 
-    private static string ArchToTitle(AssetArch arch) => arch switch
-    {
-        AssetArch.x64 => "",
-        AssetArch.x64legacy => " (legacy)",
-        AssetArch.x86 => " 32 bit",
-        AssetArch.x86legacy => " 32 bit (legacy)",
-        AssetArch.arm64 => " arm64",
-        AssetArch.manual => " user",
-        _ => " unknown",
-    };
-
-    private static string PackageToFolderName(GZDoomPackage package) => (package.Version?.ToString() ?? "unknown") + "-" + ArchToString(package.Arch);
-
-    public static string ArchToString(AssetArch arch) => arch switch
-    {
-        AssetArch.x64 => "x64",
-        AssetArch.x64legacy => "x64-legacy",
-        AssetArch.x86 => "x86",
-        AssetArch.x86legacy => "x86-legacy",
-        AssetArch.arm64 => "arm64",
-        AssetArch.manual => "manual",
-        _ => "unknown",
-    };
-
-    public static AssetArch ArchFromString(string? arch) => arch switch
-    {
-        "x64" => AssetArch.x64,
-        "x64-legacy" => AssetArch.x64legacy,
-        "x86" => AssetArch.x86,
-        "x86-legacy" => AssetArch.x86legacy,
-        "arm64" => AssetArch.arm64,
-        "manual" => AssetArch.manual,
-        _ => AssetArch.unknown,
-    };
-
     private async Task LoadReleases()
     {
         OnProgress?.Invoke(this, "Получение списка версий");
-        var entries = await Settings.WebAPI.GetGZDoomGitHubReleases();
+        var entries = await WebAPI.Current.GetGZDoomGitHubReleases();
         var onlinePackages = new List<GZDoomPackage>();
         foreach (var entry in entries)
         {
@@ -157,9 +118,9 @@ public sealed partial class SettingsPage : Page
             OnProgress?.Invoke(this, "Загрузка и извлечение архива");
             try
             {
-                using var stream = await Settings.WebAPI.DownloadUrl(package.Path);
+                using var stream = await WebAPI.Current.DownloadUrl(package.Path);
                 using var zipArchive = new ZipArchive(stream, ZipArchiveMode.Read);
-                var folderName = PackageToFolderName(package);
+                var folderName = FileHelper.PackageToFolderName(package);
                 var targetPath = Path.Combine(packagesFolderPath, folderName);
                 await Task.Run(
                     () => zipArchive.ExtractToDirectory(targetPath, overwriteFiles: true)
@@ -190,7 +151,7 @@ public sealed partial class SettingsPage : Page
         picker.FileTypeFilter.Add(".exe");
         picker.CommitButtonText = "Выбрать GZDoom";
         var file = await picker.PickSingleFileAsync();
-        if (file != null && Settings.ValidateGZDoomPath(file.Path))
+        if (file != null && FileHelper.ValidateGZDoomPath(file.Path))
         {
             var version = GetFileVersion(file.Path) is string s ? ParseVersion(s) : null;
             if (Settings.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == file.Path) is GZDoomPackage package)
@@ -235,7 +196,7 @@ public sealed partial class SettingsPage : Page
         foreach (var file in files)
         {
             OnProgress?.Invoke(this, $"Копирование: {file.Name}");
-            await Settings.CopyFileWithConfirmation(XamlRoot, file, iWadFolderPath);
+            await FileHelper.CopyFileWithConfirmation(XamlRoot, file, iWadFolderPath);
             if (!Settings.Current.IWadFiles.Contains(file.Name))
             {
                 Settings.Current.IWadFiles.Add(file.Name);
@@ -266,7 +227,7 @@ public sealed partial class SettingsPage : Page
         {
             if (el.DataContext is GZDoomPackage package)
             {
-                var title = GZDoomPackageToTitle(package);
+                var title = FileHelper.GZDoomPackageToTitle(package);
                 if (await AskDialog.ShowAsync(XamlRoot, "Удаление ссылки", $"Вы уверены, что хотите удалить ссылку на '{title}'?", "Удалить", "Отмена"))
                 {
                     Settings.Current.GZDoomInstalls.Remove(package);
@@ -292,22 +253,13 @@ public sealed partial class SettingsPage : Page
         {
             if (el.DataContext is string iWadFile)
             {
-                var title = Settings.GetIWadTitle(iWadFile);
+                var title = FileHelper.GetIWadTitle(iWadFile);
                 if (await AskDialog.ShowAsync(XamlRoot, "Удаление ссылки", $"Вы уверены, что хотите удалить ссылку на '{title}'?", "Удалить", "Отмена"))
                 {
                     Settings.Current.IWadFiles.Remove(iWadFile);
                 }
             }
         }
-    }
-
-    public static string GZDoomPackageToTitle(GZDoomPackage? package)
-    {
-        if (package == null || package.Arch == AssetArch.notSelected)
-        {
-            return "Не выбрано";
-        }
-        return (package.Version?.ToString() ?? "unknown") + ArchToTitle(package.Arch);
     }
 
     [GeneratedRegex("(\\d+)[.-](\\d+)[.-](\\d+)")]

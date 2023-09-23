@@ -110,6 +110,7 @@ public sealed partial class RootPage : Page
             page.OnStart += Page_OnStart;
             page.OnEdit += Page_OnEdit;
             page.OnCopy += Page_OnCopy;
+            page.OnCreateShortcut += Page_OnCreateShortcut;
             page.OnExport += Page_OnExport;
             page.OnRemove += Page_OnRemove;
             page.OnProgress += Page_OnProgress;
@@ -230,6 +231,22 @@ public sealed partial class RootPage : Page
             if (el.DataContext is DoomEntry entry)
             {
                 CopyMod(entry);
+            }
+        }
+    }
+
+    private async void Page_OnCreateShortcut(object? sender, DoomEntry entry)
+    {
+        await CreateShortcut(entry);
+    }
+
+    private async void CreateShortcut_Click(object? sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement el)
+        {
+            if (el.DataContext is DoomEntry entry)
+            {
+                await CreateShortcut(entry);
             }
         }
     }
@@ -413,11 +430,11 @@ public sealed partial class RootPage : Page
         WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
 
         // Now we can use the picker object as normal
-        foreach (var ext in Settings.SupportedModExtensions)
+        foreach (var ext in FileHelper.SupportedModExtensions)
         {
             picker.FileTypeFilter.Add(ext);
         }
-        foreach (var ext in Settings.SupportedImageExtensions)
+        foreach (var ext in FileHelper.SupportedImageExtensions)
         {
             picker.FileTypeFilter.Add(ext);
         }
@@ -426,8 +443,8 @@ public sealed partial class RootPage : Page
 
         if (files.Any())
         {
-            var mods = files.Where(file => Settings.SupportedModExtensions.Contains(Path.GetExtension(file.Name))).ToList();
-            var images = files.Where(file => Settings.SupportedImageExtensions.Contains(Path.GetExtension(file.Name))).ToList();
+            var mods = files.Where(file => FileHelper.SupportedModExtensions.Contains(Path.GetExtension(file.Name))).ToList();
+            var images = files.Where(file => FileHelper.SupportedImageExtensions.Contains(Path.GetExtension(file.Name))).ToList();
             var newEntry = await CreateModFromFiles(mods, images, withConfirm: true);
             if (newEntry != null)
             {
@@ -480,7 +497,31 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private async Task ExportMod(DoomEntry entry)
+    private async Task CreateShortcut(DoomEntry entry)
+    {
+        var picker = new Windows.Storage.Pickers.FileSavePicker();
+
+        // Need to initialize the picker object with the hwnd / IInitializeWithWindow
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
+
+        // Now we can use the picker object as normal
+        picker.FileTypeChoices.Add("Ярлык", new List<string>() { ".url" });
+        picker.SuggestedFileName = entry.Name;
+        picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Desktop;
+        picker.CommitButtonText = "Создать ярлык";
+
+        var file = await picker.PickSaveFileAsync();
+        if (file == null)
+        {
+            return;
+        }
+
+        SetProgress("Создание ярлыка");
+        await FileHelper.CreateEntryShortcut(entry, file);
+        SetProgress(null);
+    }
+
+        private async Task ExportMod(DoomEntry entry)
     {
         var picker = new Windows.Storage.Pickers.FileSavePicker();
 
@@ -490,6 +531,7 @@ public sealed partial class RootPage : Page
         // Now we can use the picker object as normal
         picker.FileTypeChoices.Add("Сборка GZDoomLauncher", new List<string>() { ".gzdl" });
         picker.SuggestedFileName = entry.Name;
+        picker.CommitButtonText = "Экспортировать";
 
         var file = await picker.PickSaveFileAsync();
         if (file == null)
@@ -567,7 +609,7 @@ public sealed partial class RootPage : Page
     public async Task ImportEntryFromDoomWorldId(string wadId, bool withConfirm)
     {
         SetProgress($"Получение информации...");
-        var wadInfo = await Settings.WebAPI.GetDoomWorldWADInfo(wadId);
+        var wadInfo = await WebAPI.Current.GetDoomWorldWADInfo(wadId);
         if (wadInfo != null)
         {
             var newEntry = await ImportModFileFromDoomWorld(wadInfo, withConfirm);
@@ -605,11 +647,11 @@ public sealed partial class RootPage : Page
                 foreach (var zipFileEntry in archive.Entries)
                 {
                     var ext = Path.GetExtension(zipFileEntry.Name).ToLowerInvariant();
-                    if (Settings.SupportedModExtensions.Contains(ext))
+                    if (FileHelper.SupportedModExtensions.Contains(ext))
                     {
                         entryProperties.modFiles.Add(zipFileEntry.Name);
                     }
-                    else if (Settings.SupportedImageExtensions.Contains(ext))
+                    else if (FileHelper.SupportedImageExtensions.Contains(ext))
                     {
                         entryProperties.imageFiles.Add(zipFileEntry.Name);
                     }
@@ -625,18 +667,18 @@ public sealed partial class RootPage : Page
                 foreach (var zipFileEntry in archive.Entries)
                 {
                     var ext = Path.GetExtension(zipFileEntry.Name).ToLowerInvariant();
-                    if (Settings.SupportedModExtensions.Contains(ext) && (!withConfirm || entryProperties.modFiles.Contains(zipFileEntry.Name)))
+                    if (FileHelper.SupportedModExtensions.Contains(ext) && (!withConfirm || entryProperties.modFiles.Contains(zipFileEntry.Name)))
                     {
                         SetProgress($"Извлечение: {zipFileEntry.Name}");
                         using var fileStream = zipFileEntry.Open();
-                        await Settings.CopyFileWithConfirmation(XamlRoot, fileStream, zipFileEntry.Name, modsFolderPath);
+                        await FileHelper.CopyFileWithConfirmation(XamlRoot, fileStream, zipFileEntry.Name, modsFolderPath);
                         modsCopied.Add(zipFileEntry.Name);
                     }
-                    else if (Settings.SupportedImageExtensions.Contains(ext) && (!withConfirm || entryProperties.imageFiles.Contains(zipFileEntry.Name)))
+                    else if (FileHelper.SupportedImageExtensions.Contains(ext) && (!withConfirm || entryProperties.imageFiles.Contains(zipFileEntry.Name)))
                     {
                         SetProgress($"Извлечение: {zipFileEntry.Name}");
                         using var fileStream = zipFileEntry.Open();
-                        await Settings.CopyFileWithConfirmation(XamlRoot, fileStream, zipFileEntry.Name, imagesFolderPath);
+                        await FileHelper.CopyFileWithConfirmation(XamlRoot, fileStream, zipFileEntry.Name, imagesFolderPath);
                         imagesCopied.Add(zipFileEntry.Name);
                     }
                 }
@@ -685,7 +727,7 @@ public sealed partial class RootPage : Page
         try
         {
             SetProgress($"Чтение файла: {wadInfo.Filename}");
-            using var zipToRead = await Settings.WebAPI.DownloadDoomWorldWadArchive(wadInfo);
+            using var zipToRead = await WebAPI.Current.DownloadDoomWorldWadArchive(wadInfo);
             using var archive = new ZipArchive(zipToRead, ZipArchiveMode.Read);
 
             var entryProperties = new EditModDialogResult(new DoomEntry()
@@ -698,11 +740,11 @@ public sealed partial class RootPage : Page
                 foreach (var zipFileEntry in archive.Entries)
                 {
                     var ext = Path.GetExtension(zipFileEntry.Name).ToLowerInvariant();
-                    if (Settings.SupportedModExtensions.Contains(ext))
+                    if (FileHelper.SupportedModExtensions.Contains(ext))
                     {
                         entryProperties.modFiles.Add(zipFileEntry.Name);
                     }
-                    else if (Settings.SupportedImageExtensions.Contains(ext))
+                    else if (FileHelper.SupportedImageExtensions.Contains(ext))
                     {
                         entryProperties.imageFiles.Add(zipFileEntry.Name);
                     }
@@ -718,18 +760,18 @@ public sealed partial class RootPage : Page
                 foreach (var zipFileEntry in archive.Entries)
                 {
                     var ext = Path.GetExtension(zipFileEntry.Name).ToLowerInvariant();
-                    if (Settings.SupportedModExtensions.Contains(ext) && (!withConfirm || entryProperties.modFiles.Contains(zipFileEntry.Name)))
+                    if (FileHelper.SupportedModExtensions.Contains(ext) && (!withConfirm || entryProperties.modFiles.Contains(zipFileEntry.Name)))
                     {
                         SetProgress($"Извлечение: {zipFileEntry.Name}");
                         using var fileStream = zipFileEntry.Open();
-                        await Settings.CopyFileWithConfirmation(XamlRoot, fileStream, zipFileEntry.Name, modsFolderPath);
+                        await FileHelper.CopyFileWithConfirmation(XamlRoot, fileStream, zipFileEntry.Name, modsFolderPath);
                         modsCopied.Add(zipFileEntry.Name);
                     }
-                    else if (Settings.SupportedImageExtensions.Contains(ext) && (!withConfirm || entryProperties.imageFiles.Contains(zipFileEntry.Name)))
+                    else if (FileHelper.SupportedImageExtensions.Contains(ext) && (!withConfirm || entryProperties.imageFiles.Contains(zipFileEntry.Name)))
                     {
                         SetProgress($"Извлечение: {zipFileEntry.Name}");
                         using var fileStream = zipFileEntry.Open();
-                        await Settings.CopyFileWithConfirmation(XamlRoot, fileStream, zipFileEntry.Name, imagesFolderPath);
+                        await FileHelper.CopyFileWithConfirmation(XamlRoot, fileStream, zipFileEntry.Name, imagesFolderPath);
                         imagesCopied.Add(zipFileEntry.Name);
                     }
                 }
@@ -800,7 +842,7 @@ public sealed partial class RootPage : Page
                     if (!withConfirm || entryProperties.modFiles.Contains(mod.Name))
                     {
                         SetProgress($"Копирование: {mod.Name}");
-                        await Settings.CopyFileWithConfirmation(XamlRoot, mod, modsFolderPath);
+                        await FileHelper.CopyFileWithConfirmation(XamlRoot, mod, modsFolderPath);
                         modsCopied.Add(mod.Name);
                     }
                 }
@@ -809,7 +851,7 @@ public sealed partial class RootPage : Page
                     if (!withConfirm || entryProperties.imageFiles.Contains(image.Name))
                     {
                         SetProgress($"Копирование: {image.Name}");
-                        await Settings.CopyFileWithConfirmation(XamlRoot, image, imagesFolderPath);
+                        await FileHelper.CopyFileWithConfirmation(XamlRoot, image, imagesFolderPath);
                         imagesCopied.Add(image.Name);
                     }
                 }
@@ -851,7 +893,7 @@ public sealed partial class RootPage : Page
                     if (item is StorageFile file)
                     {
                         var ext = Path.GetExtension(file.Name).ToLowerInvariant();
-                        if (ext == ".gzdl" || ext == ".zip" || Settings.SupportedModExtensions.Contains(ext) || Settings.SupportedImageExtensions.Contains(ext))
+                        if (ext == ".gzdl" || ext == ".zip" || FileHelper.SupportedModExtensions.Contains(ext) || FileHelper.SupportedImageExtensions.Contains(ext))
                         {
                             DropHelper.Visibility = Visibility.Visible;
                             return;
@@ -896,11 +938,11 @@ public sealed partial class RootPage : Page
                         {
                             files.Add(file);
                         }
-                        else if (Settings.SupportedModExtensions.Contains(ext))
+                        else if (FileHelper.SupportedModExtensions.Contains(ext))
                         {
                             mods.Add(file);
                         }
-                        else if (Settings.SupportedImageExtensions.Contains(ext))
+                        else if (FileHelper.SupportedImageExtensions.Contains(ext))
                         {
                             images.Add(file);
                         }

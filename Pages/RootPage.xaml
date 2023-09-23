@@ -4,10 +4,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:animations="using:CommunityToolkit.WinUI.Animations"
     xmlns:local="using:DoomLauncher"
     xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
-    xmlns:ui="using:CommunityToolkit.WinUI"
     mc:Ignorable="d"
 >
     <Grid>
@@ -108,6 +108,11 @@
                                             <MenuFlyoutItem Text="Дублировать" Click="CopyMod_Click">
                                                 <MenuFlyoutItem.Icon>
                                                     <SymbolIcon Symbol="Copy" />
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+                                            <MenuFlyoutItem Text="Создать ярлык" Click="CreateShortcut_Click">
+                                                <MenuFlyoutItem.Icon>
+                                                    <SymbolIcon Symbol="Link" />
                                                 </MenuFlyoutItem.Icon>
                                             </MenuFlyoutItem>
                                             <MenuFlyoutItem Text="Экспортировать" Click="ExportMod_Click">

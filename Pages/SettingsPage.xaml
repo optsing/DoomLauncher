@@ -1,11 +1,11 @@
 ﻿<Page
     x:Class="DoomLauncher.SettingsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:DoomLauncher"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:local="using:DoomLauncher"
     mc:Ignorable="d"
 >
     <Grid RowDefinitions="48,*">
@@ -39,7 +39,7 @@
                             <Grid ColumnDefinitions="*,Auto">
                                 <TextBlock
                                     Grid.Column="0"
-                                    Text="{x:Bind local:SettingsPage.GZDoomPackageToTitle((local:GZDoomPackage)), Mode=OneWay}"
+                                    Text="{x:Bind local:FileHelper.GZDoomPackageToTitle((local:GZDoomPackage)), Mode=OneWay}"
                                     VerticalAlignment="Center"
                                 />
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
@@ -98,7 +98,7 @@
                             <Grid ColumnDefinitions="*,Auto">
                                 <TextBlock
                                     Grid.Column="0"
-                                    Text="{x:Bind local:Settings.GetIWadTitle((x:String))}"
+                                    Text="{x:Bind local:FileHelper.GetIWadTitle((x:String))}"
                                     VerticalAlignment="Center"
                                 />
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">

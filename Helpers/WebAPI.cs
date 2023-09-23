@@ -59,6 +59,8 @@ public class GitHubAssetEntry
 
 public class WebAPI
 {
+    public static readonly WebAPI Current = new("GZDoom Launcher");
+
     public const string DoomWorldDlGermany = "https://www.quaddicted.com/files/idgames/";
 
     private readonly HttpClient httpClient;
