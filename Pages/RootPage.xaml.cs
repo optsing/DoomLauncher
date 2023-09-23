@@ -338,6 +338,7 @@ public sealed partial class RootPage : Page
 
     private async void LaunchEntry(DoomEntry entry, bool forceClose)
     {
+        DoomList.SelectedItem = entry;
         var result = LaunchHelper.LaunchEntry(entry, dataFolderPath);
         if (result == LaunchResult.Success && LaunchHelper.CurrentProcess != null)
         {
