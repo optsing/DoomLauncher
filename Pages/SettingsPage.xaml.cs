@@ -25,15 +25,11 @@ public sealed partial class SettingsPage : Page
 {
     private readonly IntPtr hWnd;
     private readonly string appVersion;
-    private readonly string packagesFolderPath;
-    private readonly string iWadFolderPath;
 
-    public SettingsPage(IntPtr hWnd, string dataFolderPath)
+    public SettingsPage(IntPtr hWnd)
     {
         this.InitializeComponent();
         this.hWnd = hWnd;
-        packagesFolderPath = Path.Combine(dataFolderPath, "gzdoom");
-        iWadFolderPath = Path.Combine(dataFolderPath, "iwads");
         try
         {
             var version = Package.Current.Id.Version;
@@ -121,7 +117,7 @@ public sealed partial class SettingsPage : Page
                 using var stream = await WebAPI.Current.DownloadUrl(package.Path);
                 using var zipArchive = new ZipArchive(stream, ZipArchiveMode.Read);
                 var folderName = FileHelper.PackageToFolderName(package);
-                var targetPath = Path.Combine(packagesFolderPath, folderName);
+                var targetPath = Path.Combine(FileHelper.PackagesFolderPath, folderName);
                 await Task.Run(
                     () => zipArchive.ExtractToDirectory(targetPath, overwriteFiles: true)
                 );
@@ -196,7 +192,7 @@ public sealed partial class SettingsPage : Page
         foreach (var file in files)
         {
             OnProgress?.Invoke(this, $"Копирование: {file.Name}");
-            await FileHelper.CopyFileWithConfirmation(XamlRoot, file, iWadFolderPath);
+            await FileHelper.CopyFileWithConfirmation(XamlRoot, file, FileHelper.IWadFolderPath);
             if (!Settings.Current.IWadFiles.Contains(file.Name))
             {
                 Settings.Current.IWadFiles.Add(file.Name);
@@ -216,7 +212,7 @@ public sealed partial class SettingsPage : Page
         {
             if (el.DataContext is GZDoomPackage package)
             {
-                Process.Start("explorer.exe", "/select," + Path.GetFullPath(package.Path, packagesFolderPath));
+                Process.Start("explorer.exe", "/select," + Path.GetFullPath(package.Path, FileHelper.PackagesFolderPath));
             }
         }
     }
@@ -242,7 +238,7 @@ public sealed partial class SettingsPage : Page
         {
             if (el.DataContext is string iWadFile)
             {
-                Process.Start("explorer.exe", "/select," + Path.GetFullPath(iWadFile, iWadFolderPath));
+                Process.Start("explorer.exe", "/select," + Path.GetFullPath(iWadFile, FileHelper.IWadFolderPath));
             }
         }
     }

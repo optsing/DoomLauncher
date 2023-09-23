@@ -9,6 +9,14 @@ namespace DoomLauncher;
 
 internal static class FileHelper
 {
+    public static string ConfigFilePath = "";
+    public static string ModsFolderPath = "";
+    public static string ImagesFolderPath = "";
+    public static string PackagesFolderPath = "";
+    public static string IWadFolderPath = "";
+    public static string EntriesFolderPath = "";
+
+
     public static readonly string[] SupportedModExtensions = new[] { ".pk3", ".wad", ".zip" };
     public static readonly string[] SupportedImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif", ".svg" };
 

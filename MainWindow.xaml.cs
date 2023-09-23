@@ -40,6 +40,7 @@ public sealed partial class MainWindow : Window
 
         Closed += MainWindow_Closed;
 
+        string dataFolderPath;
         try
         {
             // Packaged only
@@ -50,16 +51,22 @@ public sealed partial class MainWindow : Window
             // Unpackaged only
             dataFolderPath = Directory.GetCurrentDirectory();
         }
-        configFilePath = Path.Combine(dataFolderPath, "config.json");
 
-        if (File.Exists(configFilePath))
+        FileHelper.ConfigFilePath = Path.Combine(dataFolderPath, "config.json");
+        FileHelper.PackagesFolderPath = Path.Combine(dataFolderPath, "gzdoom");
+        FileHelper.IWadFolderPath = Path.Combine(dataFolderPath, "iwads");
+        FileHelper.ModsFolderPath = Path.Combine(dataFolderPath, "mods");
+        FileHelper.ImagesFolderPath = Path.Combine(dataFolderPath, "images");
+        FileHelper.EntriesFolderPath = Path.Combine(dataFolderPath, "entries");
+
+        if (File.Exists(FileHelper.ConfigFilePath))
         {
-            var text = File.ReadAllText(configFilePath);
+            var text = File.ReadAllText(FileHelper.ConfigFilePath);
             if (JsonSerializer.Deserialize(text, JsonSettingsContext.Default.Settings) is Settings settings) {
                 Settings.Current = settings;
             }
             var backupConfigFilePath = Path.Combine(dataFolderPath, "config.old.json");
-            File.Copy(configFilePath, backupConfigFilePath, true);
+            File.Copy(FileHelper.ConfigFilePath, backupConfigFilePath, true);
         }
 
         if (Settings.Current.WindowX != null && Settings.Current.WindowY != null && Settings.Current.WindowWidth != null && Settings.Current.WindowHeight != null)
@@ -79,14 +86,8 @@ public sealed partial class MainWindow : Window
 
         AppWindow.Changed += AppWindow_Changed;
 
-        rootPage = new RootPage(AppWindow, hWnd, dataFolderPath);
-        rootPage.OnSave += RootPage_OnSave;
+        rootPage = new RootPage(AppWindow, hWnd);
         frameRoot.Content = rootPage;
-    }
-
-    private void RootPage_OnSave(object? sender, System.EventArgs e)
-    {
-        Save();
     }
 
     private void AppWindow_Changed(AppWindow sender, AppWindowChangedEventArgs args)
@@ -108,17 +109,8 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private readonly string dataFolderPath;
-    private readonly string configFilePath;
-
     private void MainWindow_Closed(object sender, WindowEventArgs args)
     {
-        Save();
-    }
-
-    public void Save()
-    {
-        var text = JsonSerializer.Serialize(Settings.Current, JsonSettingsContext.Default.Settings);
-        File.WriteAllText(configFilePath, text);
+        Settings.Save();
     }
 }

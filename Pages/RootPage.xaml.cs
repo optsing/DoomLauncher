@@ -32,13 +32,12 @@ public sealed partial class RootPage : Page
 
     private readonly TimeSpan SlideshowAnimationDuration = TimeSpan.FromMilliseconds(150);
 
-    public RootPage(AppWindow appWindow, IntPtr hWnd, string dataFolderPath)
+    public RootPage(AppWindow appWindow, IntPtr hWnd)
     {
         InitializeComponent();
 
         this.appWindow = appWindow;
         this.hWnd = hWnd;
-        this.dataFolderPath = dataFolderPath;
 
         if (AppWindowTitleBar.IsCustomizationSupported())
         {
@@ -63,8 +62,6 @@ public sealed partial class RootPage : Page
         frameMain.Content = notSelectedPage;
         DoomList.SelectedIndex = Settings.Current.SelectedModIndex;
     }
-
-    public event EventHandler? OnSave;
 
     private void TitleBar_SizeChanged(object sender, SizeChangedEventArgs e)
     {
@@ -92,7 +89,6 @@ public sealed partial class RootPage : Page
     }
 
     private readonly IntPtr hWnd;
-    private readonly string dataFolderPath;
 
     private readonly NotSelectedPage notSelectedPage = new();
 
@@ -103,7 +99,7 @@ public sealed partial class RootPage : Page
         if (DoomList.SelectedItem is DoomEntry entry)
         {
             Settings.Current.SelectedModIndex = DoomList.SelectedIndex;
-            DoomPage page = new(entry, hWnd, dataFolderPath);
+            var page = new DoomPage(entry, hWnd);
             page.OnStart += Page_OnStart;
             page.OnEdit += Page_OnEdit;
             page.OnCopy += Page_OnCopy;
@@ -269,7 +265,7 @@ public sealed partial class RootPage : Page
         if (await AskDialog.ShowAsync(XamlRoot, "Удаление сборки", $"Вы уверены, что хотите удалить сборку '{entry.Name}'?", "Удалить", "Отмена"))
         {
             Settings.Current.Entries.Remove(entry);
-            OnSave?.Invoke(this, new EventArgs());
+            Settings.Save();
             await JumpListHelper.Update();
         }
     }
@@ -286,7 +282,7 @@ public sealed partial class RootPage : Page
             entry.IWadFile = result.iWadFile;
             entry.UniqueConfig = result.uniqueConfig;
             entry.UniqueSavesFolder = result.uniqueSavesFolder;
-            OnSave?.Invoke(this, new EventArgs());
+            Settings.Save();
             await JumpListHelper.Update();
         }
     }
@@ -309,7 +305,7 @@ public sealed partial class RootPage : Page
         };
         Settings.Current.Entries.Add(newEntry);
         DoomList.SelectedItem = newEntry;
-        OnSave?.Invoke(this, new EventArgs());
+        Settings.Save();
     }
 
     private void Page_OnStart(object? sender, DoomEntry entry)
@@ -337,7 +333,7 @@ public sealed partial class RootPage : Page
             return;
         }
         DoomList.SelectedItem = entry;
-        var result = LaunchHelper.LaunchEntry(entry, dataFolderPath);
+        var result = LaunchHelper.LaunchEntry(entry);
         if (result == LaunchResult.Success && LaunchHelper.CurrentProcess != null)
         {
             entry.LastLaunch = DateTime.Now;
@@ -408,7 +404,7 @@ public sealed partial class RootPage : Page
         if (frameMain.Content is not SettingsPage)
         {
             DoomList.SelectedItem = null;
-            var settingsPage = new SettingsPage(hWnd, dataFolderPath);
+            var settingsPage = new SettingsPage(hWnd);
             settingsPage.OnProgress += Page_OnProgress;
             frameMain.Content = settingsPage;
             Page_OnChangeBackground(null, (null, AnimationDirection.None));
@@ -436,12 +432,12 @@ public sealed partial class RootPage : Page
 
         if (files.Any())
         {
-            var newEntry = await EntryHelper.CreateEntryFromFiles(XamlRoot, files, withConfirm: true, dataFolderPath, SetProgress);
+            var newEntry = await EntryHelper.CreateEntryFromFiles(XamlRoot, files, withConfirm: true, SetProgress);
             if (newEntry != null)
             {
                 Settings.Current.Entries.Add(newEntry);
                 DoomList.SelectedItem = newEntry;
-                OnSave?.Invoke(this, new EventArgs());
+                Settings.Save();
             }
         }
     }
@@ -465,7 +461,7 @@ public sealed partial class RootPage : Page
             };
             Settings.Current.Entries.Add(newEntry);
             DoomList.SelectedItem = newEntry;
-            OnSave?.Invoke(this, new EventArgs());
+            Settings.Save();
         }
     }
 
@@ -527,7 +523,7 @@ public sealed partial class RootPage : Page
         var file = await picker.PickSaveFileAsync();
         if (file != null)
         {
-            await EntryHelper.ExportToGZDLFile(entry, file, dataFolderPath, SetProgress);
+            await EntryHelper.ExportToGZDLFile(entry, file, SetProgress);
         }
     }
 
@@ -536,7 +532,7 @@ public sealed partial class RootPage : Page
         DoomEntry? lastAddedEntry = null;
         foreach (var file in files)
         {
-            var newEntry = await EntryHelper.ImportFromGZDLFile(XamlRoot, file, withConfirm, dataFolderPath, SetProgress);
+            var newEntry = await EntryHelper.ImportFromGZDLFile(XamlRoot, file, withConfirm, SetProgress);
             if (newEntry != null)
             {
                 Settings.Current.Entries.Add(newEntry);
@@ -546,7 +542,7 @@ public sealed partial class RootPage : Page
         if (lastAddedEntry != null)
         {
             DoomList.SelectedItem = lastAddedEntry;
-            OnSave?.Invoke(this, new EventArgs());
+            Settings.Save();
         }
     }
 
@@ -556,12 +552,12 @@ public sealed partial class RootPage : Page
         var wadInfo = await WebAPI.Current.GetDoomWorldWADInfo(wadId);
         if (wadInfo != null)
         {
-            var newEntry = await EntryHelper.ImportFromDoomWorld(XamlRoot, wadInfo, withConfirm, dataFolderPath, SetProgress);
+            var newEntry = await EntryHelper.ImportFromDoomWorld(XamlRoot, wadInfo, withConfirm, SetProgress);
             if (newEntry != null)
             {
                 Settings.Current.Entries.Add(newEntry);
                 DoomList.SelectedItem = newEntry;
-                OnSave?.Invoke(this, new EventArgs());
+                Settings.Save();
             }
         }
         SetProgress(null);
@@ -635,12 +631,12 @@ public sealed partial class RootPage : Page
                 }
                 if (otherFiles.Any())
                 {
-                    var newEntry = await EntryHelper.CreateEntryFromFiles(XamlRoot, otherFiles, withConfirm: true, dataFolderPath, SetProgress);
+                    var newEntry = await EntryHelper.CreateEntryFromFiles(XamlRoot, otherFiles, withConfirm: true, SetProgress);
                     if (newEntry != null)
                     {
                         Settings.Current.Entries.Add(newEntry);
                         DoomList.SelectedItem = newEntry;
-                        OnSave?.Invoke(this, new EventArgs());
+                        Settings.Save();
                     }
                 }
             }

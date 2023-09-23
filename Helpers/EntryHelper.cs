@@ -13,7 +13,7 @@ namespace DoomLauncher;
 
 internal static partial class EntryHelper
 {
-    public static async Task<DoomEntry?> ImportFromGZDLFile(XamlRoot xamlRoot, StorageFile file, bool withConfirm, string dataFolderPath, Action<string?> SetProgress)
+    public static async Task<DoomEntry?> ImportFromGZDLFile(XamlRoot xamlRoot, StorageFile file, bool withConfirm, Action<string?> SetProgress)
     {
         try
         {
@@ -52,8 +52,6 @@ internal static partial class EntryHelper
             {
                 var modsCopied = new List<string>();
                 var imagesCopied = new List<string>();
-                var modsFolderPath = Path.Combine(dataFolderPath, "mods");
-                var imagesFolderPath = Path.Combine(dataFolderPath, "images");
                 foreach (var zipFileEntry in archive.Entries)
                 {
                     var ext = Path.GetExtension(zipFileEntry.Name).ToLowerInvariant();
@@ -61,14 +59,14 @@ internal static partial class EntryHelper
                     {
                         SetProgress($"Извлечение: {zipFileEntry.Name}");
                         using var fileStream = zipFileEntry.Open();
-                        await FileHelper.CopyFileWithConfirmation(xamlRoot, fileStream, zipFileEntry.Name, modsFolderPath);
+                        await FileHelper.CopyFileWithConfirmation(xamlRoot, fileStream, zipFileEntry.Name, FileHelper.ModsFolderPath);
                         modsCopied.Add(zipFileEntry.Name);
                     }
                     else if (FileHelper.SupportedImageExtensions.Contains(ext) && (!withConfirm || entryProperties.imageFiles.Contains(zipFileEntry.Name)))
                     {
                         SetProgress($"Извлечение: {zipFileEntry.Name}");
                         using var fileStream = zipFileEntry.Open();
-                        await FileHelper.CopyFileWithConfirmation(xamlRoot, fileStream, zipFileEntry.Name, imagesFolderPath);
+                        await FileHelper.CopyFileWithConfirmation(xamlRoot, fileStream, zipFileEntry.Name, FileHelper.ImagesFolderPath);
                         imagesCopied.Add(zipFileEntry.Name);
                     }
                 }
@@ -107,7 +105,7 @@ internal static partial class EntryHelper
         return null;
     }
 
-    public static async Task<DoomEntry?> ImportFromDoomWorld(XamlRoot xamlRoot, DoomWorldFileEntry wadInfo, bool withConfirm, string dataFolderPath, Action<string?> SetProgress)
+    public static async Task<DoomEntry?> ImportFromDoomWorld(XamlRoot xamlRoot, DoomWorldFileEntry wadInfo, bool withConfirm, Action<string?> SetProgress)
     {
         try
         {
@@ -140,8 +138,6 @@ internal static partial class EntryHelper
             {
                 var modsCopied = new List<string>();
                 var imagesCopied = new List<string>();
-                var modsFolderPath = Path.Combine(dataFolderPath, "mods");
-                var imagesFolderPath = Path.Combine(dataFolderPath, "images");
                 foreach (var zipFileEntry in archive.Entries)
                 {
                     var ext = Path.GetExtension(zipFileEntry.Name).ToLowerInvariant();
@@ -149,14 +145,14 @@ internal static partial class EntryHelper
                     {
                         SetProgress($"Извлечение: {zipFileEntry.Name}");
                         using var fileStream = zipFileEntry.Open();
-                        await FileHelper.CopyFileWithConfirmation(xamlRoot, fileStream, zipFileEntry.Name, modsFolderPath);
+                        await FileHelper.CopyFileWithConfirmation(xamlRoot, fileStream, zipFileEntry.Name, FileHelper.ModsFolderPath);
                         modsCopied.Add(zipFileEntry.Name);
                     }
                     else if (FileHelper.SupportedImageExtensions.Contains(ext) && (!withConfirm || entryProperties.imageFiles.Contains(zipFileEntry.Name)))
                     {
                         SetProgress($"Извлечение: {zipFileEntry.Name}");
                         using var fileStream = zipFileEntry.Open();
-                        await FileHelper.CopyFileWithConfirmation(xamlRoot, fileStream, zipFileEntry.Name, imagesFolderPath);
+                        await FileHelper.CopyFileWithConfirmation(xamlRoot, fileStream, zipFileEntry.Name, FileHelper.ImagesFolderPath);
                         imagesCopied.Add(zipFileEntry.Name);
                     }
                 }
@@ -189,7 +185,7 @@ internal static partial class EntryHelper
     [GeneratedRegex(@"\s*<br>\s*")]
     private static partial Regex reLineBreak();
 
-    public static async Task<DoomEntry?> CreateEntryFromFiles(XamlRoot xamlRoot, IReadOnlyList<StorageFile> files, bool withConfirm, string dataFolderPath, Action<string?> SetProgress)
+    public static async Task<DoomEntry?> CreateEntryFromFiles(XamlRoot xamlRoot, IReadOnlyList<StorageFile> files, bool withConfirm, Action<string?> SetProgress)
     {
         try
         {
@@ -225,14 +221,12 @@ internal static partial class EntryHelper
             {
                 var modsCopied = new List<string>();
                 var imagesCopied = new List<string>();
-                var modsFolderPath = Path.Combine(dataFolderPath, "mods");
-                var imagesFolderPath = Path.Combine(dataFolderPath, "images");
                 foreach (var mod in mods)
                 {
                     if (!withConfirm || entryProperties.modFiles.Contains(mod.Name))
                     {
                         SetProgress($"Копирование: {mod.Name}");
-                        await FileHelper.CopyFileWithConfirmation(xamlRoot, mod, modsFolderPath);
+                        await FileHelper.CopyFileWithConfirmation(xamlRoot, mod, FileHelper.ModsFolderPath);
                         modsCopied.Add(mod.Name);
                     }
                 }
@@ -241,7 +235,7 @@ internal static partial class EntryHelper
                     if (!withConfirm || entryProperties.imageFiles.Contains(image.Name))
                     {
                         SetProgress($"Копирование: {image.Name}");
-                        await FileHelper.CopyFileWithConfirmation(xamlRoot, image, imagesFolderPath);
+                        await FileHelper.CopyFileWithConfirmation(xamlRoot, image, FileHelper.ImagesFolderPath);
                         imagesCopied.Add(image.Name);
                     }
                 }
@@ -271,13 +265,13 @@ internal static partial class EntryHelper
         return null;
     }
 
-    public static async Task ExportToGZDLFile(DoomEntry entry, StorageFile file, string dataFolderPath, Action<string?> SetProgress)
+    public static async Task ExportToGZDLFile(DoomEntry entry, StorageFile file, Action<string?> SetProgress)
     {
         SetProgress($"Экспорт: {file.Name}");
         using var zipToWrite = await file.OpenStreamForWriteAsync();
         using var archive = new ZipArchive(zipToWrite, ZipArchiveMode.Create);
 
-        var zipConfigEntry = archive.CreateEntry(Path.Combine("entry.json"));
+        var zipConfigEntry = archive.CreateEntry("entry.json");
         using (var configStream = zipConfigEntry.Open())
         {
             var fileName = "entry.json";
@@ -299,11 +293,9 @@ internal static partial class EntryHelper
             await JsonSerializer.SerializeAsync(configStream, newEntry, JsonSettingsContext.Default.DoomEntry);
         }
 
-        var modsFolderPath = Path.Combine(dataFolderPath, "mods");
-        var imagesFolderPath = Path.Combine(dataFolderPath, "images");
         foreach (var filePath in entry.ModFiles)
         {
-            var fullPath = Path.GetFullPath(filePath, modsFolderPath);
+            var fullPath = Path.GetFullPath(filePath, FileHelper.ModsFolderPath);
             var fileName = Path.GetFileName(filePath);
             SetProgress($"Экспорт: {fileName}");
             var zipFileEntry = archive.CreateEntry(Path.Combine("mods", fileName));
@@ -312,7 +304,7 @@ internal static partial class EntryHelper
         }
         foreach (var filePath in entry.ImageFiles)
         {
-            var fullPath = Path.GetFullPath(filePath, imagesFolderPath);
+            var fullPath = Path.GetFullPath(filePath, FileHelper.ImagesFolderPath);
             var fileName = Path.GetFileName(filePath);
             SetProgress($"Экспорт: {fileName}");
             var zipFileEntry = archive.CreateEntry(Path.Combine("images", fileName));

@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -27,6 +28,12 @@ public class Settings
     public int? WindowWidth { get; set; } = null;
     public int? WindowHeight { get; set; } = null;
     public bool WindowMaximized { get; set; } = false;
+
+    public static void Save()
+    {
+        var text = JsonSerializer.Serialize(Current, JsonSettingsContext.Default.Settings);
+        File.WriteAllText(FileHelper.ConfigFilePath, text);
+    }
 }
 
 public class GZDoomPackage: ObservableObject

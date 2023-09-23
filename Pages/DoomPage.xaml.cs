@@ -30,16 +30,12 @@ public sealed partial class DoomPage : Page
 
     private readonly DoomEntry entry;
     private readonly IntPtr hWnd;
-    private readonly string modsFolderPath;
-    private readonly string imagesFolderPath;
 
-    public DoomPage(DoomEntry entry, IntPtr hWnd, string dataFolderPath)
+    public DoomPage(DoomEntry entry, IntPtr hWnd)
     {
         InitializeComponent();
         this.entry = entry;
         this.hWnd = hWnd;
-        this.modsFolderPath = Path.Combine(dataFolderPath, "mods");
-        this.imagesFolderPath = Path.Combine(dataFolderPath, "images");
 
         timerSlideshow.Interval = SlideshowInterval;
         timerSlideshow.Tick += Timer_Tick;
@@ -95,7 +91,7 @@ public sealed partial class DoomPage : Page
                     };
                     item.Click += async (object sender, RoutedEventArgs e) =>
                     {
-                        var fullPath = Path.GetFullPath(filePath, modsFolderPath);
+                        var fullPath = Path.GetFullPath(filePath, FileHelper.ModsFolderPath);
                         if (File.Exists(fullPath))
                         {
                             var file = await StorageFile.GetFileFromPathAsync(fullPath);
@@ -208,7 +204,7 @@ public sealed partial class DoomPage : Page
                 ind = 0;
             }
             entry.SelectedImageIndex = ind;
-            var imagePath = Path.GetFullPath(entry.ImageFiles[entry.SelectedImageIndex], imagesFolderPath);
+            var imagePath = Path.GetFullPath(entry.ImageFiles[entry.SelectedImageIndex], FileHelper.ImagesFolderPath);
             var bitmap = await BitmapHelper.CreateBitmapFromFile(imagePath);
             OnChangeBackground?.Invoke(this, (bitmap, direction));
         }
@@ -247,7 +243,7 @@ public sealed partial class DoomPage : Page
         foreach (var file in files)
         {
             OnProgress?.Invoke(this, $"Копирование: {file.Name}");
-            await FileHelper.CopyFileWithConfirmation(XamlRoot, file, modsFolderPath);
+            await FileHelper.CopyFileWithConfirmation(XamlRoot, file, FileHelper.ModsFolderPath);
             if (!entry.ModFiles.Contains(file.Name))
             {
                 entry.ModFiles.Add(file.Name);
@@ -262,7 +258,7 @@ public sealed partial class DoomPage : Page
         foreach (var file in files)
         {
             OnProgress?.Invoke(this, $"Копирование: {file.Name}");
-            await FileHelper.CopyFileWithConfirmation(XamlRoot, file, imagesFolderPath);
+            await FileHelper.CopyFileWithConfirmation(XamlRoot, file, FileHelper.ImagesFolderPath);
             if (!entry.ModFiles.Contains(file.Name))
             {
                 entry.ImageFiles.Add(file.Name);
@@ -283,7 +279,7 @@ public sealed partial class DoomPage : Page
         {
             if (el.DataContext is string filePath)
             {
-                Process.Start("explorer.exe", "/select," + Path.GetFullPath(filePath, modsFolderPath));
+                Process.Start("explorer.exe", "/select," + Path.GetFullPath(filePath, FileHelper.ModsFolderPath));
             }
         }
     }

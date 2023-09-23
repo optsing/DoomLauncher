@@ -11,13 +11,13 @@ public enum LaunchResult
 internal static class LaunchHelper
 {
     public static Process? CurrentProcess { get; private set; }
-    public static LaunchResult LaunchEntry(DoomEntry entry, string dataFolderPath)
+    public static LaunchResult LaunchEntry(DoomEntry entry)
     {
         if (CurrentProcess != null && !CurrentProcess.HasExited)
         {
             return LaunchResult.AlreadyLaunched;
         }
-        var gZDoomPath = Path.GetFullPath(entry.GZDoomPath, Path.Combine(dataFolderPath, "gzdoom"));
+        var gZDoomPath = Path.GetFullPath(entry.GZDoomPath, FileHelper.PackagesFolderPath);
         if (!FileHelper.ValidateGZDoomPath(gZDoomPath))
         {
             return LaunchResult.PathNotValid;
@@ -29,7 +29,7 @@ internal static class LaunchHelper
         };
         if (entry.UniqueConfig)
         {
-            var entryFolderPath = Path.Combine(dataFolderPath, "entries", entry.Id);
+            var entryFolderPath = Path.Combine(FileHelper.EntriesFolderPath, entry.Id);
             if (!Directory.Exists(entryFolderPath))
             {
                 Directory.CreateDirectory(entryFolderPath);
@@ -40,7 +40,7 @@ internal static class LaunchHelper
         }
         if (entry.UniqueSavesFolder)
         {
-            var entrySavesFolderPath = Path.Combine(dataFolderPath, "entries", entry.Id, "saves");
+            var entrySavesFolderPath = Path.Combine(FileHelper.EntriesFolderPath, entry.Id, "saves");
             if (!Directory.Exists(entrySavesFolderPath))
             {
                 Directory.CreateDirectory(entrySavesFolderPath);
@@ -51,18 +51,16 @@ internal static class LaunchHelper
         if (!string.IsNullOrEmpty(entry.IWadFile))
         {
             processInfo.ArgumentList.Add("-iwad");
-            processInfo.ArgumentList.Add(Path.GetFullPath(entry.IWadFile, Path.Combine(dataFolderPath, "iwads")));
+            processInfo.ArgumentList.Add(Path.GetFullPath(entry.IWadFile, FileHelper.IWadFolderPath));
         }
         if (entry.ModFiles.Count > 0)
         {
             processInfo.ArgumentList.Add("-file");
-            var modsFolderPath = Path.Combine(dataFolderPath, "mods");
             foreach (var filePath in entry.ModFiles)
             {
-                processInfo.ArgumentList.Add(Path.GetFullPath(filePath, modsFolderPath));
+                processInfo.ArgumentList.Add(Path.GetFullPath(filePath, FileHelper.ModsFolderPath));
             }
         }
-
         CurrentProcess = Process.Start(processInfo);
         if (CurrentProcess == null)
         {
