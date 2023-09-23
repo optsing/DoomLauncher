@@ -320,24 +320,23 @@ public sealed partial class RootPage : Page
 
     public void LaunchEntryById(string entryId, bool forceClose)
     {
-        var entry = Settings.Current.Entries.FirstOrDefault(entry => entry.Id == entryId);
-        if (entry != null)
-        {
-            LaunchEntry(entry, forceClose);
-        }
+        var entry = Settings.Current.Entries.FirstOrDefault(entry => string.Equals(entry.Id, entryId));
+        LaunchEntry(entry, forceClose);
     }
 
     public void LaunchEntryByName(string entryName, bool forceClose)
     {
-        var entry = Settings.Current.Entries.FirstOrDefault(entry => entry.Name == entryName);
-        if (entry != null)
-        {
-            LaunchEntry(entry, forceClose);
-        }
+        var entry = Settings.Current.Entries.FirstOrDefault(entry => string.Equals(entry.Name, entryName));
+        LaunchEntry(entry, forceClose);
     }
 
-    private async void LaunchEntry(DoomEntry entry, bool forceClose)
+    private async void LaunchEntry(DoomEntry? entry, bool forceClose)
     {
+        if (entry == null)
+        {
+            await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске", "Не удалось найти нужную сборку", "", "Отмена");
+            return;
+        }
         DoomList.SelectedItem = entry;
         var result = LaunchHelper.LaunchEntry(entry, dataFolderPath);
         if (result == LaunchResult.Success && LaunchHelper.CurrentProcess != null)
@@ -362,7 +361,7 @@ public sealed partial class RootPage : Page
         }
         else if (result == LaunchResult.AlreadyLaunched && LaunchHelper.CurrentProcess != null)
         {
-            if (await AskDialog.ShowAsync(XamlRoot, "Игра уже запущена", "Закройте текущую игру, чтобы запустить новую", "Переключить на игру", "Отмена"))
+            if (await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске", "Игра уже запущена, закройте текущую игру", "Переключить на игру", "Отмена"))
             {
                 WinApi.SetForegroundWindow(LaunchHelper.CurrentProcess.MainWindowHandle);
                 if (appWindow.Presenter is OverlappedPresenter presenter)
@@ -373,14 +372,14 @@ public sealed partial class RootPage : Page
         }
         else if (result == LaunchResult.PathNotValid)
         {
-            if (await AskDialog.ShowAsync(XamlRoot, "Не выбран GZDoom", "Выберите нужную версию GZDoom в настройках сборки", "Перейти в настройки", "Отмена"))
+            if (await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске", "Не выбрана версия GZDoom, выберите нужную версию в настройках сборки", "Перейти в настройки", "Отмена"))
             {
                 await EditMod(entry);
             }
         }
         else
         {
-            await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске игры", "Не удалось запустить новую игру", "", "Отмена");
+            await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске", "Не удалось запустить новую игру", "", "Отмена");
         }
     }
 
