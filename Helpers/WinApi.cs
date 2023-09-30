@@ -7,6 +7,8 @@ namespace DoomLauncher;
 
 public partial class WinApi
 {
+    public static IntPtr HWND;
+
     [LibraryImport("User32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static partial bool SetForegroundWindow(IntPtr handle);

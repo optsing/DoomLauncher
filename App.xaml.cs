@@ -69,7 +69,7 @@ public partial class App : Application
 
     private void MainInstance_Activated(object? sender, AppActivationArguments e)
     {
-        m_window?.dispatcher.TryEnqueue(() =>
+        m_window?.DispatcherQueue.TryEnqueue(() =>
             {
                 m_window.rootPage.RestoreAndSwitchToThisWindow();
                 ParseAppArgs(m_window.rootPage, e);

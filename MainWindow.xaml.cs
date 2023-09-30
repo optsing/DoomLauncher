@@ -16,16 +16,13 @@ namespace DoomLauncher;
 /// </summary>
 public sealed partial class MainWindow : Window
 {
-    public readonly IntPtr hWnd;
     public readonly RootPage rootPage;
-    public readonly DispatcherQueue dispatcher;
 
     public MainWindow()
     {
         InitializeComponent();
 
-        hWnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
-        dispatcher = DispatcherQueue.GetForCurrentThread();
+        WinApi.HWND = WinRT.Interop.WindowNative.GetWindowHandle(this);
 
         AppWindow.Title = "GZDoom Launcher";
         AppWindow.SetIcon("Assets/app.ico");
@@ -40,17 +37,11 @@ public sealed partial class MainWindow : Window
 
         Closed += MainWindow_Closed;
 
-        string dataFolderPath;
-        try
-        {
-            // Packaged only
-            dataFolderPath = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
-        }
-        catch
-        {
-            // Unpackaged only
-            dataFolderPath = Directory.GetCurrentDirectory();
-        }
+#if IS_NON_PACKAGED
+        var dataFolderPath = Directory.GetCurrentDirectory();
+#else
+        var dataFolderPath = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
+#endif
 
         FileHelper.ConfigFilePath = Path.Combine(dataFolderPath, "config.json");
         FileHelper.PackagesFolderPath = Path.Combine(dataFolderPath, "gzdoom");
@@ -86,7 +77,7 @@ public sealed partial class MainWindow : Window
 
         AppWindow.Changed += AppWindow_Changed;
 
-        rootPage = new RootPage(AppWindow, hWnd);
+        rootPage = new RootPage(AppWindow);
         frameRoot.Content = rootPage;
     }
 

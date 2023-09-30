@@ -23,28 +23,29 @@ public enum AssetArch
 
 public sealed partial class SettingsPage : Page
 {
-    private readonly IntPtr hWnd;
     private readonly string appVersion;
 
-    public SettingsPage(IntPtr hWnd)
+    public SettingsPage()
     {
         this.InitializeComponent();
-        this.hWnd = hWnd;
-        try
+#if IS_NON_PACKAGED
+        var appName = "Неизвестное приложение";
+        var appVersion = "Неизвестная версия";
+        if (Assembly.GetEntryAssembly() is Assembly assembly)
         {
-            var version = Package.Current.Id.Version;
-            appVersion = $"Версия {version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
-        }
-        catch {
-            if (Assembly.GetExecutingAssembly()?.GetName()?.Version is Version version)
-            {
-                appVersion = "Версия " + version.ToString();
+            if (assembly.GetCustomAttribute<AssemblyTitleAttribute>() is AssemblyTitleAttribute assemblyTitle) {
+                appName = assemblyTitle.Title;
             }
-            else
+            if (assembly.GetCustomAttribute<AssemblyFileVersionAttribute>() is AssemblyFileVersionAttribute assemblyVersion)
             {
-                appVersion = "Неизвестная версия";
+                appVersion = assemblyVersion.Version.ToString();
             }
         }
+        this.appVersion = $"{appName} {appVersion}";
+#else
+        var version = Package.Current.Id.Version;
+        appVersion = $"{Package.Current.DisplayName} {version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+#endif
     }
 
     public event EventHandler<string?>? OnProgress;
@@ -141,7 +142,7 @@ public sealed partial class SettingsPage : Page
         var picker = new Windows.Storage.Pickers.FileOpenPicker();
 
         // Need to initialize the picker object with the hwnd / IInitializeWithWindow 
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, WinApi.HWND);
 
         // Now we can use the picker object as normal
         picker.FileTypeFilter.Add(".exe");
@@ -182,7 +183,7 @@ public sealed partial class SettingsPage : Page
         var picker = new Windows.Storage.Pickers.FileOpenPicker();
 
         // Need to initialize the picker object with the hwnd / IInitializeWithWindow 
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, WinApi.HWND);
 
         // Now we can use the picker object as normal
         picker.FileTypeFilter.Add(".wad");

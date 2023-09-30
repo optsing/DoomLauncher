@@ -32,19 +32,18 @@ public sealed partial class RootPage : Page
 
     private readonly TimeSpan SlideshowAnimationDuration = TimeSpan.FromMilliseconds(150);
 
-    public RootPage(AppWindow appWindow, IntPtr hWnd)
+    public RootPage(AppWindow appWindow)
     {
         InitializeComponent();
 
         this.appWindow = appWindow;
-        this.hWnd = hWnd;
 
         if (AppWindowTitleBar.IsCustomizationSupported())
         {
             titleBar.Loaded += TitleBar_Loaded;
             titleBar.SizeChanged += TitleBar_SizeChanged;
 
-            var scaleAdjustment = WinApi.GetScaleAdjustment(hWnd);
+            var scaleAdjustment = WinApi.GetScaleAdjustment(WinApi.HWND);
             if (appWindow.TitleBar.LeftInset > 0)
             {
                 LeftInset = new GridLength(appWindow.TitleBar.LeftInset / scaleAdjustment);
@@ -88,8 +87,6 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private readonly IntPtr hWnd;
-
     private readonly NotSelectedPage notSelectedPage = new();
 
     private readonly AppWindow appWindow;
@@ -99,7 +96,7 @@ public sealed partial class RootPage : Page
         if (DoomList.SelectedItem is DoomEntry entry)
         {
             Settings.Current.SelectedModIndex = DoomList.SelectedIndex;
-            var page = new DoomPage(entry, hWnd);
+            var page = new DoomPage(entry);
             page.OnStart += Page_OnStart;
             page.OnEdit += Page_OnEdit;
             page.OnCopy += Page_OnCopy;
@@ -391,7 +388,7 @@ public sealed partial class RootPage : Page
                 presenter.Restore();
             }
         }
-        WinApi.SetForegroundWindow(hWnd);
+        WinApi.SetForegroundWindow(WinApi.HWND);
     }
 
     private void ButtonMenu_Click(object sender, RoutedEventArgs e)
@@ -404,7 +401,7 @@ public sealed partial class RootPage : Page
         if (frameMain.Content is not SettingsPage)
         {
             DoomList.SelectedItem = null;
-            var settingsPage = new SettingsPage(hWnd);
+            var settingsPage = new SettingsPage();
             settingsPage.OnProgress += Page_OnProgress;
             frameMain.Content = settingsPage;
             Page_OnChangeBackground(null, (null, AnimationDirection.None));
@@ -416,7 +413,7 @@ public sealed partial class RootPage : Page
         var picker = new Windows.Storage.Pickers.FileOpenPicker();
 
         // Need to initialize the picker object with the hwnd / IInitializeWithWindow
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, WinApi.HWND);
 
         // Now we can use the picker object as normal
         foreach (var ext in FileHelper.SupportedModExtensions)
@@ -470,7 +467,7 @@ public sealed partial class RootPage : Page
         var picker = new Windows.Storage.Pickers.FileOpenPicker();
 
         // Need to initialize the picker object with the hwnd / IInitializeWithWindow
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, WinApi.HWND);
 
         // Now we can use the picker object as normal
         picker.FileTypeFilter.Add(".gzdl");
@@ -489,7 +486,7 @@ public sealed partial class RootPage : Page
         var picker = new Windows.Storage.Pickers.FileSavePicker();
 
         // Need to initialize the picker object with the hwnd / IInitializeWithWindow
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, WinApi.HWND);
 
         // Now we can use the picker object as normal
         picker.FileTypeChoices.Add("Ярлык", new List<string>() { ".url" });
@@ -513,7 +510,7 @@ public sealed partial class RootPage : Page
         var picker = new Windows.Storage.Pickers.FileSavePicker();
 
         // Need to initialize the picker object with the hwnd / IInitializeWithWindow
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, WinApi.HWND);
 
         // Now we can use the picker object as normal
         picker.FileTypeChoices.Add("Сборка GZDoomLauncher", new List<string>() { ".gzdl" });

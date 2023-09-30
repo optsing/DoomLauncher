@@ -17,48 +17,26 @@
         <converters:BoolToObjectConverter x:Key="SlideshowGlyph" TrueValue="&#xE769;" FalseValue="&#xE768;"/>
     </Page.Resources>
     <Grid
-        RowDefinitions="Auto,*,Auto,Auto"
+        RowDefinitions="48,*,Auto"
         AllowDrop="True"
         DragEnter="Root_DragEnter"
         DragLeave="Root_DragLeave"
     >
-        <StackPanel
-            Grid.RowSpan="4"
-            Orientation="Horizontal"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            Visibility="{x:Bind local:XamlHelper.HasNoItems(entry.ModFiles.Count), Mode=OneWay}"
+        <Grid
+            Grid.Row="0"
+            ColumnDefinitions="*,Auto,Auto"
+            MaxWidth="992"
+            Margin="16,0"
         >
-            <TextBlock
-                FontSize="24"
-                Text="Перетащите или выберите файлы"
-                TextWrapping="WrapWholeWords"
-            />
-            <FontIcon Glyph="&#xF0AD;" Margin="8,4,0,0" FontSize="24" VerticalAlignment="Center" />
-        </StackPanel>
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto,Auto">
             <TextBlock
                 Grid.Column="0"
                 VerticalAlignment="Center"
-                Margin="16,0"
                 Text="{x:Bind entry.Name, Mode=OneWay}"
-                FontSize="18"
+                FontSize="20"
                 Style="{ThemeResource BaseTextBlockStyle}"
                 TextWrapping="NoWrap"
             />
-            <DropDownButton Grid.Column="1" Margin="4,8">
-                <DropDownButton.Flyout>
-                    <MenuFlyout
-                        Placement="Bottom"
-                        Opening="MenuFlyout_Opening"
-                    />
-                </DropDownButton.Flyout>
-                <StackPanel Orientation="Horizontal">
-                    <SymbolIcon Symbol="Add" Height="18" Margin="0,0,4,0"/>
-                    <TextBlock>Добавить</TextBlock>
-                </StackPanel>
-            </DropDownButton>
-            <DropDownButton Grid.Column="2" Margin="4,8" VerticalAlignment="Center">
+            <DropDownButton Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center">
                 <DropDownButton.Flyout>
                     <MenuFlyout Placement="Bottom">
                         <MenuFlyoutItem Text="Настроить" Click="EditMod_Click">
@@ -88,93 +66,140 @@
                         </MenuFlyoutItem>
                     </MenuFlyout>
                 </DropDownButton.Flyout>
-                <SymbolIcon Symbol="More"/>
+                <SymbolIcon Symbol="More" />
             </DropDownButton>
-            <Button Grid.Column="3" Width="180" Margin="4,8,8,8" VerticalAlignment="Center" Click="Start_Click" Style="{ThemeResource AccentButtonStyle}">
+            <Button Grid.Column="2" Width="180" Margin="8,0,0,0" VerticalAlignment="Center" Click="Start_Click" Style="{ThemeResource AccentButtonStyle}">
                 <StackPanel Orientation="Horizontal">
                     <FontIcon Glyph="&#xE7FC;" Margin="0,0,4,0" />
                     <TextBlock>Играть</TextBlock>
                 </StackPanel>
             </Button>
         </Grid>
-        <ListView 
+        <ScrollView
             Grid.Row="1"
-            SelectionMode="None"
-            CanReorderItems="True"
-            AllowDrop="True"
-            ItemsSource="{x:Bind entry.ModFiles}"
-            IsMultiSelectCheckBoxEnabled="False"
         >
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="x:String">
+            <Grid
+                RowDefinitions="Auto,*,Auto,Auto"
+                MaxWidth="992"
+                Margin="16,8"
+            >
+                <StackPanel
+                    Grid.Row="0"
+                    Orientation="Vertical"
+                    CornerRadius="8"
+                    HorizontalAlignment="Stretch"
+                    Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
+                    Padding="16"
+                >
                     <Grid ColumnDefinitions="*,Auto">
                         <TextBlock
                             Grid.Column="0"
-                            Text="{x:Bind local:DoomPage.GetFileTitle((x:String))}"
                             VerticalAlignment="Center"
+                            Text="Файлы"
+                            Style="{ThemeResource BaseTextBlockStyle}"
+                            FontSize="16"
                         />
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                            <Button
-                                Click="ToggleFavoriteFile_Click"
-                                Style="{ThemeResource EllipsisButton}"
-                                Height="40"
-                                Width="40"
-                                ToolTipService.ToolTip="{x:Bind local:XamlHelper.FileInFavoritesTooltip(local:Settings.Current.FavoriteFiles, (x:String)), Mode=OneWay}"
-                            >
-                                <FontIcon Glyph="{x:Bind local:XamlHelper.FileInFavoritesGlyph(local:Settings.Current.FavoriteFiles, (x:String)), Mode=OneWay}" FontSize="16" />
-                            </Button>
-                            <Button
-                                Click="OpenContainFolder_Click"
-                                Style="{ThemeResource EllipsisButton}"
-                                Height="40"
-                                Width="40"
-                                ToolTipService.ToolTip="Открыть расположение файла"
-                            >
-                                <FontIcon Glyph="&#xE838;" FontSize="16" />
-                            </Button>
-                            <Button
-                                Click="RemoveFile_Click"
-                                Style="{ThemeResource EllipsisButton}"
-                                Height="40"
-                                Width="40"
-                                ToolTipService.ToolTip="Удалить ссылку на файл"
-                            >
-                                <FontIcon Glyph="&#xE74D;" FontSize="16" />
-                            </Button>
-                        </StackPanel>
+                        <DropDownButton Grid.Column="1" VerticalAlignment="Center">
+                            <DropDownButton.Flyout>
+                                <MenuFlyout
+                                    Placement="Bottom"
+                                    Opening="MenuFlyout_Opening"
+                                />
+                            </DropDownButton.Flyout>
+                            <StackPanel Orientation="Horizontal">
+                                <SymbolIcon Symbol="Add" Height="18" Margin="0,0,4,0"/>
+                                <TextBlock>Добавить</TextBlock>
+                            </StackPanel>
+                        </DropDownButton>
                     </Grid>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-        <ScrollView
-            Grid.Row="2"
-            MaxHeight="256"
-            Background="{ThemeResource AcrylicInAppFillColorBaseBrush}"
-            Margin="8"
-            CornerRadius="8"
-        >
-            <StackPanel
-                Margin="8"
-                Orientation="Vertical"
-            >
-                <TextBlock FontSize="18">
-                    <Run Text="{x:Bind GZDoomPathToTitle(entry.GZDoomPath), Mode=OneWay}"
-                    /> • <Run Text="{x:Bind local:FileHelper.GetIWadTitle(entry.IWadFile), Mode=OneWay}" />
-                </TextBlock>
-                <TextBlock FontSize="16">
-                    Последний запуск: <Run Text="{x:Bind local:XamlHelper.DateToText(entry.LastLaunch), Mode=OneWay}"/>
-                </TextBlock>
-                <TextBlock
-                    FontSize="16"
-                    Margin="0,16,0,0"
-                    Text="{x:Bind entry.LongDescription, Mode=OneWay}"
+                    <ListView 
+                        SelectionMode="None"
+                        CanReorderItems="True"
+                        AllowDrop="True"
+                        ItemsSource="{x:Bind entry.ModFiles}"
+                        Margin="-16,4,-16,0"
+                        Visibility="{x:Bind local:XamlHelper.HasItems(entry.ModFiles.Count), Mode=OneWay}"
+                    >
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        Text="{x:Bind local:DoomPage.GetFileTitle((x:String))}"
+                                        VerticalAlignment="Center"
+                                    />
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Button
+                                            Click="ToggleFavoriteFile_Click"
+                                            Style="{ThemeResource EllipsisButton}"
+                                            Height="40"
+                                            Width="40"
+                                            ToolTipService.ToolTip="{x:Bind local:XamlHelper.FileInFavoritesTooltip(local:Settings.Current.FavoriteFiles, (x:String)), Mode=OneWay}"
+                                        >
+                                            <FontIcon Glyph="{x:Bind local:XamlHelper.FileInFavoritesGlyph(local:Settings.Current.FavoriteFiles, (x:String)), Mode=OneWay}" FontSize="16" />
+                                        </Button>
+                                        <Button
+                                            Click="OpenContainFolder_Click"
+                                            Style="{ThemeResource EllipsisButton}"
+                                            Height="40"
+                                            Width="40"
+                                            ToolTipService.ToolTip="Открыть расположение файла"
+                                        >
+                                            <FontIcon Glyph="&#xE838;" FontSize="16" />
+                                        </Button>
+                                        <Button
+                                            Click="RemoveFile_Click"
+                                            Style="{ThemeResource EllipsisButton}"
+                                            Height="40"
+                                            Width="40"
+                                            ToolTipService.ToolTip="Удалить ссылку на файл"
+                                        >
+                                            <FontIcon Glyph="&#xE74D;" FontSize="16" />
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
+                <StackPanel
+                    Grid.Row="2"
+                    Orientation="Vertical"
+                    CornerRadius="8"
+                    HorizontalAlignment="Stretch"
+                    Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
+                    Padding="16"
+                    Margin="0,8,0,0"
+                >
+                    <TextBlock FontSize="18">
+                        <Run Text="{x:Bind GZDoomPathToTitle(entry.GZDoomPath), Mode=OneWay}"
+                        /> • <Run Text="{x:Bind local:FileHelper.GetIWadTitle(entry.IWadFile), Mode=OneWay}" />
+                    </TextBlock>
+                    <TextBlock FontSize="16">
+                        Последний запуск: <Run Text="{x:Bind local:XamlHelper.DateToText(entry.LastLaunch), Mode=OneWay}"/>
+                    </TextBlock>
+                </StackPanel>
+                <ScrollView
+                    Grid.Row="3"
+                    MaxHeight="256"
+                    Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8"
+                    HorizontalAlignment="Stretch"
+                    Margin="0,8,0,0"
                     Visibility="{x:Bind local:XamlHelper.HasText(entry.LongDescription), Mode=OneWay}"
-                    TextWrapping="WrapWholeWords"
-                />
-            </StackPanel>
+                >
+                    <TextBlock
+                        Margin="16"
+                        FontSize="16"
+                        Text="{x:Bind entry.LongDescription, Mode=OneWay}"
+                        Visibility="{x:Bind local:XamlHelper.HasText(entry.LongDescription), Mode=OneWay}"
+                        TextWrapping="WrapWholeWords"
+                    />
+                </ScrollView>
+            </Grid>
         </ScrollView>
         <StackPanel
-            Grid.Row="3"
+            Grid.Row="2"
             Orientation="Horizontal"
             HorizontalAlignment="Right"
         >
@@ -245,7 +270,7 @@
         <Border
             x:Name="DropHelper"
             Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
-            Grid.RowSpan="4"
+            Grid.RowSpan="3"
             AllowDrop="True"
             DragOver="DropHelper_DragOver"
             Drop="DropHelper_Drop"

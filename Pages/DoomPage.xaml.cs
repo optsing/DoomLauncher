@@ -29,13 +29,11 @@ public sealed partial class DoomPage : Page
     private readonly DispatcherTimer timerSlideshow = new();
 
     private readonly DoomEntry entry;
-    private readonly IntPtr hWnd;
 
-    public DoomPage(DoomEntry entry, IntPtr hWnd)
+    public DoomPage(DoomEntry entry)
     {
         InitializeComponent();
         this.entry = entry;
-        this.hWnd = hWnd;
 
         timerSlideshow.Interval = SlideshowInterval;
         timerSlideshow.Tick += Timer_Tick;
@@ -61,7 +59,7 @@ public sealed partial class DoomPage : Page
             menu.Items.Clear();
             var browseItem = new MenuFlyoutItem()
             {
-                Text = "Выбрать файлы",
+                Text = "Выбрать на устройстве",
                 Icon = new FontIcon()
                 {
                     Glyph = "\uEC50",
@@ -156,7 +154,7 @@ public sealed partial class DoomPage : Page
         var picker = new Windows.Storage.Pickers.FileOpenPicker();
 
         // Need to initialize the picker object with the hwnd / IInitializeWithWindow
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, WinApi.HWND);
 
         // Now we can use the picker object as normal
         foreach (var fileExtension in FileHelper.SupportedModExtensions)
@@ -176,7 +174,7 @@ public sealed partial class DoomPage : Page
         var picker = new Windows.Storage.Pickers.FileOpenPicker();
 
         // Need to initialize the picker object with the hwnd / IInitializeWithWindow
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, WinApi.HWND);
 
         // Now we can use the picker object as normal
         foreach (var fileExtension in FileHelper.SupportedImageExtensions)

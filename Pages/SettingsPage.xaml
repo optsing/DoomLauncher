@@ -4,7 +4,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:local="using:DoomLauncher"
     mc:Ignorable="d"
 >
@@ -12,137 +11,212 @@
         <TextBlock
             Grid.Row="0"
             VerticalAlignment="Center"
-            Margin="16,0"
+            HorizontalAlignment="Stretch"
             Text="Настройки"
-            FontSize="18"
+            FontSize="20"
             Style="{ThemeResource BaseTextBlockStyle}"
+            MaxWidth="992"
+            Margin="16,0"
         />
         <ScrollView
             Grid.Row="1"
         >
-            <StackPanel Margin="16,0,16,16">
-                <TextBlock
-                    Text="Установленные GZDoom"
-                    Margin="0,0,0,4"
-                    Style="{ThemeResource BaseTextBlockStyle}"
-                />
-                <ListView
-                    ItemsSource="{x:Bind local:Settings.Current.GZDoomInstalls, Mode=OneWay}"
+            <StackPanel
+                Orientation="Vertical"
+                MaxWidth="992"
+                Margin="16,8"
+            >
+                <StackPanel
+                    Orientation="Vertical"
+                    CornerRadius="8"
                     HorizontalAlignment="Stretch"
-                    SelectionMode="None"
-                    Margin="-8,0"
-                    CanReorderItems="True"
-                    AllowDrop="True"
+                    Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
+                    Padding="16"
                 >
-                    <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="local:GZDoomPackage">
-                            <Grid ColumnDefinitions="*,Auto">
-                                <TextBlock
-                                    Grid.Column="0"
-                                    Text="{x:Bind local:FileHelper.GZDoomPackageToTitle((local:GZDoomPackage)), Mode=OneWay}"
-                                    VerticalAlignment="Center"
-                                />
-                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Button
-                                        Click="OpenContainFolder_Click"
-                                        Style="{ThemeResource EllipsisButton}"
-                                        Height="40"
-                                        Width="40"
-                                        ToolTipService.ToolTip="Открыть расположение"
-                                    >
-                                        <FontIcon Glyph="&#xE838;" FontSize="16" />
-                                    </Button>
-                                    <Button
-                                        Click="RemovePackage_Click"
-                                        Style="{ThemeResource EllipsisButton}"
-                                        Height="40"
-                                        Width="40"
-                                        ToolTipService.ToolTip="Удалить ссылку"
-                                    >
-                                        <FontIcon Glyph="&#xE74D;" FontSize="16" />
-                                    </Button>
-                                </StackPanel>
-                            </Grid>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-                <controls:WrapPanel Orientation="Horizontal" Margin="0,8,0,0" HorizontalSpacing="4" VerticalSpacing="4">
-                    <Button Click="BrowseButton_Click">
-                        <StackPanel Orientation="Horizontal">
-                            <FontIcon Glyph="&#xEC50;" Margin="0,0,4,0" FontSize="16"/>
-                            <TextBlock Text="Выбрать на устройстве" />
-                        </StackPanel>
-                    </Button>
-                    <Button Click="SearchPackages_Click">
-                        <StackPanel Orientation="Horizontal">
-                            <FontIcon Glyph="&#xE896;" Margin="0,0,4,0" FontSize="16"/>
-                            <TextBlock Text="Загрузить из интернета" />
-                        </StackPanel>
-                    </Button>
-                </controls:WrapPanel>
-                <TextBlock
-                    Text="Установленные iWad"
-                    Margin="0,16,0,4"
-                    Style="{ThemeResource BaseTextBlockStyle}"
-                />
-                <ListView
-                    ItemsSource="{x:Bind local:Settings.Current.IWadFiles, Mode=OneWay}"
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock
+                            Grid.Column="0"
+                            VerticalAlignment="Center"
+                            Text="Установленные GZDoom"
+                            Style="{ThemeResource BaseTextBlockStyle}"
+                            FontSize="16"
+                        />
+                        <DropDownButton Grid.Column="1" VerticalAlignment="Center">
+                            <DropDownButton.Flyout>
+                                <MenuFlyout
+                                    Placement="Bottom"
+                                >
+                                    <MenuFlyoutItem Click="BrowseButton_Click" Text="Выбрать на устройстве">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xEC50;" FontSize="16"/>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem Click="SearchPackages_Click" Text="Скачать с GitHub">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE896;" FontSize="16"/>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                </MenuFlyout>
+                            </DropDownButton.Flyout>
+                            <StackPanel Orientation="Horizontal">
+                                <SymbolIcon Symbol="Add" Height="18" Margin="0,0,4,0"/>
+                                <TextBlock>Добавить</TextBlock>
+                            </StackPanel>
+                        </DropDownButton>
+                    </Grid>
+                    <ListView
+                        ItemsSource="{x:Bind local:Settings.Current.GZDoomInstalls, Mode=OneWay}"
+                        HorizontalAlignment="Stretch"
+                        SelectionMode="None"
+                        Margin="-16,4,-16,0"
+                        CanReorderItems="True"
+                        AllowDrop="True"
+                        Visibility="{x:Bind local:XamlHelper.HasItems(local:Settings.Current.IWadFiles.Count), Mode=OneWay}"
+                    >
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="local:GZDoomPackage">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        Text="{x:Bind local:FileHelper.GZDoomPackageToTitle((local:GZDoomPackage)), Mode=OneWay}"
+                                        VerticalAlignment="Center"
+                                    />
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Button
+                                            Click="OpenContainFolder_Click"
+                                            Style="{ThemeResource EllipsisButton}"
+                                            Height="40"
+                                            Width="40"
+                                            ToolTipService.ToolTip="Открыть расположение"
+                                        >
+                                            <FontIcon Glyph="&#xE838;" FontSize="16" />
+                                        </Button>
+                                        <Button
+                                            Click="RemovePackage_Click"
+                                            Style="{ThemeResource EllipsisButton}"
+                                            Height="40"
+                                            Width="40"
+                                            ToolTipService.ToolTip="Удалить ссылку"
+                                        >
+                                            <FontIcon Glyph="&#xE74D;" FontSize="16" />
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
+                <StackPanel
+                    Orientation="Vertical"
+                    CornerRadius="8"
                     HorizontalAlignment="Stretch"
-                    Margin="-8,0"
-                    CanReorderItems="True"
-                    AllowDrop="True"
-                    SelectionMode="None"
+                    Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
+                    Padding="16"
+                    Margin="0,8,0,0"
                 >
-                    <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="x:String">
-                            <Grid ColumnDefinitions="*,Auto">
-                                <TextBlock
-                                    Grid.Column="0"
-                                    Text="{x:Bind local:FileHelper.GetIWadTitle((x:String))}"
-                                    VerticalAlignment="Center"
-                                />
-                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Button
-                                        Click="OpenIWadFolder_Click"
-                                        Style="{ThemeResource EllipsisButton}"
-                                        Height="40"
-                                        Width="40"
-                                        ToolTipService.ToolTip="Открыть расположение файла"
-                                    >
-                                        <FontIcon Glyph="&#xE838;" FontSize="16" />
-                                    </Button>
-                                    <Button
-                                        Click="RemoveIWad_Click"
-                                        Style="{ThemeResource EllipsisButton}"
-                                        Height="40"
-                                        Width="40"
-                                        ToolTipService.ToolTip="Удалить ссылку на файл"
-                                    >
-                                        <FontIcon Glyph="&#xE74D;" FontSize="16" />
-                                    </Button>
-                                </StackPanel>
-                            </Grid>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-                <Button Margin="0,8,0,0" Click="BrowseIWadButton_Click">
-                    <StackPanel Orientation="Horizontal">
-                        <FontIcon Glyph="&#xEC50;" Margin="0,0,4,0" FontSize="16"/>
-                        <TextBlock Text="Выбрать на устройстве" />
-                    </StackPanel>
-                </Button>
-                <TextBlock
-                    Text="Дополнительно"
-                    Margin="0,16,0,4"
-                    Style="{ThemeResource BaseTextBlockStyle}"
-                />
-                <CheckBox
-                    Content="Закрывать лаунчер при запуске сборки"
-                    IsChecked="{x:Bind local:Settings.Current.CloseOnLaunch, Mode=TwoWay}"
-                />
-                <TextBlock Text="О приложении" Margin="0,16,0,4" Style="{ThemeResource BodyStrongTextBlockStyle}"/>
-                <TextBlock Text="GZDoom Launcher" />
-                <TextBlock Text="{x:Bind appVersion}" />
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock
+                            Grid.Column="0"
+                            VerticalAlignment="Center"
+                            Text="Установленные iWad"
+                            Style="{ThemeResource BaseTextBlockStyle}"
+                            FontSize="16"
+                        />
+                        <DropDownButton Grid.Column="1" VerticalAlignment="Center">
+                            <DropDownButton.Flyout>
+                                <MenuFlyout
+                                    Placement="Bottom"
+                                >
+                                    <MenuFlyoutItem Click="BrowseIWadButton_Click" Text="Выбрать на устройстве">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xEC50;" Margin="0,0,4,0" FontSize="16"/>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                </MenuFlyout>
+                            </DropDownButton.Flyout>
+                            <StackPanel Orientation="Horizontal">
+                                <SymbolIcon Symbol="Add" Height="18" Margin="0,0,4,0"/>
+                                <TextBlock>Добавить</TextBlock>
+                            </StackPanel>
+                        </DropDownButton>
+                    </Grid>
+                    <ListView
+                        ItemsSource="{x:Bind local:Settings.Current.IWadFiles, Mode=OneWay}"
+                        HorizontalAlignment="Stretch"
+                        Margin="-16,4,-16,0"
+                        CanReorderItems="True"
+                        AllowDrop="True"
+                        SelectionMode="None"
+                        Visibility="{x:Bind local:XamlHelper.HasItems(local:Settings.Current.IWadFiles.Count), Mode=OneWay}"
+                    >
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        Text="{x:Bind local:FileHelper.GetIWadTitle((x:String))}"
+                                        VerticalAlignment="Center"
+                                    />
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Button
+                                            Click="OpenIWadFolder_Click"
+                                            Style="{ThemeResource EllipsisButton}"
+                                            Height="40"
+                                            Width="40"
+                                            ToolTipService.ToolTip="Открыть расположение файла"
+                                        >
+                                            <FontIcon Glyph="&#xE838;" FontSize="16" />
+                                        </Button>
+                                        <Button
+                                            Click="RemoveIWad_Click"
+                                            Style="{ThemeResource EllipsisButton}"
+                                            Height="40"
+                                            Width="40"
+                                            ToolTipService.ToolTip="Удалить ссылку на файл"
+                                        >
+                                            <FontIcon Glyph="&#xE74D;" FontSize="16" />
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
+                <StackPanel
+                    Orientation="Vertical"
+                    CornerRadius="8"
+                    HorizontalAlignment="Stretch"
+                    Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
+                    Padding="16"
+                    Margin="0,8,0,0"
+                >
+                    <TextBlock
+                        Text="Дополнительно"
+                        Margin="0,0,0,4"
+                        Style="{ThemeResource BaseTextBlockStyle}"
+                        FontSize="16"
+                    />
+                    <CheckBox
+                        Content="Закрывать лаунчер при запуске сборки"
+                        IsChecked="{x:Bind local:Settings.Current.CloseOnLaunch, Mode=TwoWay}"
+                    />
+                </StackPanel>
+                <StackPanel
+                    Orientation="Vertical"
+                    CornerRadius="8"
+                    HorizontalAlignment="Stretch"
+                    Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
+                    Padding="16"
+                    Margin="0,8,0,0"
+                >
+                    <TextBlock
+                        Text="О приложении"
+                        Margin="0,0,0,4"
+                        Style="{ThemeResource BaseTextBlockStyle}"
+                        FontSize="16"
+                    />
+                    <TextBlock Text="{x:Bind appVersion}" />
+                </StackPanel>
             </StackPanel>
         </ScrollView>
     </Grid>
