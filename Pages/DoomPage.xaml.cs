@@ -117,7 +117,7 @@ public sealed partial class DoomPage : Page
     public event EventHandler<DoomEntry>? OnCreateShortcut;
     public event EventHandler<DoomEntry>? OnRemove;
     public event EventHandler<string?>? OnProgress;
-    public event EventHandler<(BitmapImage? bitmap, AnimationDirection direction)>? OnChangeBackground;
+    public event EventHandler<(string? imagePath, AnimationDirection direction)>? OnChangeBackground;
 
     private void Start_Click(object sender, RoutedEventArgs e)
     {
@@ -189,7 +189,7 @@ public sealed partial class DoomPage : Page
         }
     }
 
-    private async void SetSelectedImageIndex(int ind, AnimationDirection direction)
+    private void SetSelectedImageIndex(int ind, AnimationDirection direction)
     {
         if (entry.ImageFiles.Any())
         {
@@ -203,8 +203,7 @@ public sealed partial class DoomPage : Page
             }
             entry.SelectedImageIndex = ind;
             var imagePath = Path.GetFullPath(entry.ImageFiles[entry.SelectedImageIndex], FileHelper.ImagesFolderPath);
-            var bitmap = await BitmapHelper.CreateBitmapFromFile(imagePath);
-            OnChangeBackground?.Invoke(this, (bitmap, direction));
+            OnChangeBackground?.Invoke(this, (imagePath, direction));
         }
         else
         {
@@ -451,15 +450,5 @@ public sealed partial class DoomPage : Page
         entry.Slideshow = !entry.Slideshow;
         CurrentTicksToSlideshow = 0;
         SetSlideshow();
-    }
-
-    private string GZDoomPathToTitle(string path)
-    {
-        var package = Settings.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == path);
-        if (package == null)
-        {
-            return "Не выбрано";
-        }
-        return FileHelper.GZDoomPackageToTitle(package);
     }
 }

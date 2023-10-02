@@ -26,7 +26,8 @@ public sealed partial class MainWindow : Window
 
         AppWindow.Title = "GZDoom Launcher";
         AppWindow.SetIcon("Assets/app.ico");
-        if (AppWindowTitleBar.IsCustomizationSupported())
+        Settings.IsCustomTitlebar = AppWindowTitleBar.IsCustomizationSupported();
+        if (Settings.IsCustomTitlebar)
         {
             AppWindow.TitleBar.IconShowOptions = IconShowOptions.HideIconAndSystemMenu;
             AppWindow.TitleBar.ExtendsContentIntoTitleBar = true;

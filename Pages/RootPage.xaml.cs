@@ -38,7 +38,7 @@ public sealed partial class RootPage : Page
 
         this.appWindow = appWindow;
 
-        if (AppWindowTitleBar.IsCustomizationSupported())
+        if (Settings.IsCustomTitlebar)
         {
             titleBar.Loaded += TitleBar_Loaded;
             titleBar.SizeChanged += TitleBar_SizeChanged;
@@ -119,13 +119,14 @@ public sealed partial class RootPage : Page
     }
 
     private readonly SemaphoreSlim semaphoreAnimation = new(1, 1);
-    private async void Page_OnChangeBackground(object? sender, (Microsoft.UI.Xaml.Media.Imaging.BitmapImage? bitmap, AnimationDirection direction) e)
+    private async void Page_OnChangeBackground(object? sender, (string? imagePath, AnimationDirection direction) e)
     {
         await semaphoreAnimation.WaitAsync();
+        var bitmap = string.IsNullOrEmpty(e.imagePath) ? null : await BitmapHelper.CreateBitmapFromFile(e.imagePath);
         bool hasPrevBitmap = imgBackground.Source != null;
         if (hasPrevBitmap)
         {
-            if (e.bitmap != null)
+            if (bitmap != null)
             {
                 if (e.direction == AnimationDirection.Next)
                 {
@@ -139,7 +140,7 @@ public sealed partial class RootPage : Page
             sbHide.Begin();
             await Task.Delay(SlideshowAnimationDuration);
         }
-        imgBackground.Source = e.bitmap;
+        imgBackground.Source = bitmap;
         if (imgBackground.Source != null)
         {
             if (hasPrevBitmap)
@@ -277,6 +278,7 @@ public sealed partial class RootPage : Page
             entry.LongDescription = result.longDescription;
             entry.GZDoomPath = result.gZDoomPath;
             entry.IWadFile = result.iWadFile;
+            entry.SteamGame = result.steamGame;
             entry.UniqueConfig = result.uniqueConfig;
             entry.UniqueSavesFolder = result.uniqueSavesFolder;
             Settings.Save();
@@ -294,6 +296,7 @@ public sealed partial class RootPage : Page
             LongDescription = entry.LongDescription,
             GZDoomPath = entry.GZDoomPath,
             IWadFile = entry.IWadFile,
+            SteamGame = entry.SteamGame,
             UniqueConfig = entry.UniqueConfig,
             UniqueSavesFolder = entry.UniqueSavesFolder,
             SelectedImageIndex = entry.SelectedImageIndex,
@@ -344,6 +347,10 @@ public sealed partial class RootPage : Page
                 MinimizeAndSwitchToAnotherWindow(LaunchHelper.CurrentProcess.MainWindowHandle);
                 await LaunchHelper.CurrentProcess.WaitForExitAsync();
                 RestoreAndSwitchToThisWindow();
+                if (LaunchHelper.CurrentProcess.ExitCode != 0)
+                {
+                    await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске", $"Игра завершилась с ошибкой, код ошибки - {LaunchHelper.CurrentProcess.ExitCode}", "", "Отмена");
+                }
             }
         }
         else if (result == LaunchResult.AlreadyLaunched && LaunchHelper.CurrentProcess != null)
@@ -362,7 +369,7 @@ public sealed partial class RootPage : Page
         }
         else
         {
-            await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске", "Не удалось запустить новую игру", "", "Отмена");
+            await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске", "Не удалось запустить игру", "", "Отмена");
         }
     }
 
@@ -452,6 +459,7 @@ public sealed partial class RootPage : Page
                 LongDescription = result.longDescription,
                 GZDoomPath = result.gZDoomPath,
                 IWadFile = result.iWadFile,
+                SteamGame = result.steamGame,
                 UniqueConfig = result.uniqueConfig,
                 UniqueSavesFolder = result.uniqueSavesFolder,
                 SelectedImageIndex = 0,

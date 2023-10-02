@@ -171,12 +171,13 @@
                     Padding="16"
                     Margin="0,8,0,0"
                 >
-                    <TextBlock FontSize="18">
-                        <Run Text="{x:Bind GZDoomPathToTitle(entry.GZDoomPath), Mode=OneWay}"
-                        /> • <Run Text="{x:Bind local:FileHelper.GetIWadTitle(entry.IWadFile), Mode=OneWay}" />
-                    </TextBlock>
                     <TextBlock FontSize="16">
-                        Последний запуск: <Run Text="{x:Bind local:XamlHelper.DateToText(entry.LastLaunch), Mode=OneWay}"/>
+                        <Run Text="{x:Bind local:FileHelper.GZDoomPathToTitle(entry.GZDoomPath, local:Settings.Current.DefaultGZDoomPath), Mode=OneWay}"/>
+                        <Run Text="•"/>
+                        <Run Text="{x:Bind local:FileHelper.GetIWadFileTitle(entry.IWadFile, local:Settings.Current.DefaultIWadFile), Mode=OneWay}" />
+                        <Run Text="•"/>
+                        <Run Text="Последний запуск:"/>
+                        <Run Text="{x:Bind local:XamlHelper.DateToText(entry.LastLaunch), Mode=OneWay}"/>
                     </TextBlock>
                 </StackPanel>
                 <ScrollView

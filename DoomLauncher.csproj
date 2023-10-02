@@ -74,4 +74,7 @@
 	<ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnablePreviewMsixTooling)'=='true'">
 		<ProjectCapability Include="Msix" />
 	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\RunAsSteamGame\RunAsSteamGame\RunAsSteamGame.csproj" />
+	</ItemGroup>
 </Project>

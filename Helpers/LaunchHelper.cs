@@ -17,16 +17,35 @@ internal static class LaunchHelper
         {
             return LaunchResult.AlreadyLaunched;
         }
-        var gZDoomPath = Path.GetFullPath(entry.GZDoomPath, FileHelper.PackagesFolderPath);
+        var package = FileHelper.ResolveGZDoomPath(entry.GZDoomPath, Settings.Current.DefaultGZDoomPath);
+        if (package == null)
+        {
+            return LaunchResult.PathNotValid;
+        }
+        var gZDoomPath = Path.GetFullPath(package.Path, FileHelper.PackagesFolderPath);
         if (!FileHelper.ValidateGZDoomPath(gZDoomPath))
         {
             return LaunchResult.PathNotValid;
         }
-        ProcessStartInfo processInfo = new()
+        ProcessStartInfo processInfo;
+        var steamAppId = FileHelper.GetSteamAppIdForEntry(entry);
+        if (steamAppId == 0)
         {
-            FileName = gZDoomPath,
-            WorkingDirectory = Path.GetDirectoryName(gZDoomPath),
-        };
+            processInfo = new()
+            {
+                FileName = gZDoomPath,
+                WorkingDirectory = Path.GetDirectoryName(gZDoomPath),
+            };
+        }
+        else
+        {
+            processInfo = new()
+            {
+                FileName = "RunAsSteamGame.exe"
+            };
+            processInfo.ArgumentList.Add(steamAppId.ToString());
+            processInfo.ArgumentList.Add(gZDoomPath);
+        }
         if (entry.UniqueConfig)
         {
             var entryFolderPath = Path.Combine(FileHelper.EntriesFolderPath, entry.Id);
@@ -48,10 +67,11 @@ internal static class LaunchHelper
             processInfo.ArgumentList.Add("-savedir");
             processInfo.ArgumentList.Add(entrySavesFolderPath);
         }
-        if (!string.IsNullOrEmpty(entry.IWadFile))
+        var resolvedIWadFile = FileHelper.ResolveIWadFile(entry.IWadFile, Settings.Current.DefaultIWadFile);
+        if (!string.IsNullOrEmpty(resolvedIWadFile))
         {
             processInfo.ArgumentList.Add("-iwad");
-            processInfo.ArgumentList.Add(Path.GetFullPath(entry.IWadFile, FileHelper.IWadFolderPath));
+            processInfo.ArgumentList.Add(Path.GetFullPath(resolvedIWadFile, FileHelper.IWadFolderPath));
         }
         if (entry.ModFiles.Count > 0)
         {

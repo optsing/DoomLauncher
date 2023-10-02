@@ -40,4 +40,9 @@ static class XamlHelper
     {
         return list.Contains(value) ? "Удалить из избранного" : "Добавить в избранное";
     }
+
+    public static string IsDefaultText(object value1, object value2)
+    {
+        return Equals(value1, value2) ? " по умолчанию" : "";
+    }
 }

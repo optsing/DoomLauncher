@@ -13,13 +13,21 @@ internal partial class JsonSettingsContext : JsonSerializerContext
 {
 }
 
-public class Settings
+public class Settings: ObservableObject
 {
+    public static bool IsCustomTitlebar = false;
+    private string defaultGZDoomPath = "";
+    private string defaultIWadFile = "";
+    private bool steamIntegration = false;
+
     public static Settings Current { get; set; } = new();
     public ObservableCollection<GZDoomPackage> GZDoomInstalls { get; set; } = new();
     public ObservableCollection<string> IWadFiles { get; set; } = new();
+    public string DefaultGZDoomPath { get => defaultGZDoomPath; set => SetProperty(ref defaultGZDoomPath, value); }
+    public string DefaultIWadFile { get => defaultIWadFile; set => SetProperty(ref defaultIWadFile, value); }
     public ObservableCollection<string> FavoriteFiles { get; set; } = new();
     public bool CloseOnLaunch { get; set; } = false;
+    public bool SteamIntegration { get => steamIntegration; set => SetProperty(ref steamIntegration, value); }
     public int SelectedModIndex { get; set; } = 0;
     public ObservableCollection<DoomEntry> Entries { get; set; } = new();
 
@@ -80,7 +88,7 @@ public partial class DoomEntry: ObservableObject
     {
         get => gZDoomPath;
         set => SetProperty(ref gZDoomPath, value);
-    } 
+    }
 
     private string iWadFile = "";
     public string IWadFile
@@ -88,6 +96,8 @@ public partial class DoomEntry: ObservableObject
         get => iWadFile;
         set => SetProperty(ref iWadFile, value);
     }
+
+    public string SteamGame { get; set; } = "";
 
     public bool UniqueConfig { get; set; } = false;
     public bool UniqueSavesFolder { get; set; } = false;

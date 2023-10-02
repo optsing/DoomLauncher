@@ -207,6 +207,17 @@ public sealed partial class SettingsPage : Page
         return FileVersionInfo.GetVersionInfo(filePath)?.ProductVersion;
     }
 
+    private void ToggleDefaultGZDoom_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement el)
+        {
+            if (el.DataContext is GZDoomPackage package)
+            {
+                Settings.Current.DefaultGZDoomPath = Settings.Current.DefaultGZDoomPath == package.Path ? "" : package.Path;
+            }
+        }
+    }
+
     private void OpenContainFolder_Click(object sender, RoutedEventArgs e)
     {
         if (sender is FrameworkElement el)
@@ -233,6 +244,17 @@ public sealed partial class SettingsPage : Page
         }
     }
 
+    private void ToggleDefaultIWad_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement el)
+        {
+            if (el.DataContext is string iWadFile)
+            {
+                Settings.Current.DefaultIWadFile = Settings.Current.DefaultIWadFile == iWadFile ? "" : iWadFile;
+            }
+        }
+    }
+
     private void OpenIWadFolder_Click(object sender, RoutedEventArgs e)
     {
         if (sender is FrameworkElement el)
@@ -250,7 +272,7 @@ public sealed partial class SettingsPage : Page
         {
             if (el.DataContext is string iWadFile)
             {
-                var title = FileHelper.GetIWadTitle(iWadFile);
+                var title = FileHelper.IWadFileToTitle(iWadFile);
                 if (await AskDialog.ShowAsync(XamlRoot, "Удаление ссылки", $"Вы уверены, что хотите удалить ссылку на '{title}'?", "Удалить", "Отмена"))
                 {
                     Settings.Current.IWadFiles.Remove(iWadFile);

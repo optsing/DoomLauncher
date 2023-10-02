@@ -26,11 +26,15 @@ public sealed partial class EditEntryDialog : ContentDialog
 
         GZDoomPackages = new List<GZDoomPackage>() { new GZDoomPackage { Path = "", Arch = AssetArch.notSelected } };
         GZDoomPackages.AddRange(Settings.Current.GZDoomInstalls);
-        GZDoomPackage = Settings.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == initial.gZDoomPath, GZDoomPackages.First());
+        GZDoomPackage = GZDoomPackages.FirstOrDefault(package => package.Path == initial.gZDoomPath, GZDoomPackages.First());
 
-        IWadFiles = new() { new KeyValue("", "Не выбрано") };
-        IWadFiles.AddRange(Settings.Current.IWadFiles.Select(iWadFile => new KeyValue(iWadFile, FileHelper.GetIWadTitle(iWadFile))));
+        IWadFiles = new() { new KeyValue("", "По умолчанию") };
+        IWadFiles.AddRange(Settings.Current.IWadFiles.Select(iWadFile => new KeyValue(iWadFile, FileHelper.IWadFileToTitle(iWadFile))));
         IWadFile = IWadFiles.FirstOrDefault(iWad => iWad.Key == initial.iWadFile, IWadFiles.First());
+
+        SteamGames = new() { new KeyValue("", "Согласно iWad") };
+        SteamGames.AddRange(FileHelper.SteamAppIds.Select(item => new KeyValue(item.Key, item.Value.title)));
+        SteamGame = SteamGames.FirstOrDefault(steamGame => steamGame.Key == initial.steamGame, SteamGames.First());
 
         PrimaryButtonText = mode switch
         {
@@ -94,6 +98,10 @@ public sealed partial class EditEntryDialog : ContentDialog
         get; private set;
     }
 
+    public List<KeyValue> SteamGames { get; }
+
+    public KeyValue SteamGame { get; private set; }
+
     public bool UniqueConfig
     {
         get; private set;
@@ -122,6 +130,7 @@ public sealed partial class EditEntryDialog : ContentDialog
                     LongDescription = dialog.ModLongDescription,
                     GZDoomPath = dialog.GZDoomPackage.Path,
                     IWadFile = dialog.IWadFile.Key,
+                    SteamGame = dialog.SteamGame.Key,
                     UniqueConfig = dialog.UniqueConfig,
                     UniqueSavesFolder = dialog.UniqueSavesFolder,
                 }, modFiles, imageFiles);
@@ -142,6 +151,7 @@ public class EditEntryDialogResult
     public readonly string longDescription;
     public readonly string gZDoomPath;
     public readonly string iWadFile;
+    public readonly string steamGame;
     public readonly bool uniqueConfig;
     public readonly bool uniqueSavesFolder;
     public readonly List<string> modFiles;
@@ -154,6 +164,7 @@ public class EditEntryDialogResult
         longDescription = entry.LongDescription;
         gZDoomPath = entry.GZDoomPath;
         iWadFile = entry.IWadFile;
+        steamGame = entry.SteamGame;
         uniqueConfig = entry.UniqueConfig;
         uniqueSavesFolder = entry.UniqueSavesFolder;
         this.modFiles = modFiles ?? new List<string>();

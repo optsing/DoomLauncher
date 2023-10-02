@@ -7,6 +7,60 @@
     xmlns:local="using:DoomLauncher"
     mc:Ignorable="d"
 >
+    <Page.Resources>
+        <MenuFlyout x:Key="flyoutPackage" Placement="Bottom" >
+            <MenuFlyoutItem
+                Click="ToggleDefaultGZDoom_Click"
+                Text="По умолчанию"
+            >
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE73E;" FontSize="14" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem
+                Click="OpenContainFolder_Click"
+                Text="Расположение"
+            >
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE838;" FontSize="14" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem
+                Click="RemovePackage_Click"
+                Text="Удалить ссылку"
+            >
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE74D;" FontSize="14" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+        </MenuFlyout>
+        <MenuFlyout x:Key="flyoutIWad" Placement="Bottom" >
+            <MenuFlyoutItem
+                Click="ToggleDefaultIWad_Click"
+                Text="По умолчанию"
+            >   
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE73E;" FontSize="14" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem
+                Click="OpenIWadFolder_Click"
+                Text="Расположение"
+            >
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE838;" FontSize="14" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem
+                Click="RemoveIWad_Click"
+                Text="Удалить ссылку"
+            >
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE74D;" FontSize="14" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+        </MenuFlyout>
+    </Page.Resources>
     <Grid RowDefinitions="48,*">
         <TextBlock
             Grid.Row="0"
@@ -75,32 +129,26 @@
                     >
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="local:GZDoomPackage">
-                                <Grid ColumnDefinitions="*,Auto">
+                                <Grid ColumnDefinitions="*,Auto" ContextFlyout="{StaticResource flyoutPackage}">
                                     <TextBlock
                                         Grid.Column="0"
-                                        Text="{x:Bind local:FileHelper.GZDoomPackageToTitle((local:GZDoomPackage)), Mode=OneWay}"
                                         VerticalAlignment="Center"
-                                    />
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                        <Button
-                                            Click="OpenContainFolder_Click"
-                                            Style="{ThemeResource EllipsisButton}"
-                                            Height="40"
-                                            Width="40"
-                                            ToolTipService.ToolTip="Открыть расположение"
-                                        >
-                                            <FontIcon Glyph="&#xE838;" FontSize="16" />
-                                        </Button>
-                                        <Button
-                                            Click="RemovePackage_Click"
-                                            Style="{ThemeResource EllipsisButton}"
-                                            Height="40"
-                                            Width="40"
-                                            ToolTipService.ToolTip="Удалить ссылку"
-                                        >
-                                            <FontIcon Glyph="&#xE74D;" FontSize="16" />
-                                        </Button>
-                                    </StackPanel>
+                                    >
+                                        <Run Text="{x:Bind local:FileHelper.GZDoomPackageToTitle((local:GZDoomPackage)), Mode=OneWay}" />
+                                        <Run
+                                            Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                            Text="{x:Bind local:XamlHelper.IsDefaultText(local:Settings.Current.DefaultGZDoomPath, Path), Mode=OneWay}"
+                                        />
+                                    </TextBlock>
+                                    <Button
+                                        Grid.Column="1"
+                                        Style="{ThemeResource EllipsisButton}"
+                                        Height="40"
+                                        Width="40"
+                                        Flyout="{StaticResource flyoutPackage}"
+                                    >
+                                        <SymbolIcon Symbol="More" />
+                                    </Button>
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>
@@ -151,39 +199,36 @@
                     >
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="x:String">
-                                <Grid ColumnDefinitions="*,Auto">
+                                <Grid
+                                    ColumnDefinitions="*,Auto"
+                                    ContextFlyout="{StaticResource flyoutIWad}"
+                                >
                                     <TextBlock
                                         Grid.Column="0"
-                                        Text="{x:Bind local:FileHelper.GetIWadTitle((x:String))}"
                                         VerticalAlignment="Center"
-                                    />
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                        <Button
-                                            Click="OpenIWadFolder_Click"
-                                            Style="{ThemeResource EllipsisButton}"
-                                            Height="40"
-                                            Width="40"
-                                            ToolTipService.ToolTip="Открыть расположение файла"
-                                        >
-                                            <FontIcon Glyph="&#xE838;" FontSize="16" />
-                                        </Button>
-                                        <Button
-                                            Click="RemoveIWad_Click"
-                                            Style="{ThemeResource EllipsisButton}"
-                                            Height="40"
-                                            Width="40"
-                                            ToolTipService.ToolTip="Удалить ссылку на файл"
-                                        >
-                                            <FontIcon Glyph="&#xE74D;" FontSize="16" />
-                                        </Button>
-                                    </StackPanel>
+                                    >
+                                        <Run Text="{x:Bind local:FileHelper.IWadFileToTitle((x:String))}" />
+                                        <Run
+                                            Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                            Text="{x:Bind local:XamlHelper.IsDefaultText(local:Settings.Current.DefaultIWadFile, (x:String)), Mode=OneWay}"
+                                        />
+                                    </TextBlock>
+                                    <Button
+                                        Grid.Column="1"
+                                        Style="{ThemeResource EllipsisButton}"
+                                        Height="40"
+                                        Width="40"
+                                        Flyout="{StaticResource flyoutIWad}"
+                                    >
+                                        <SymbolIcon Symbol="More" />
+                                    </Button>
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
                 </StackPanel>
-                <StackPanel
-                    Orientation="Vertical"
+                <Grid
+                    ColumnDefinitions="*,Auto"
                     CornerRadius="8"
                     HorizontalAlignment="Stretch"
                     Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
@@ -191,16 +236,45 @@
                     Margin="0,8,0,0"
                 >
                     <TextBlock
-                        Text="Дополнительно"
-                        Margin="0,0,0,4"
+                        Grid.Column="0"
+                        Text="Интеграция с Steam"
                         Style="{ThemeResource BaseTextBlockStyle}"
                         FontSize="16"
+                        VerticalAlignment="Center"
                     />
-                    <CheckBox
-                        Content="Закрывать лаунчер при запуске сборки"
-                        IsChecked="{x:Bind local:Settings.Current.CloseOnLaunch, Mode=TwoWay}"
+                    <ToggleSwitch
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        OnContent=""
+                        OffContent=""
+                        MinWidth="0"
+                        IsOn="{x:Bind local:Settings.Current.SteamIntegration, Mode=TwoWay}"
                     />
-                </StackPanel>
+                </Grid>
+                <Grid
+                    ColumnDefinitions="*,Auto"
+                    CornerRadius="8"
+                    HorizontalAlignment="Stretch"
+                    Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
+                    Padding="16"
+                    Margin="0,8,0,0"
+                >
+                    <TextBlock
+                        Grid.Column="0"
+                        Text="Закрывать лаунчер при запуске сборки"
+                        Style="{ThemeResource BaseTextBlockStyle}"
+                        FontSize="16"
+                        VerticalAlignment="Center"
+                    />
+                    <ToggleSwitch
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        OnContent=""
+                        OffContent=""
+                        MinWidth="0"
+                        IsOn="{x:Bind local:Settings.Current.CloseOnLaunch, Mode=TwoWay}"
+                    />
+                </Grid>
                 <StackPanel
                     Orientation="Vertical"
                     CornerRadius="8"

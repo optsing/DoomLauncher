@@ -2,10 +2,23 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage;
 
 namespace DoomLauncher;
+
+public readonly struct TitleAppId
+{
+    public readonly string title;
+    public readonly int appId;
+
+    public TitleAppId(string title, int appId)
+    {
+        this.title = title;
+        this.appId = appId;
+    }
+}
 
 internal static class FileHelper
 {
@@ -74,32 +87,101 @@ internal static class FileHelper
         await FileIO.WriteTextAsync(file, $"[InternetShortcut]\nURL=gzdoomlauncher://launch/?id={entry.Id}\n");
     }
 
-    private static readonly Dictionary<string, string> IWads = new()
+    public static int GetSteamAppIdForEntry (DoomEntry entry)
     {
-        { "doom1.wad", "Doom (Shareware)" },
-        { "doom.wad", "Ultimate Doom" },
-        { "doom2.wad", "Doom II" },
-        { "doom2f.wad", "Doom II (French)"},
-        { "doom64.wad", "Doom 64"},
-        { "tnt.wad", "TNT: Evilution" },
-        { "plutonia.wad", "The Plutonia Experiment" },
-        { "heretic1.wad", "Heretic (Shareware)" },
-        { "heretic.wad", "Heretic" },
-        { "hexen.wad", "Hexen" },
-        { "strife1.wad", "Strife" },
-        { "chex.wad", "Chex Quest" },
-        { "freedoom1.wad", "Freedoom: Phase 1" },
-        { "freedoom2.wad", "Freedoom: Phase 2" },
-        { "freedm.wad", "FreeDM" },
+        if (Settings.Current.SteamIntegration)
+        {
+            if (entry.SteamGame == "")
+            {
+                var resolvedIWad = ResolveIWadFile(entry.IWadFile, Settings.Current.DefaultIWadFile).ToLower();
+                if (!string.IsNullOrEmpty(resolvedIWad) && IWads.ContainsKey(resolvedIWad))
+                {
+                    return IWads[resolvedIWad].appId;
+                }
+            }
+            else if (entry.SteamGame != "off" && SteamAppIds.ContainsKey(entry.SteamGame))
+            {
+                return SteamAppIds[entry.SteamGame].appId;
+            }
+        }
+        return 0;
+    }
+
+    public static Dictionary<string, TitleAppId> SteamAppIds = new()
+    {
+        { "off", new("Отключить", 0) },
+        { "doom", new("Ultimate Doom", 2280) },
+        { "doom2", new("Doom 2", 2300) },
+        { "doom64", new("Doom 64", 1148590) },
+        { "heretic", new("Heretic", 2390) },
+        { "hexen", new("Hexen", 2360) },
+        { "strife", new("Strife", 317040) },
     };
 
-    public static string GetIWadTitle(string iWadFile)
+    private static readonly Dictionary<string, TitleAppId> IWads = new()
     {
-        if (string.IsNullOrEmpty(iWadFile))
+        { "doom1.wad", new("Doom (Shareware)", 2280) },
+        { "doom.wad", new("Ultimate Doom", 2280) },
+        { "doom2.wad", new("Doom II", 2300) },
+        { "doom2f.wad", new("Doom II (French)", 2300) },
+        { "doom64.wad", new("Doom 64", 1148590)},
+        { "tnt.wad", new("TNT: Evilution", 0) },
+        { "plutonia.wad", new("The Plutonia Experiment", 0) },
+        { "heretic1.wad", new("Heretic (Shareware)", 2390) },
+        { "heretic.wad", new("Heretic", 2390) },
+        { "hexen.wad", new("Hexen", 2360) },
+        { "strife1.wad", new("Strife", 317040) },
+        { "chex.wad", new("Chex Quest", 0) },
+        { "freedoom1.wad", new("Freedoom: Phase 1", 0) },
+        { "freedoom2.wad", new("Freedoom: Phase 2", 0) },
+        { "freedm.wad", new("FreeDM", 0) },
+    };
+
+    public static string ResolveIWadFile(string iWadFile, string defaultIWadFile)
+    {
+        if (!string.IsNullOrEmpty(iWadFile))
+        {
+            if (Settings.Current.IWadFiles.Contains(iWadFile))
+            {
+                return iWadFile;
+            }
+        }
+        if (Settings.Current.IWadFiles.Contains(defaultIWadFile))
+        {
+            return defaultIWadFile;
+        }
+        return "";
+    }
+
+    public static GZDoomPackage? ResolveGZDoomPath(string gZDoomPath, string defaultGZDoomPath)
+    {
+        if (!string.IsNullOrEmpty(gZDoomPath))
+        {
+            if (Settings.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == gZDoomPath) is GZDoomPackage package)
+            {
+                return package;
+            }
+        }
+        return Settings.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == defaultGZDoomPath);
+    }
+
+    public static string GetIWadFileTitle(string iWadFile, string defaultIWadFile) {
+        var resolvedIWadFile = ResolveIWadFile(iWadFile, defaultIWadFile);
+        if (string.IsNullOrEmpty(resolvedIWadFile))
         {
             return "Не выбрано";
         }
-        return IWads.GetValueOrDefault(iWadFile.ToLower(), iWadFile);
+        return IWadFileToTitle(resolvedIWadFile);
+    }
+
+    public static string GZDoomPathToTitle(string gZDoomPath, string defaultGZDoomPath)
+    {
+        var package = ResolveGZDoomPath(gZDoomPath, defaultGZDoomPath);
+        if (package == null)
+        {
+            return "Не выбрано";
+        }
+        return GZDoomPackageToTitle(package);
     }
 
     private static string ArchToTitle(AssetArch arch) => arch switch
@@ -137,11 +219,21 @@ internal static class FileHelper
         _ => AssetArch.unknown,
     };
 
+    public static string IWadFileToTitle(string iWadFile)
+    {
+        var key = iWadFile.ToLower();
+        if (IWads.ContainsKey(key))
+        {
+            return IWads[key].title;
+        }
+        return iWadFile;
+    }
+
     public static string GZDoomPackageToTitle(GZDoomPackage? package)
     {
         if (package == null || package.Arch == AssetArch.notSelected)
         {
-            return "Не выбрано";
+            return "По умолчанию";
         }
         return (package.Version?.ToString() ?? "unknown") + ArchToTitle(package.Arch);
     }

@@ -69,6 +69,21 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
+            <StackPanel Visibility="{x:Bind local:Settings.Current.SteamIntegration}">
+                <TextBlock>Игра Steam</TextBlock>
+                <ComboBox
+                    HorizontalAlignment="Stretch"
+                    Margin="0,8,0,8"
+                    SelectedItem="{x:Bind SteamGame, Mode=TwoWay}"
+                    ItemsSource="{x:Bind SteamGames}"
+                >
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="local:KeyValue">
+                            <TextBlock Text="{x:Bind Value}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
             <CheckBox
                 Content="Использовать уникальный файл настроек"
                 IsChecked="{x:Bind UniqueConfig, Mode=TwoWay}"
