@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -27,7 +28,7 @@ public sealed partial class SettingsPage : Page
 
     public SettingsPage()
     {
-        this.InitializeComponent();
+        InitializeComponent();
 #if IS_NON_PACKAGED
         var appName = "Неизвестное приложение";
         var appVersion = "Неизвестная версия";
@@ -48,7 +49,11 @@ public sealed partial class SettingsPage : Page
 #endif
     }
 
-    public event EventHandler<string?>? OnProgress;
+    protected override void OnNavigatedTo(NavigationEventArgs e)
+    {
+        EventBus.ChangeBackground(this, null, AnimationDirection.None);
+        base.OnNavigatedTo(e);
+    }
 
     private static Version? ParseVersion(string version)
     {
@@ -62,7 +67,7 @@ public sealed partial class SettingsPage : Page
 
     private async Task LoadReleases()
     {
-        OnProgress?.Invoke(this, "Получение списка версий");
+        EventBus.Progress(this, "Получение списка версий");
         var entries = await WebAPI.Current.GetGZDoomGitHubReleases();
         var onlinePackages = new List<GZDoomPackage>();
         foreach (var entry in entries)
@@ -98,7 +103,7 @@ public sealed partial class SettingsPage : Page
                 }
             }
         }
-        OnProgress?.Invoke(this, null);
+        EventBus.Progress(this, null);
         {
             var newAsset = await PackageSelectorDialog.ShowAsync(XamlRoot, onlinePackages.OrderByDescending(package => package.Version).ThenBy(package => package.Arch).ToList());
             if (newAsset != null)
@@ -112,7 +117,7 @@ public sealed partial class SettingsPage : Page
     {
         if (!string.IsNullOrEmpty(package.Path))
         {
-            OnProgress?.Invoke(this, "Загрузка и извлечение архива");
+            EventBus.Progress(this, "Загрузка и извлечение архива");
             try
             {
                 using var stream = await WebAPI.Current.DownloadUrl(package.Path);
@@ -132,7 +137,7 @@ public sealed partial class SettingsPage : Page
             }
             finally
             {
-                OnProgress?.Invoke(this, null);
+                EventBus.Progress(this, null);
             }
         }
     }
@@ -192,14 +197,14 @@ public sealed partial class SettingsPage : Page
 
         foreach (var file in files)
         {
-            OnProgress?.Invoke(this, $"Копирование: {file.Name}");
+            EventBus.Progress(this, $"Копирование: {file.Name}");
             await FileHelper.CopyFileWithConfirmation(XamlRoot, file, FileHelper.IWadFolderPath);
             if (!Settings.Current.IWadFiles.Contains(file.Name))
             {
                 Settings.Current.IWadFiles.Add(file.Name);
             }
         }
-        OnProgress?.Invoke(this, null);
+        EventBus.Progress(this, null);
     }
 
     private static string? GetFileVersion(string filePath)

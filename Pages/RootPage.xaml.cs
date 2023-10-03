@@ -2,6 +2,7 @@
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Animation;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -36,6 +37,15 @@ public sealed partial class RootPage : Page
     {
         InitializeComponent();
 
+        EventBus.OnStart += Page_OnStart;
+        EventBus.OnEdit += Page_OnEdit;
+        EventBus.OnCopy += Page_OnCopy;
+        EventBus.OnCreateShortcut += Page_OnCreateShortcut;
+        EventBus.OnExport += Page_OnExport;
+        EventBus.OnRemove += Page_OnRemove;
+        EventBus.OnProgress += Page_OnProgress;
+        EventBus.OnChangeBackground += Page_OnChangeBackground;
+
         this.appWindow = appWindow;
 
         if (Settings.IsCustomTitlebar)
@@ -58,7 +68,7 @@ public sealed partial class RootPage : Page
             }
         }
 
-        frameMain.Content = notSelectedPage;
+        frameMain.Navigate(typeof(NotSelectedPage), null, new DrillInNavigationTransitionInfo());
         DoomList.SelectedIndex = Settings.Current.SelectedModIndex;
     }
 
@@ -87,8 +97,6 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private readonly NotSelectedPage notSelectedPage = new();
-
     private readonly AppWindow appWindow;
 
     private void DoomList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -96,21 +104,11 @@ public sealed partial class RootPage : Page
         if (DoomList.SelectedItem is DoomEntry entry)
         {
             Settings.Current.SelectedModIndex = DoomList.SelectedIndex;
-            var page = new DoomPage(entry);
-            page.OnStart += Page_OnStart;
-            page.OnEdit += Page_OnEdit;
-            page.OnCopy += Page_OnCopy;
-            page.OnCreateShortcut += Page_OnCreateShortcut;
-            page.OnExport += Page_OnExport;
-            page.OnRemove += Page_OnRemove;
-            page.OnProgress += Page_OnProgress;
-            page.OnChangeBackground += Page_OnChangeBackground;
-            frameMain.Content = page;
+            frameMain.Navigate(typeof(DoomPage), entry, new DrillInNavigationTransitionInfo());
         }
         else
         {
-            frameMain.Content = notSelectedPage;
-            Page_OnChangeBackground(null, (null, AnimationDirection.None));
+            frameMain.Navigate(typeof(NotSelectedPage), null, new DrillInNavigationTransitionInfo());
         }
         if (swMain.DisplayMode == SplitViewDisplayMode.Overlay)
         {
@@ -408,10 +406,7 @@ public sealed partial class RootPage : Page
         if (frameMain.Content is not SettingsPage)
         {
             DoomList.SelectedItem = null;
-            var settingsPage = new SettingsPage();
-            settingsPage.OnProgress += Page_OnProgress;
-            frameMain.Content = settingsPage;
-            Page_OnChangeBackground(null, (null, AnimationDirection.None));
+            frameMain.Navigate(typeof(SettingsPage), null, new DrillInNavigationTransitionInfo());
         }
     }
 

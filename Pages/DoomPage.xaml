@@ -10,7 +10,6 @@
     d:DataContext="{d:DesignInstance Type=local:DoomEntry}"
     mc:Ignorable="d"
     Background="Transparent"
-    Loaded="Page_Loaded"
     Unloaded="Page_Unloaded"
 >
     <Page.Resources>

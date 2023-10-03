@@ -2,6 +2,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
+using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -28,22 +29,25 @@ public sealed partial class DoomPage : Page
     private int currentTicksToSlideshow;
     private readonly DispatcherTimer timerSlideshow = new();
 
-    private readonly DoomEntry entry;
+    private DoomEntry entry = new();
 
-    public DoomPage(DoomEntry entry)
+    public DoomPage()
     {
         InitializeComponent();
-        this.entry = entry;
-
+        
         timerSlideshow.Interval = SlideshowInterval;
         timerSlideshow.Tick += Timer_Tick;
-
-        SetSlideshow();
     }
 
-    private void Page_Loaded(object sender, RoutedEventArgs e)
+    protected override void OnNavigatedTo(NavigationEventArgs e)
     {
-        SetSelectedImageIndex(entry.SelectedImageIndex, direction: AnimationDirection.None);
+        if (e.Parameter is DoomEntry entry)
+        {
+            this.entry = entry;
+            SetSlideshow();
+            SetSelectedImageIndex(entry.SelectedImageIndex, direction: AnimationDirection.None);
+        }
+        base.OnNavigatedTo(e);
     }
 
     private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -110,43 +114,34 @@ public sealed partial class DoomPage : Page
         }
     }
 
-    public event EventHandler<DoomEntry>? OnStart;
-    public event EventHandler<DoomEntry>? OnEdit;
-    public event EventHandler<DoomEntry>? OnCopy;
-    public event EventHandler<DoomEntry>? OnExport;
-    public event EventHandler<DoomEntry>? OnCreateShortcut;
-    public event EventHandler<DoomEntry>? OnRemove;
-    public event EventHandler<string?>? OnProgress;
-    public event EventHandler<(string? imagePath, AnimationDirection direction)>? OnChangeBackground;
-
     private void Start_Click(object sender, RoutedEventArgs e)
     {
-        OnStart?.Invoke(this, entry);
+        EventBus.Start(this, entry);
     }
 
     private void EditMod_Click(object sender, RoutedEventArgs e)
     {
-        OnEdit?.Invoke(this, entry);
+        EventBus.Edit(this, entry);
     }
 
     private void CopyMod_Click(object sender, RoutedEventArgs e)
     {
-        OnCopy?.Invoke(this, entry);
+        EventBus.Copy(this, entry);
     }
 
     private void CreateShortcut_Click(object sender, RoutedEventArgs e)
     {
-        OnCreateShortcut?.Invoke(this, entry);
+        EventBus.CreateShortcut(this, entry);
     }
 
     private void ExportMod_Click(object sender, RoutedEventArgs e)
     {
-        OnExport?.Invoke(this, entry);
+        EventBus.Export(this, entry);
     }
 
     private void RemoveMod_Click(object sender, RoutedEventArgs e)
     {
-        OnRemove?.Invoke(this, entry);
+        EventBus.Remove(this, entry);
     }
 
     private async void Append_Click(object sender, RoutedEventArgs e)
@@ -203,12 +198,12 @@ public sealed partial class DoomPage : Page
             }
             entry.SelectedImageIndex = ind;
             var imagePath = Path.GetFullPath(entry.ImageFiles[entry.SelectedImageIndex], FileHelper.ImagesFolderPath);
-            OnChangeBackground?.Invoke(this, (imagePath, direction));
+            EventBus.ChangeBackground(this, imagePath, direction);
         }
         else
         {
             entry.SelectedImageIndex = 0;
-            OnChangeBackground?.Invoke(this, (null, direction));
+            EventBus.ChangeBackground(this, null, direction);
         }
     }
 
@@ -239,14 +234,14 @@ public sealed partial class DoomPage : Page
     {
         foreach (var file in files)
         {
-            OnProgress?.Invoke(this, $"Копирование: {file.Name}");
+            EventBus.Progress(this, $"Копирование: {file.Name}");
             await FileHelper.CopyFileWithConfirmation(XamlRoot, file, FileHelper.ModsFolderPath);
             if (!entry.ModFiles.Contains(file.Name))
             {
                 entry.ModFiles.Add(file.Name);
             }
         }
-        OnProgress?.Invoke(this, null);
+        EventBus.Progress(this, null);
     }
 
     private async Task AddImages(IReadOnlyList<StorageFile> files)
@@ -254,7 +249,7 @@ public sealed partial class DoomPage : Page
         bool hasAddedImages = false;
         foreach (var file in files)
         {
-            OnProgress?.Invoke(this, $"Копирование: {file.Name}");
+            EventBus.Progress(this, $"Копирование: {file.Name}");
             await FileHelper.CopyFileWithConfirmation(XamlRoot, file, FileHelper.ImagesFolderPath);
             if (!entry.ModFiles.Contains(file.Name))
             {
@@ -262,7 +257,7 @@ public sealed partial class DoomPage : Page
                 hasAddedImages = true;
             }
         }
-        OnProgress?.Invoke(this, null);
+        EventBus.Progress(this, null);
         if (hasAddedImages)
         {
             SetSelectedImageIndex(entry.ImageFiles.Count - 1, direction: AnimationDirection.Next);
