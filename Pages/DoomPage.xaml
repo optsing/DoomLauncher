@@ -5,16 +5,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:animations="using:CommunityToolkit.WinUI.Animations"
-    xmlns:converters="using:CommunityToolkit.WinUI.Converters"
     xmlns:local="using:DoomLauncher"
     d:DataContext="{d:DesignInstance Type=local:DoomEntry}"
     mc:Ignorable="d"
     Background="Transparent"
     Unloaded="Page_Unloaded"
 >
-    <Page.Resources>
-        <converters:BoolToObjectConverter x:Key="SlideshowGlyph" TrueValue="&#xE769;" FalseValue="&#xE768;"/>
-    </Page.Resources>
     <Grid
         RowDefinitions="48,*,Auto"
         AllowDrop="True"
@@ -251,7 +247,7 @@
                         Height="26"
                     />
                     <FontIcon
-                        Glyph="{x:Bind IsSlideshowEnabled, Converter={StaticResource SlideshowGlyph}, Mode=OneWay}"
+                        Glyph="{x:Bind local:XamlHelper.SlideshowGlyph(IsSlideshowEnabled), Mode=OneWay}"
                         FontSize="16"
                     />
                 </Grid>

@@ -45,4 +45,9 @@ static class XamlHelper
     {
         return Equals(value1, value2) ? " по умолчанию" : "";
     }
+
+    public static string SlideshowGlyph(bool isSlideshow)
+    {
+        return isSlideshow ? "\uE769" : "\uE768";
+    }
 }
