@@ -33,12 +33,12 @@ static class XamlHelper
 
     public static string FileInFavoritesGlyph(Collection<string> list, string value)
     {
-        return list.Contains(value) ? "\uE735" : "\uE734";
+        return list.Contains(value) ? "\uE734" : "\uE735";
     }
 
     public static string FileInFavoritesTooltip(Collection<string> list, string value)
     {
-        return list.Contains(value) ? "Удалить из избранного" : "Добавить в избранное";
+        return list.Contains(value) ? "Убрать из избранного" : "Добавить в избранное";
     }
 
     public static string IsDefaultText(object value1, object value2)

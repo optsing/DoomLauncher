@@ -122,42 +122,52 @@
                     >
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="x:String">
-                                <Grid ColumnDefinitions="*,Auto">
-                                    <TextBlock
-                                        Grid.Column="0"
-                                        Text="{x:Bind local:DoomPage.GetFileTitle((x:String))}"
-                                        VerticalAlignment="Center"
-                                    />
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Border>
+                                    <Border.Resources>
+                                        <MenuFlyout x:Key="flyoutFile" Placement="Bottom" >
+                                            <MenuFlyoutItem
+                                                Click="ToggleFavoriteFile_Click"
+                                                Text="{x:Bind local:XamlHelper.FileInFavoritesTooltip(local:Settings.Current.FavoriteFiles, (x:String)), Mode=OneWay}"
+                                            >
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="{x:Bind local:XamlHelper.FileInFavoritesGlyph(local:Settings.Current.FavoriteFiles, (x:String)), Mode=OneWay}" FontSize="14" />
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+                                            <MenuFlyoutItem
+                                                Click="OpenContainFolder_Click"
+                                                Text="Открыть расположение"
+                                            >
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xE838;" FontSize="14" />
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+                                            <MenuFlyoutItem
+                                                Click="RemoveFile_Click"
+                                                Text="Удалить ссылку на файл"
+                                            >
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xE74D;" FontSize="14" />
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+                                        </MenuFlyout>
+                                    </Border.Resources>
+                                    <Grid ColumnDefinitions="*,Auto" ContextFlyout="{StaticResource flyoutFile}">
+                                        <TextBlock
+                                            Grid.Column="0"
+                                            Text="{x:Bind local:DoomPage.GetFileTitle((x:String))}"
+                                            VerticalAlignment="Center"
+                                        />
                                         <Button
-                                            Click="ToggleFavoriteFile_Click"
+                                            Grid.Column="1"
                                             Style="{ThemeResource EllipsisButton}"
                                             Height="40"
                                             Width="40"
-                                            ToolTipService.ToolTip="{x:Bind local:XamlHelper.FileInFavoritesTooltip(local:Settings.Current.FavoriteFiles, (x:String)), Mode=OneWay}"
+                                            Flyout="{StaticResource flyoutFile}"
                                         >
-                                            <FontIcon Glyph="{x:Bind local:XamlHelper.FileInFavoritesGlyph(local:Settings.Current.FavoriteFiles, (x:String)), Mode=OneWay}" FontSize="16" />
+                                            <SymbolIcon Symbol="More" />
                                         </Button>
-                                        <Button
-                                            Click="OpenContainFolder_Click"
-                                            Style="{ThemeResource EllipsisButton}"
-                                            Height="40"
-                                            Width="40"
-                                            ToolTipService.ToolTip="Открыть расположение файла"
-                                        >
-                                            <FontIcon Glyph="&#xE838;" FontSize="16" />
-                                        </Button>
-                                        <Button
-                                            Click="RemoveFile_Click"
-                                            Style="{ThemeResource EllipsisButton}"
-                                            Height="40"
-                                            Width="40"
-                                            ToolTipService.ToolTip="Удалить ссылку на файл"
-                                        >
-                                            <FontIcon Glyph="&#xE74D;" FontSize="16" />
-                                        </Button>
-                                    </StackPanel>
-                                </Grid>
+                                    </Grid>
+                                </Border>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
