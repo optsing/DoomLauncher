@@ -52,6 +52,7 @@ public sealed partial class SettingsPage : Page
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         EventBus.ChangeBackground(this, null, AnimationDirection.None);
+        EventBus.ChangeCaption(this, "Настройки");
         base.OnNavigatedTo(e);
     }
 
@@ -74,7 +75,7 @@ public sealed partial class SettingsPage : Page
         {
             foreach (var asset in entry.Assets)
             {
-                if (asset.Name.EndsWith(".zip") && !asset.Name.Contains("macOS") && !asset.Name.Contains("ci_deps"))
+                if (asset.Name.EndsWith(".zip") && !asset.Name.Contains("macOS") && !asset.Name.Contains("ci_deps") && !asset.Name.Contains("AppImage"))
                 {
                     var isLegacy = asset.Name.Contains("legacy");
                     AssetArch arch;

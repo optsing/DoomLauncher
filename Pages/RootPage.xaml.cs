@@ -1,8 +1,9 @@
-﻿using Microsoft.UI.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,6 +23,27 @@ public enum AnimationDirection
     None, Previous, Next
 }
 
+public partial class RootPageViewModel : ObservableObject
+{
+    [ObservableProperty]
+    private string? caption = null;
+
+    [ObservableProperty]
+    private BitmapImage? background = null;
+
+    [ObservableProperty]
+    private DoomEntry? currentEntry = null;
+
+    [ObservableProperty]
+    private string? progressText = null;
+
+    [ObservableProperty]
+    private bool isLeftDropHelperVisible;
+
+    [ObservableProperty]
+    private bool isRightDropHelperVisible;
+}
+
 /// <summary>
 /// An empty page that can be used on its own or navigated to within a Frame.
 /// </summary>
@@ -33,23 +55,22 @@ public sealed partial class RootPage : Page
 
     private readonly TimeSpan SlideshowAnimationDuration = TimeSpan.FromMilliseconds(150);
 
-    public RootPage(AppWindow appWindow)
+    private RootPageViewModel ViewModel { get; set; } = new();
+
+    public RootPage()
     {
         InitializeComponent();
 
-        EventBus.OnStart += Page_OnStart;
-        EventBus.OnEdit += Page_OnEdit;
-        EventBus.OnCopy += Page_OnCopy;
-        EventBus.OnCreateShortcut += Page_OnCreateShortcut;
-        EventBus.OnExport += Page_OnExport;
-        EventBus.OnRemove += Page_OnRemove;
-        EventBus.OnProgress += Page_OnProgress;
-        EventBus.OnChangeBackground += Page_OnChangeBackground;
+        EventBus.OnProgress += EventBus_OnProgress;
+        EventBus.OnChangeBackground += EventBus_OnChangeBackground;
+        EventBus.OnChangeCaption += EventBus_OnChangeCaption;
+        EventBus.OnDropHelper += EventBus_OnDropHelper;
 
-        this.appWindow = appWindow;
+        ViewModel.PropertyChanged += ViewModel_PropertyChanged;
 
         if (Settings.IsCustomTitlebar)
         {
+            var appWindow = AppWindow.GetFromWindowId(WinApi.WindowId);
             titleBar.Loaded += TitleBar_Loaded;
             titleBar.SizeChanged += TitleBar_SizeChanged;
 
@@ -68,8 +89,44 @@ public sealed partial class RootPage : Page
             }
         }
 
-        frameMain.Navigate(typeof(NotSelectedPage), null, new DrillInNavigationTransitionInfo());
-        DoomList.SelectedIndex = Settings.Current.SelectedModIndex;
+        if (Settings.Current.SelectedModIndex >= 0 && Settings.Current.SelectedModIndex < Settings.Current.Entries.Count)
+        {
+            ViewModel.CurrentEntry = Settings.Current.Entries[Settings.Current.SelectedModIndex];
+        }
+        else
+        {
+            frameMain.Navigate(typeof(NotSelectedPage));
+        }
+    }
+
+    private void EventBus_OnDropHelper(object? sender, bool e)
+    {
+        ViewModel.IsRightDropHelperVisible = e;
+    }
+
+    private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ViewModel.CurrentEntry))
+        {
+            if (ViewModel.CurrentEntry != null)
+            {
+                Settings.Current.SelectedModIndex = Settings.Current.Entries.IndexOf(ViewModel.CurrentEntry);
+                frameMain.Navigate(typeof(DoomPage), ViewModel.CurrentEntry);
+            } 
+            else if (frameMain.Content is not SettingsPage)
+            {
+                frameMain.Navigate(typeof(NotSelectedPage));
+            }
+            if (swMain.DisplayMode == SplitViewDisplayMode.Overlay)
+            {
+                swMain.IsPaneOpen = false;
+            }
+        } 
+    }
+
+    private void EventBus_OnChangeCaption(object? sender, string? e)
+    {
+        ViewModel.Caption = e;
     }
 
     private void TitleBar_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -83,7 +140,7 @@ public sealed partial class RootPage : Page
     }
     private void SetDragRegion()
     {
-        if (InputNonClientPointerSource.GetForWindowId(appWindow.Id) is InputNonClientPointerSource NonClientSource)
+        if (InputNonClientPointerSource.GetForWindowId(WinApi.WindowId) is InputNonClientPointerSource nonClientSource)
         {
             var scaleAdjustment = XamlRoot.RasterizationScale;
             var dragRect = new Windows.Graphics.RectInt32()
@@ -93,35 +150,16 @@ public sealed partial class RootPage : Page
                 Width = (int)(titleBar.ActualWidth * scaleAdjustment),
                 Height = (int)(titleBar.ActualHeight * scaleAdjustment),
             };
-            NonClientSource.SetRegionRects(NonClientRegionKind.Caption, new[] { dragRect });
-        }
-    }
-
-    private readonly AppWindow appWindow;
-
-    private void DoomList_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (DoomList.SelectedItem is DoomEntry entry)
-        {
-            Settings.Current.SelectedModIndex = DoomList.SelectedIndex;
-            frameMain.Navigate(typeof(DoomPage), entry, new DrillInNavigationTransitionInfo());
-        }
-        else
-        {
-            frameMain.Navigate(typeof(NotSelectedPage), null, new DrillInNavigationTransitionInfo());
-        }
-        if (swMain.DisplayMode == SplitViewDisplayMode.Overlay)
-        {
-            swMain.IsPaneOpen = false;
+            nonClientSource.SetRegionRects(NonClientRegionKind.Caption, new[] { dragRect });
         }
     }
 
     private readonly SemaphoreSlim semaphoreAnimation = new(1, 1);
-    private async void Page_OnChangeBackground(object? sender, (string? imagePath, AnimationDirection direction) e)
+    private async void EventBus_OnChangeBackground(object? sender, (string? imagePath, AnimationDirection direction) e)
     {
         await semaphoreAnimation.WaitAsync();
         var bitmap = string.IsNullOrEmpty(e.imagePath) ? null : await BitmapHelper.CreateBitmapFromFile(e.imagePath);
-        bool hasPrevBitmap = imgBackground.Source != null;
+        bool hasPrevBitmap = ViewModel.Background != null;
         if (hasPrevBitmap)
         {
             if (bitmap != null)
@@ -138,8 +176,8 @@ public sealed partial class RootPage : Page
             sbHide.Begin();
             await Task.Delay(SlideshowAnimationDuration);
         }
-        imgBackground.Source = bitmap;
-        if (imgBackground.Source != null)
+        ViewModel.Background = bitmap;
+        if (bitmap != null)
         {
             if (hasPrevBitmap)
             {
@@ -162,16 +200,15 @@ public sealed partial class RootPage : Page
     {
         if (string.IsNullOrEmpty(text))
         {
-            progressIndicator.Visibility = Visibility.Collapsed;
+            ViewModel.ProgressText = null;
         }
         else
         {
-            progressIndicator.Visibility = Visibility.Visible;
-            progressIndicatorText.Text = text;
+            ViewModel.ProgressText = text;
         }
     }
 
-    private void Page_OnProgress(object? sender, string? e)
+    private void EventBus_OnProgress(object? sender, string? e)
     {
         SetProgress(e);
     }
@@ -302,13 +339,19 @@ public sealed partial class RootPage : Page
             ImageFiles = new(entry.ImageFiles),
         };
         Settings.Current.Entries.Add(newEntry);
-        DoomList.SelectedItem = newEntry;
+        ViewModel.CurrentEntry = newEntry;
         Settings.Save();
     }
 
-    private void Page_OnStart(object? sender, DoomEntry entry)
+    private void Start_Click(object sender, RoutedEventArgs e)
     {
-        LaunchEntry(entry, forceClose: false);
+        if (sender is FrameworkElement el)
+        {
+            if (el.DataContext is DoomEntry entry)
+            {
+                LaunchEntry(entry, forceClose: false);
+            }
+        }
     }
 
     public void LaunchEntryById(string entryId, bool forceClose)
@@ -330,7 +373,7 @@ public sealed partial class RootPage : Page
             await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске", "Не удалось найти нужную сборку", "", "Отмена");
             return;
         }
-        DoomList.SelectedItem = entry;
+        ViewModel.CurrentEntry = entry;
         var result = LaunchHelper.LaunchEntry(entry);
         if (result == LaunchResult.Success && LaunchHelper.CurrentProcess != null)
         {
@@ -342,12 +385,21 @@ public sealed partial class RootPage : Page
             }
             else
             {
-                MinimizeAndSwitchToAnotherWindow(LaunchHelper.CurrentProcess.MainWindowHandle);
+                WinApi.MinimizeAndSwitchToAnotherWindow(LaunchHelper.CurrentProcess.MainWindowHandle);
                 await LaunchHelper.CurrentProcess.WaitForExitAsync();
-                RestoreAndSwitchToThisWindow();
+                WinApi.RestoreAndSwitchToThisWindow();
                 if (LaunchHelper.CurrentProcess.ExitCode != 0)
                 {
-                    await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске", $"Игра завершилась с ошибкой, код ошибки - {LaunchHelper.CurrentProcess.ExitCode}", "", "Отмена");
+                    var error = await LaunchHelper.CurrentProcess.StandardError.ReadToEndAsync();
+                    if (string.IsNullOrEmpty(error))
+                    {
+                        await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске", $"Игра завершилась с ошибкой, код ошибки: {LaunchHelper.CurrentProcess.ExitCode}", "", "Отмена");
+                    }
+                    else
+                    {
+                        await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске", $"Игра завершилась с ошибкой, вывод:\n{error}", "", "Отмена");
+                    }
+                    
                 }
             }
         }
@@ -355,7 +407,7 @@ public sealed partial class RootPage : Page
         {
             if (await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске", "Игра уже запущена, закройте текущую игру", "Переключить на игру", "Отмена"))
             {
-                MinimizeAndSwitchToAnotherWindow(LaunchHelper.CurrentProcess.MainWindowHandle);
+                WinApi.MinimizeAndSwitchToAnotherWindow(LaunchHelper.CurrentProcess.MainWindowHandle);
             }
         }
         else if (result == LaunchResult.PathNotValid)
@@ -371,31 +423,6 @@ public sealed partial class RootPage : Page
         }
     }
 
-    public void MinimizeAndSwitchToAnotherWindow(IntPtr anotherHWnd)
-    {
-        if (appWindow.Presenter is OverlappedPresenter presenter)
-        {
-            presenter.Minimize();
-        }
-        WinApi.SetForegroundWindow(anotherHWnd);
-    }
-
-    public void RestoreAndSwitchToThisWindow()
-    {
-        if (appWindow.Presenter is OverlappedPresenter presenter && presenter.State == OverlappedPresenterState.Minimized)
-        {
-            if (Settings.Current.WindowMaximized)
-            {
-                presenter.Maximize();
-            }
-            else
-            {
-                presenter.Restore();
-            }
-        }
-        WinApi.SetForegroundWindow(WinApi.HWND);
-    }
-
     private void ButtonMenu_Click(object sender, RoutedEventArgs e)
     {
         swMain.IsPaneOpen = !swMain.IsPaneOpen;
@@ -405,8 +432,8 @@ public sealed partial class RootPage : Page
     {
         if (frameMain.Content is not SettingsPage)
         {
-            DoomList.SelectedItem = null;
-            frameMain.Navigate(typeof(SettingsPage), null, new DrillInNavigationTransitionInfo());
+            frameMain.Navigate(typeof(SettingsPage));
+            ViewModel.CurrentEntry = null;
         }
     }
 
@@ -435,7 +462,7 @@ public sealed partial class RootPage : Page
             if (newEntry != null)
             {
                 Settings.Current.Entries.Add(newEntry);
-                DoomList.SelectedItem = newEntry;
+                ViewModel.CurrentEntry = newEntry;
                 Settings.Save();
             }
         }
@@ -460,7 +487,7 @@ public sealed partial class RootPage : Page
                 SelectedImageIndex = 0,
             };
             Settings.Current.Entries.Add(newEntry);
-            DoomList.SelectedItem = newEntry;
+            ViewModel.CurrentEntry = newEntry;
             Settings.Save();
         }
     }
@@ -541,7 +568,7 @@ public sealed partial class RootPage : Page
         }
         if (lastAddedEntry != null)
         {
-            DoomList.SelectedItem = lastAddedEntry;
+            ViewModel.CurrentEntry = lastAddedEntry;
             Settings.Save();
         }
     }
@@ -556,7 +583,7 @@ public sealed partial class RootPage : Page
             if (newEntry != null)
             {
                 Settings.Current.Entries.Add(newEntry);
-                DoomList.SelectedItem = newEntry;
+                ViewModel.CurrentEntry = newEntry;
                 Settings.Save();
             }
         }
@@ -577,7 +604,7 @@ public sealed partial class RootPage : Page
                         var ext = Path.GetExtension(file.Name).ToLowerInvariant();
                         if (ext == ".gzdl" || ext == ".zip" || FileHelper.SupportedModExtensions.Contains(ext) || FileHelper.SupportedImageExtensions.Contains(ext))
                         {
-                            DropHelper.Visibility = Visibility.Visible;
+                            ViewModel.IsLeftDropHelperVisible = true;
                             return;
                         }
                     }
@@ -592,17 +619,17 @@ public sealed partial class RootPage : Page
 
     private void Root_DragLeave(object sender, DragEventArgs e)
     {
-        DropHelper.Visibility = Visibility.Collapsed;
+        ViewModel.IsLeftDropHelperVisible = false;
     }
 
-    private void DropHelper_DragOver(object sender, DragEventArgs e)
+    private void LeftDropHelper_DragOver(object sender, DragEventArgs e)
     {
         e.AcceptedOperation = DataPackageOperation.Copy;
     }
 
-    private async void DropHelper_Drop(object? sender, DragEventArgs e)
+    private async void LeftDropHelper_Drop(object? sender, DragEventArgs e)
     {
-        DropHelper.Visibility = Visibility.Collapsed;
+        ViewModel.IsLeftDropHelperVisible = false;
         try
         {
             if (e.DataView.Contains(StandardDataFormats.StorageItems))
@@ -635,7 +662,7 @@ public sealed partial class RootPage : Page
                     if (newEntry != null)
                     {
                         Settings.Current.Entries.Add(newEntry);
-                        DoomList.SelectedItem = newEntry;
+                        ViewModel.CurrentEntry = newEntry;
                         Settings.Save();
                     }
                 }
@@ -645,5 +672,26 @@ public sealed partial class RootPage : Page
         {
             Console.Error.WriteLine(ex);
         }
+    }
+
+    private void RightDropHelper_DragOver(object sender, DragEventArgs e)
+    {
+        EventBus.RightDragOver(this, e);
+    }
+
+    private void RightDropHelper_Drop(object sender, DragEventArgs e)
+    {
+        ViewModel.IsRightDropHelperVisible = false;
+        EventBus.RightDrop(this, e);
+    }
+
+    private void RightDropHelper_DragEnter(object sender, DragEventArgs e)
+    {
+        EventBus.RightDragEnter(this, e);
+    }
+
+    private void RightDropHelper_DragLeave(object sender, DragEventArgs e)
+    {
+        ViewModel.IsRightDropHelperVisible = false;
     }
 }

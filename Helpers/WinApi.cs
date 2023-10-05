@@ -8,6 +8,32 @@ namespace DoomLauncher;
 public partial class WinApi
 {
     public static IntPtr HWND;
+    public static WindowId WindowId;
+
+    public static void MinimizeAndSwitchToAnotherWindow(IntPtr anotherHWnd)
+    {
+        if (AppWindow.GetFromWindowId(WindowId).Presenter is OverlappedPresenter presenter)
+        {
+            presenter.Minimize();
+        }
+        SetForegroundWindow(anotherHWnd);
+    }
+
+    public static void RestoreAndSwitchToThisWindow()
+    {
+        if (AppWindow.GetFromWindowId(WindowId).Presenter is OverlappedPresenter presenter && presenter.State == OverlappedPresenterState.Minimized)
+        {
+            if (Settings.Current.WindowMaximized)
+            {
+                presenter.Maximize();
+            }
+            else
+            {
+                presenter.Restore();
+            }
+        }
+        SetForegroundWindow(HWND);
+    }
 
     [LibraryImport("User32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]

@@ -1,6 +1,6 @@
 ﻿<Application
-    x:Class="DoomLauncher.App"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        x:Class="DoomLauncher.App"
+   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Application.Resources>
         <ResourceDictionary>
@@ -11,6 +11,17 @@
             <!-- Other app resources here -->
             <SolidColorBrush x:Key="WindowCaptionBackground">Transparent</SolidColorBrush>
             <SolidColorBrush x:Key="WindowCaptionBackgroundDisabled">Transparent</SolidColorBrush>
+            <TransitionCollection x:Key="PageCardsAnimations">
+                <EntranceThemeTransition FromVerticalOffset="50" IsStaggeringEnabled="True"/>
+                <!--  Animates cards when loaded  -->
+                <RepositionThemeTransition IsStaggeringEnabled="False" />
+                <!--  Smoothly animates individual cards upon whenever Expanders are expanded/collapsed  -->
+            </TransitionCollection>
+            <TransitionCollection x:Key="ListViewAnimations">
+                <AddDeleteThemeTransition />
+                <ContentThemeTransition />
+                <ReorderThemeTransition/>
+            </TransitionCollection>
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Light">
                     <SolidColorBrush x:Key="CustomColor" Color="#33ffffff" />

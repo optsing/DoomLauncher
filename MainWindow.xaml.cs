@@ -15,14 +15,11 @@ namespace DoomLauncher;
 /// An empty window that can be used on its own or navigated to within a Frame.
 /// </summary>
 public sealed partial class MainWindow : Window
-{
-    public readonly RootPage rootPage;
-
+{ 
     public MainWindow()
     {
-        InitializeComponent();
-
         WinApi.HWND = WinRT.Interop.WindowNative.GetWindowHandle(this);
+        WinApi.WindowId = AppWindow.Id;
 
         AppWindow.Title = "GZDoom Launcher";
         AppWindow.SetIcon("Assets/app.ico");
@@ -35,8 +32,6 @@ public sealed partial class MainWindow : Window
             AppWindow.TitleBar.ButtonBackgroundColor = Colors.Transparent;
             AppWindow.TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
         }
-
-        Closed += MainWindow_Closed;
 
 #if IS_NON_PACKAGED
         var dataFolderPath = Directory.GetCurrentDirectory();
@@ -54,7 +49,8 @@ public sealed partial class MainWindow : Window
         if (File.Exists(FileHelper.ConfigFilePath))
         {
             var text = File.ReadAllText(FileHelper.ConfigFilePath);
-            if (JsonSerializer.Deserialize(text, JsonSettingsContext.Default.Settings) is Settings settings) {
+            if (JsonSerializer.Deserialize(text, JsonSettingsContext.Default.Settings) is Settings settings)
+            {
                 Settings.Current = settings;
             }
             var backupConfigFilePath = Path.Combine(dataFolderPath, "config.old.json");
@@ -75,11 +71,9 @@ public sealed partial class MainWindow : Window
         {
             presenter.Maximize();
         }
-
         AppWindow.Changed += AppWindow_Changed;
 
-        rootPage = new RootPage(AppWindow);
-        frameRoot.Content = rootPage;
+        InitializeComponent();
     }
 
     private void AppWindow_Changed(AppWindow sender, AppWindowChangedEventArgs args)

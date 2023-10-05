@@ -17,19 +17,50 @@ using Windows.Storage;
 
 namespace DoomLauncher;
 
+public partial class DoomPageViewModel : ObservableObject
+{
+    private readonly DispatcherTimer timerSlideshow;
+
+    public DoomPageViewModel(DispatcherTimer timer)
+    {
+        timerSlideshow = timer;
+    }
+
+    [ObservableProperty]
+    private int currentTicksToSlideshow;
+
+    private bool isSlideshowEnabled;
+    public bool IsSlideshowEnabled
+    {
+        get => isSlideshowEnabled;
+        set
+        {
+            if (SetProperty(ref isSlideshowEnabled, value))
+            {
+                if (value)
+                {
+                    timerSlideshow.Start();
+                }
+                else
+                {
+                    timerSlideshow.Stop();
+                }
+            }
+        }
+    }
+} 
+
 /// <summary>
 /// An empty page that can be used on its own or navigated to within a Frame.
 /// </summary>
-[INotifyPropertyChanged]
 public sealed partial class DoomPage : Page
 {
     private readonly TimeSpan SlideshowInterval = TimeSpan.FromSeconds(1);
     private readonly int TicksToSlideshow = 10;
-    [ObservableProperty]
-    private int currentTicksToSlideshow;
     private readonly DispatcherTimer timerSlideshow = new();
+    public DoomEntry entry = new();
 
-    private DoomEntry entry = new();
+    public DoomPageViewModel ViewModel;
 
     public DoomPage()
     {
@@ -37,6 +68,12 @@ public sealed partial class DoomPage : Page
         
         timerSlideshow.Interval = SlideshowInterval;
         timerSlideshow.Tick += Timer_Tick;
+
+        ViewModel = new DoomPageViewModel(timerSlideshow);
+
+        EventBus.OnRightDragEnter += Root_DragEnter;
+        EventBus.OnRightDragOver += DropHelper_DragOver;
+        EventBus.OnRightDrop += DropHelper_Drop;
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -46,12 +83,16 @@ public sealed partial class DoomPage : Page
             this.entry = entry;
             SetSlideshow();
             SetSelectedImageIndex(entry.SelectedImageIndex, direction: AnimationDirection.None);
+            EventBus.ChangeCaption(this, entry.Name);
         }
         base.OnNavigatedTo(e);
     }
 
     private void Page_Unloaded(object sender, RoutedEventArgs e)
     {
+        EventBus.OnRightDragEnter -= Root_DragEnter;
+        EventBus.OnRightDragOver -= DropHelper_DragOver;
+        EventBus.OnRightDrop -= DropHelper_Drop;
         timerSlideshow.Tick -= Timer_Tick;
         timerSlideshow.Stop();
     }
@@ -112,36 +153,6 @@ public sealed partial class DoomPage : Page
                 });
             }
         }
-    }
-
-    private void Start_Click(object sender, RoutedEventArgs e)
-    {
-        EventBus.Start(this, entry);
-    }
-
-    private void EditMod_Click(object sender, RoutedEventArgs e)
-    {
-        EventBus.Edit(this, entry);
-    }
-
-    private void CopyMod_Click(object sender, RoutedEventArgs e)
-    {
-        EventBus.Copy(this, entry);
-    }
-
-    private void CreateShortcut_Click(object sender, RoutedEventArgs e)
-    {
-        EventBus.CreateShortcut(this, entry);
-    }
-
-    private void ExportMod_Click(object sender, RoutedEventArgs e)
-    {
-        EventBus.Export(this, entry);
-    }
-
-    private void RemoveMod_Click(object sender, RoutedEventArgs e)
-    {
-        EventBus.Remove(this, entry);
     }
 
     private async void Append_Click(object sender, RoutedEventArgs e)
@@ -219,14 +230,14 @@ public sealed partial class DoomPage : Page
 
     private void Timer_Tick(object? sender, object e)
     {
-        if (CurrentTicksToSlideshow < TicksToSlideshow)
+        if (ViewModel.CurrentTicksToSlideshow < TicksToSlideshow)
         {
-            CurrentTicksToSlideshow += 1;
+            ViewModel.CurrentTicksToSlideshow += 1;
         }
         else
         {
             SetSelectedImageIndex(entry.SelectedImageIndex + 1, direction: AnimationDirection.Next);
-            CurrentTicksToSlideshow = 0;
+            ViewModel.CurrentTicksToSlideshow = 0;
         }
     }
 
@@ -312,7 +323,7 @@ public sealed partial class DoomPage : Page
     {
         if (entry.SelectedImageIndex >= 0 && entry.SelectedImageIndex < entry.ImageFiles.Count)
         {
-            IsSlideshowEnabled = false;
+            ViewModel.IsSlideshowEnabled = false;
             var selectedImageIndex = entry.SelectedImageIndex;
             if (await AskDialog.ShowAsync(XamlRoot, "Удаление фона", $"Вы уверены, что хотите удалить текущий фон?", "Удалить", "Отмена"))
             {
@@ -351,7 +362,7 @@ public sealed partial class DoomPage : Page
                         var ext = Path.GetExtension(file.Name).ToLowerInvariant();
                         if (FileHelper.SupportedModExtensions.Contains(ext) || FileHelper.SupportedImageExtensions.Contains(ext))
                         {
-                            DropHelper.Visibility = Visibility.Visible;
+                            EventBus.DropHelper(this, true);
                             return;
                         }
                     }
@@ -364,11 +375,6 @@ public sealed partial class DoomPage : Page
         }
     }
 
-    private void Root_DragLeave(object sender, DragEventArgs e)
-    {
-        DropHelper.Visibility = Visibility.Collapsed;
-    }
-
     private void DropHelper_DragOver(object sender, DragEventArgs e)
     {
         e.AcceptedOperation = DataPackageOperation.Copy;
@@ -376,7 +382,6 @@ public sealed partial class DoomPage : Page
 
     private async void DropHelper_Drop(object sender, DragEventArgs e)
     {
-        DropHelper.Visibility = Visibility.Collapsed;
         try
         {
             if (e.DataView.Contains(StandardDataFormats.StorageItems))
@@ -415,35 +420,15 @@ public sealed partial class DoomPage : Page
         }
     }
 
-    private bool isSlideshowEnabled;
-    public bool IsSlideshowEnabled
-    {
-        get => isSlideshowEnabled;
-        set
-        {
-            if (SetProperty(ref isSlideshowEnabled, value))
-            {
-                if (value)
-                {
-                    timerSlideshow.Start();
-                }
-                else
-                {
-                    timerSlideshow.Stop();
-                }
-            }
-        }
-    } 
-
     private void SetSlideshow()
     {
-        IsSlideshowEnabled = entry.Slideshow && entry.ImageFiles.Count > 1;
+        ViewModel.IsSlideshowEnabled = entry.Slideshow && entry.ImageFiles.Count > 1;
     }
 
     private void Slideshow_Click(object sender, RoutedEventArgs e)
     {
         entry.Slideshow = !entry.Slideshow;
-        CurrentTicksToSlideshow = 0;
+        ViewModel.CurrentTicksToSlideshow = 0;
         SetSlideshow();
     }
 }

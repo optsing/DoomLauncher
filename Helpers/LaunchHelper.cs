@@ -41,7 +41,7 @@ internal static class LaunchHelper
         {
             processInfo = new()
             {
-                FileName = "RunAsSteamGame.exe"
+                FileName = "RunAsSteamGame.exe",
             };
             processInfo.ArgumentList.Add(steamAppId.ToString());
             processInfo.ArgumentList.Add(gZDoomPath);
@@ -81,6 +81,7 @@ internal static class LaunchHelper
                 processInfo.ArgumentList.Add(Path.GetFullPath(filePath, FileHelper.ModsFolderPath));
             }
         }
+        processInfo.RedirectStandardError = true;
         CurrentProcess = Process.Start(processInfo);
         if (CurrentProcess == null)
         {

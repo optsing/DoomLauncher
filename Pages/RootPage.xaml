@@ -6,10 +6,95 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:animations="using:CommunityToolkit.WinUI.Animations"
+    xmlns:converters="using:CommunityToolkit.WinUI.Converters"
     xmlns:local="using:DoomLauncher"
     xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
     mc:Ignorable="d"
 >
+    <Page.Resources>
+        <converters:EmptyObjectToObjectConverter x:Key="NullVisibilityConverter" NotEmptyValue="Visible" EmptyValue="Collapsed"/>
+        <MenuFlyout x:Key="flyoutEntry" Placement="Bottom">
+            <MenuFlyoutItem
+                Text="Настроить"
+                Icon="{ui:SymbolIcon Symbol=Edit}"
+                Click="EditMod_Click"
+            />
+            <MenuFlyoutItem
+                Text="Дублировать"
+                Click="CopyMod_Click"
+                Icon="{ui:SymbolIcon Symbol=Copy}"
+            />
+            <MenuFlyoutItem
+                Text="Создать ярлык"
+                Click="CreateShortcut_Click"
+                Icon="{ui:SymbolIcon Symbol=Link}"
+            />
+            <MenuFlyoutItem
+                Text="Экспортировать"
+                Click="ExportMod_Click"
+                Icon="{ui:SymbolIcon Symbol=Download}"
+            />
+            <MenuFlyoutItem
+                Text="Удалить"
+                Click="RemoveMod_Click"
+                Icon="{ui:SymbolIcon Symbol=Delete}"
+            />
+        </MenuFlyout>
+        <Storyboard x:Name="sbShow">
+            <DoubleAnimation
+                Storyboard.TargetName="imgBackground"
+                Storyboard.TargetProperty="Opacity"
+                From="0"
+                To="0.25"
+                Duration="{x:Bind SlideshowAnimationDuration}"
+            />
+        </Storyboard>
+        <Storyboard x:Name="sbHide">
+            <DoubleAnimation
+                Storyboard.TargetName="imgBackground"
+                Storyboard.TargetProperty="Opacity"
+                From="0.25"
+                To="0"
+                Duration="{x:Bind SlideshowAnimationDuration}"
+            />
+        </Storyboard>
+        <Storyboard x:Name="sbToLeft">
+            <DoubleAnimation
+                Storyboard.TargetName="imgBackgroundTranslate"
+                Storyboard.TargetProperty="X"
+                From="0"
+                To="-200"
+                Duration="{x:Bind SlideshowAnimationDuration}"
+            />
+        </Storyboard>
+        <Storyboard x:Name="sbToRight">
+            <DoubleAnimation
+                Storyboard.TargetName="imgBackgroundTranslate"
+                Storyboard.TargetProperty="X"
+                From="0"
+                To="200"
+                Duration="{x:Bind SlideshowAnimationDuration}"
+            />
+        </Storyboard>
+        <Storyboard x:Name="sbFromLeft">
+            <DoubleAnimation
+                Storyboard.TargetName="imgBackgroundTranslate"
+                Storyboard.TargetProperty="X"
+                From="-200"
+                To="0"
+                Duration="{x:Bind SlideshowAnimationDuration}"
+            />
+        </Storyboard>
+        <Storyboard x:Name="sbFromRight">
+            <DoubleAnimation
+                Storyboard.TargetName="imgBackgroundTranslate"
+                Storyboard.TargetProperty="X"
+                From="200"
+                To="0"
+                Duration="{x:Bind SlideshowAnimationDuration}"
+            />
+        </Storyboard>
+    </Page.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="{x:Bind TitleBarHeight}" />
@@ -25,8 +110,6 @@
                         <Setter Target="swMain.DisplayMode" Value="Inline" />
                         <Setter Target="swMain.IsPaneOpen" Value="true" />
                         <Setter Target="gridPane.Background" Value="Transparent" />
-                        <!--<Setter Target="buttonMenu.Visibility" Value="Collapsed" />-->
-                        <!--<Setter Target="frameMain.CornerRadius" Value="8,0,0,0" />-->
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
@@ -50,31 +133,25 @@
                 >
                     <Grid.RowDefinitions>
                         <RowDefinition Height="{x:Bind TitleBarHeight}" />
-                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="48" />
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <SplitButton Grid.Row="1" Click="CreateMod_Click" HorizontalAlignment="Stretch" Margin="8">
+                    <SplitButton Grid.Row="1" Click="CreateMod_Click" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="8">
                         <SplitButton.Flyout>
                             <MenuFlyout>
                                 <MenuFlyoutItem
                                     Click="CreateEntryFromFiles_Click"
                                     HorizontalAlignment="Stretch"
                                     Text="Создать сборку из файлов"
-                                >
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xEC50;" FontSize="16" />
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
+                                    Icon="{ui:FontIcon FontSize=14, Glyph=&#xEC50;}"
+                                />
                                 <MenuFlyoutItem
                                     Click="ImportButton_Click"
                                     HorizontalAlignment="Stretch"
                                     Text="Импортировать из файла"
-                                >
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE898;" FontSize="16" />
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
+                                    Icon="{ui:FontIcon FontSize=14, Glyph=&#xE898;}"
+                                />
                             </MenuFlyout>
                         </SplitButton.Flyout>
                         <StackPanel Orientation="Horizontal">
@@ -83,12 +160,11 @@
                         </StackPanel>
                     </SplitButton>
                     <ListView
-                        x:Name="DoomList"
                         SelectionMode="Single"
                         Grid.Row="2"
                         VerticalAlignment="Stretch"
                         ItemsSource="{x:Bind local:Settings.Current.Entries}"
-                        SelectionChanged="DoomList_SelectionChanged"
+                        SelectedItem="{x:Bind ViewModel.CurrentEntry, Mode=TwoWay}"
                         CanReorderItems="True"
                         AllowDrop="True"
                     >
@@ -97,36 +173,8 @@
                                 <StackPanel
                                     Orientation="Vertical"
                                     Padding="0,8"
+                                    ContextFlyout="{StaticResource flyoutEntry}"
                                 >
-                                    <StackPanel.ContextFlyout>
-                                        <MenuFlyout>
-                                            <MenuFlyoutItem Text="Настроить" Click="EditMod_Click">
-                                                <MenuFlyoutItem.Icon>
-                                                    <SymbolIcon Symbol="Edit" />
-                                                </MenuFlyoutItem.Icon>
-                                            </MenuFlyoutItem>
-                                            <MenuFlyoutItem Text="Дублировать" Click="CopyMod_Click">
-                                                <MenuFlyoutItem.Icon>
-                                                    <SymbolIcon Symbol="Copy" />
-                                                </MenuFlyoutItem.Icon>
-                                            </MenuFlyoutItem>
-                                            <MenuFlyoutItem Text="Создать ярлык" Click="CreateShortcut_Click">
-                                                <MenuFlyoutItem.Icon>
-                                                    <SymbolIcon Symbol="Link" />
-                                                </MenuFlyoutItem.Icon>
-                                            </MenuFlyoutItem>
-                                            <MenuFlyoutItem Text="Экспортировать" Click="ExportMod_Click">
-                                                <MenuFlyoutItem.Icon>
-                                                    <SymbolIcon Symbol="Download" />
-                                                </MenuFlyoutItem.Icon>
-                                            </MenuFlyoutItem>
-                                            <MenuFlyoutItem Text="Удалить" Click="RemoveMod_Click">
-                                                <MenuFlyoutItem.Icon>
-                                                    <SymbolIcon Symbol="Delete" />
-                                                </MenuFlyoutItem.Icon>
-                                            </MenuFlyoutItem>
-                                        </MenuFlyout>
-                                    </StackPanel.ContextFlyout>
                                     <TextBlock
                                         Text="{x:Bind Name, Mode=OneWay}"
                                         FontSize="16"
@@ -161,15 +209,14 @@
                         </StackPanel>
                     </Button>
                     <Border
-                        x:Name="DropHelper"
                         Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
                         Grid.Row="1"
                         Grid.RowSpan="3"
                         CornerRadius="8"
                         AllowDrop="True"
-                        DragOver="DropHelper_DragOver"
-                        Drop="DropHelper_Drop"
-                        Visibility="Collapsed"
+                        DragOver="LeftDropHelper_DragOver"
+                        Drop="LeftDropHelper_Drop"
+                        Visibility="{x:Bind ViewModel.IsLeftDropHelperVisible, Mode=OneWay}"
                     >
                         <animations:Implicit.ShowAnimations>
                             <animations:OpacityAnimation Duration="0:0:0.3" From="0" To="1.0"/>
@@ -192,83 +239,92 @@
             <Grid
                 Background="{ThemeResource CustomColor}"
                 ui:UIElementExtensions.ClipToBounds="True"
+                AllowDrop="True"
+                DragEnter="RightDropHelper_DragEnter"
+                DragLeave="RightDropHelper_DragLeave"
             >
                 <Grid.RowDefinitions>
                     <RowDefinition Height="{x:Bind TitleBarHeight}" />
+                    <RowDefinition Height="48" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Image
-                    Grid.RowSpan="2"
+                    Grid.RowSpan="3"
                     x:Name="imgBackground"
+                    Source="{x:Bind ViewModel.Background, Mode=OneWay}"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Center"
                     Opacity="0.25"
                     Stretch="UniformToFill"
                 >
-                    <Image.Resources>
-                        <Storyboard x:Name="sbShow">
-                            <DoubleAnimation
-                                Storyboard.TargetName="imgBackground"
-                                Storyboard.TargetProperty="Opacity"
-                                From="0"
-                                To="0.25"
-                                Duration="{x:Bind SlideshowAnimationDuration}"
-                            />
-                        </Storyboard>
-                        <Storyboard x:Name="sbHide">
-                            <DoubleAnimation
-                                Storyboard.TargetName="imgBackground"
-                                Storyboard.TargetProperty="Opacity"
-                                From="0.25"
-                                To="0"
-                                Duration="{x:Bind SlideshowAnimationDuration}"
-                            />
-                        </Storyboard>
-                        <Storyboard x:Name="sbToLeft">
-                            <DoubleAnimation
-                                Storyboard.TargetName="imgBackgroundTranslate"
-                                Storyboard.TargetProperty="X"
-                                From="0"
-                                To="-200"
-                                Duration="{x:Bind SlideshowAnimationDuration}"
-                            />
-                        </Storyboard>
-                        <Storyboard x:Name="sbToRight">
-                            <DoubleAnimation
-                                Storyboard.TargetName="imgBackgroundTranslate"
-                                Storyboard.TargetProperty="X"
-                                From="0"
-                                To="200"
-                                Duration="{x:Bind SlideshowAnimationDuration}"
-                            />
-                        </Storyboard>
-                        <Storyboard x:Name="sbFromLeft">
-                            <DoubleAnimation
-                                Storyboard.TargetName="imgBackgroundTranslate"
-                                Storyboard.TargetProperty="X"
-                                From="-200"
-                                To="0"
-                                Duration="{x:Bind SlideshowAnimationDuration}"
-                            />
-                        </Storyboard>
-                        <Storyboard x:Name="sbFromRight">
-                            <DoubleAnimation
-                                Storyboard.TargetName="imgBackgroundTranslate"
-                                Storyboard.TargetProperty="X"
-                                From="200"
-                                To="0"
-                                Duration="{x:Bind SlideshowAnimationDuration}"
-                            />
-                        </Storyboard>
-                    </Image.Resources>
                     <Image.RenderTransform>
                         <TranslateTransform x:Name="imgBackgroundTranslate"/>
                     </Image.RenderTransform>
                 </Image>
-                <Frame
+                <Grid
+                    ColumnDefinitions="*,Auto"
                     Grid.Row="1"
+                    MaxWidth="992"
+                    Margin="16,0"
+                >
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Text="{x:Bind ViewModel.Caption, Mode=OneWay}"
+                        FontSize="20"
+                        Style="{ThemeResource BaseTextBlockStyle}"
+                        TextTrimming="CharacterEllipsis"
+                    />
+                    <StackPanel
+                        Grid.Column="1"
+                        Orientation="Horizontal"
+                        Visibility="{x:Bind ViewModel.CurrentEntry, Converter={StaticResource NullVisibilityConverter}, Mode=OneWay}"
+                        DataContext="{x:Bind ViewModel.CurrentEntry, Mode=OneWay}"
+                    >
+                        <DropDownButton
+                            Margin="8,0,0,0"
+                            VerticalAlignment="Center"
+                            Flyout="{StaticResource flyoutEntry}"
+                        >
+                            <SymbolIcon Symbol="More" />
+                        </DropDownButton>
+                        <Button Margin="8,0,0,0" Width="180" VerticalAlignment="Center" Click="Start_Click" Style="{ThemeResource AccentButtonStyle}">
+                            <StackPanel Orientation="Horizontal">
+                                <FontIcon Glyph="&#xE7FC;" Margin="0,0,4,0" />
+                                <TextBlock>Запустить</TextBlock>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+                <Frame
+                    Grid.Row="2"
                     x:Name="frameMain"
                 />
+                <Border
+                    Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+                    Grid.Row="1"
+                    Grid.RowSpan="2"
+                    AllowDrop="True"
+                    DragOver="RightDropHelper_DragOver"
+                    Drop="RightDropHelper_Drop"
+                    Visibility="{x:Bind ViewModel.IsRightDropHelperVisible, Mode=OneWay}"
+                    CornerRadius="8"
+                >
+                    <animations:Implicit.ShowAnimations>
+                        <animations:OpacityAnimation Duration="0:0:0.3" From="0" To="1.0"/>
+                    </animations:Implicit.ShowAnimations>
+                    <animations:Implicit.HideAnimations>
+                        <animations:OpacityAnimation Duration="0:0:0.3" From="1.0" To="0"/>
+                    </animations:Implicit.HideAnimations>
+                    <TextBlock
+                        FontSize="24"
+                        Margin="8"
+                        Text="Отпустите файлы, чтобы добавить их в сборку"
+                        TextWrapping="WrapWholeWords"
+                        HorizontalAlignment="Stretch"
+                        TextAlignment="Center"
+                        VerticalAlignment="Center"
+                    />
+                </Border>
             </Grid>
         </SplitView>
         <Grid Grid.Row="0">
@@ -279,7 +335,6 @@
                 <ColumnDefinition Width="{x:Bind RightInset}" />
             </Grid.ColumnDefinitions>
             <Button
-                x:Name="buttonMenu"
                 Grid.Column="1"
                 Width="48"
                 VerticalAlignment="Stretch"
@@ -300,10 +355,9 @@
             </Border>
         </Grid>
         <Border
-            x:Name="progressIndicator"
             Background="{ThemeResource CustomBackdropColor}"
             Grid.RowSpan="2"
-            Visibility="Collapsed"
+            Visibility="{x:Bind ViewModel.ProgressText, Converter={StaticResource NullVisibilityConverter}, Mode=OneWay}"
         >
             <animations:Implicit.ShowAnimations>
                 <animations:OpacityAnimation Duration="0:0:0.3" From="0" To="1.0"/>
@@ -320,8 +374,8 @@
                 <TextBlock
                     VerticalAlignment="Center"
                     Margin="8,0,0,0"
-                    x:Name="progressIndicatorText"
                     FontSize="16"
+                    Text="{x:Bind ViewModel.ProgressText, Mode=OneWay}"
                 />
             </StackPanel>
         </Border>

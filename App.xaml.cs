@@ -43,10 +43,13 @@ public partial class App : Application
         {
             mainInstance.Activated += MainInstance_Activated;
             m_window = new MainWindow();
-            m_window.rootPage.Loaded += (object sender, RoutedEventArgs e) =>
+            if (m_window.Content is RootPage rootPage)
             {
-                ParseAppArgs(m_window.rootPage, appArgs);
-            };
+                rootPage.Loaded += (object sender, RoutedEventArgs e) =>
+                {
+                    ParseAppArgs(rootPage, appArgs);
+                };
+            }
             m_window.Activate();
         }
         // If the main instance isn't this current instance
@@ -71,8 +74,11 @@ public partial class App : Application
     {
         m_window?.DispatcherQueue.TryEnqueue(() =>
             {
-                m_window.rootPage.RestoreAndSwitchToThisWindow();
-                ParseAppArgs(m_window.rootPage, e);
+                WinApi.RestoreAndSwitchToThisWindow();
+                if (m_window.Content is RootPage rootPage)
+                {
+                    ParseAppArgs(rootPage, e);
+                }
             }
         );
     }

@@ -4,7 +4,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:animations="using:CommunityToolkit.WinUI.Animations"
+    xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:local="using:DoomLauncher"
     d:DataContext="{d:DesignInstance Type=local:DoomEntry}"
     mc:Ignorable="d"
@@ -12,71 +12,17 @@
     Unloaded="Page_Unloaded"
 >
     <Grid
-        RowDefinitions="48,*,Auto"
+        RowDefinitions="*,Auto"
         AllowDrop="True"
-        DragEnter="Root_DragEnter"
-        DragLeave="Root_DragLeave"
     >
-        <Grid
-            Grid.Row="0"
-            ColumnDefinitions="*,Auto,Auto"
-            MaxWidth="992"
-            Margin="16,0"
-        >
-            <TextBlock
-                Grid.Column="0"
-                VerticalAlignment="Center"
-                Text="{x:Bind entry.Name, Mode=OneWay}"
-                FontSize="20"
-                Style="{ThemeResource BaseTextBlockStyle}"
-                TextWrapping="NoWrap"
-            />
-            <DropDownButton Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center">
-                <DropDownButton.Flyout>
-                    <MenuFlyout Placement="Bottom">
-                        <MenuFlyoutItem Text="Настроить" Click="EditMod_Click">
-                            <MenuFlyoutItem.Icon>
-                                <SymbolIcon Symbol="Edit" />
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
-                        <MenuFlyoutItem Text="Дублировать" Click="CopyMod_Click">
-                            <MenuFlyoutItem.Icon>
-                                <SymbolIcon Symbol="Copy" />
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
-                        <MenuFlyoutItem Text="Создать ярлык" Click="CreateShortcut_Click">
-                            <MenuFlyoutItem.Icon>
-                                <SymbolIcon Symbol="Link" />
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
-                        <MenuFlyoutItem Text="Экспортировать" Click="ExportMod_Click">
-                            <MenuFlyoutItem.Icon>
-                                <SymbolIcon Symbol="Download" />
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
-                        <MenuFlyoutItem Text="Удалить" Click="RemoveMod_Click">
-                            <MenuFlyoutItem.Icon>
-                                <SymbolIcon Symbol="Delete" />
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
-                    </MenuFlyout>
-                </DropDownButton.Flyout>
-                <SymbolIcon Symbol="More" />
-            </DropDownButton>
-            <Button Grid.Column="2" Width="180" Margin="8,0,0,0" VerticalAlignment="Center" Click="Start_Click" Style="{ThemeResource AccentButtonStyle}">
-                <StackPanel Orientation="Horizontal">
-                    <FontIcon Glyph="&#xE7FC;" Margin="0,0,4,0" />
-                    <TextBlock>Играть</TextBlock>
-                </StackPanel>
-            </Button>
-        </Grid>
         <ScrollView
-            Grid.Row="1"
+            Grid.Row="0"
         >
             <Grid
                 RowDefinitions="Auto,*,Auto,Auto"
                 MaxWidth="992"
                 Margin="16,8"
+                ChildrenTransitions="{StaticResource PageCardsAnimations}"
             >
                 <StackPanel
                     Grid.Row="0"
@@ -114,6 +60,7 @@
                         ItemsSource="{x:Bind entry.ModFiles}"
                         Margin="-16,4,-16,0"
                         Visibility="{x:Bind local:XamlHelper.HasItems(entry.ModFiles.Count), Mode=OneWay}"
+                        ItemContainerTransitions="{StaticResource ListViewAnimations}"
                     >
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="x:String">
@@ -131,19 +78,13 @@
                                             <MenuFlyoutItem
                                                 Click="OpenContainFolder_Click"
                                                 Text="Открыть расположение"
-                                            >
-                                                <MenuFlyoutItem.Icon>
-                                                    <FontIcon Glyph="&#xE838;" FontSize="14" />
-                                                </MenuFlyoutItem.Icon>
-                                            </MenuFlyoutItem>
+                                                Icon="{ui:FontIcon FontSize=14, Glyph=&#xE838;}"
+                                            />
                                             <MenuFlyoutItem
                                                 Click="RemoveFile_Click"
                                                 Text="Удалить ссылку на файл"
-                                            >
-                                                <MenuFlyoutItem.Icon>
-                                                    <FontIcon Glyph="&#xE74D;" FontSize="14" />
-                                                </MenuFlyoutItem.Icon>
-                                            </MenuFlyoutItem>
+                                                Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
+                                            />
                                         </MenuFlyout>
                                     </Border.Resources>
                                     <Grid ColumnDefinitions="*,Auto" ContextFlyout="{StaticResource flyoutFile}">
@@ -167,16 +108,19 @@
                         </ListView.ItemTemplate>
                     </ListView>
                 </StackPanel>
-                <StackPanel
+                <Border
                     Grid.Row="2"
-                    Orientation="Vertical"
                     CornerRadius="8"
                     HorizontalAlignment="Stretch"
                     Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
                     Padding="16"
                     Margin="0,8,0,0"
                 >
-                    <TextBlock FontSize="16">
+                    <TextBlock
+                        Grid.Column="0"
+                        FontSize="16"
+                        VerticalAlignment="Center"
+                    >
                         <Run Text="{x:Bind local:FileHelper.GZDoomPathToTitle(entry.GZDoomPath, local:Settings.Current.DefaultGZDoomPath), Mode=OneWay}"/>
                         <Run Text="•"/>
                         <Run Text="{x:Bind local:FileHelper.GetIWadFileTitle(entry.IWadFile, local:Settings.Current.DefaultIWadFile), Mode=OneWay}" />
@@ -184,7 +128,7 @@
                         <Run Text="Последний запуск:"/>
                         <Run Text="{x:Bind local:XamlHelper.DateToText(entry.LastLaunch), Mode=OneWay}"/>
                     </TextBlock>
-                </StackPanel>
+                </Border>
                 <ScrollView
                     Grid.Row="3"
                     MaxHeight="256"
@@ -205,7 +149,7 @@
             </Grid>
         </ScrollView>
         <StackPanel
-            Grid.Row="2"
+            Grid.Row="1"
             Orientation="Horizontal"
             HorizontalAlignment="Right"
         >
@@ -238,16 +182,16 @@
             >
                 <Grid>
                     <ProgressRing
-                        Visibility="{x:Bind IsSlideshowEnabled, Mode=OneWay}"
+                        Visibility="{x:Bind ViewModel.IsSlideshowEnabled, Mode=OneWay}"
                         IsIndeterminate="False"
                         Minimum="0"
                         Maximum="{x:Bind TicksToSlideshow}"
-                        Value="{x:Bind CurrentTicksToSlideshow, Mode=OneWay}"
+                        Value="{x:Bind ViewModel.CurrentTicksToSlideshow, Mode=OneWay}"
                         Width="26"
                         Height="26"
                     />
                     <FontIcon
-                        Glyph="{x:Bind local:XamlHelper.SlideshowGlyph(IsSlideshowEnabled), Mode=OneWay}"
+                        Glyph="{x:Bind local:XamlHelper.SlideshowGlyph(ViewModel.IsSlideshowEnabled), Mode=OneWay}"
                         FontSize="16"
                     />
                 </Grid>
@@ -273,31 +217,5 @@
                 <FontIcon Glyph="&#xE74D;" FontSize="16" />
             </Button>
         </StackPanel>
-        <Border
-            x:Name="DropHelper"
-            Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
-            Grid.RowSpan="3"
-            AllowDrop="True"
-            DragOver="DropHelper_DragOver"
-            Drop="DropHelper_Drop"
-            Visibility="Collapsed"
-            CornerRadius="8"
-        >
-            <animations:Implicit.ShowAnimations>
-                <animations:OpacityAnimation Duration="0:0:0.3" From="0" To="1.0"/>
-            </animations:Implicit.ShowAnimations>
-            <animations:Implicit.HideAnimations>
-                <animations:OpacityAnimation Duration="0:0:0.3" From="1.0" To="0"/>
-            </animations:Implicit.HideAnimations>
-            <TextBlock
-                FontSize="24"
-                Margin="8"
-                Text="Отпустите файлы, чтобы добавить их в сборку"
-                TextWrapping="WrapWholeWords"
-                HorizontalAlignment="Stretch"
-                TextAlignment="Center"
-                VerticalAlignment="Center"
-            />
-        </Border>
     </Grid>
 </Page>
