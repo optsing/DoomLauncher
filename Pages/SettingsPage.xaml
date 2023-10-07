@@ -50,6 +50,7 @@
             MaxWidth="992"
             Margin="16,8"
             ChildrenTransitions="{StaticResource PageCardsAnimations}"
+            Spacing="8"
         >
             <StackPanel
                 Orientation="Vertical"
@@ -83,8 +84,8 @@
                                 />
                             </MenuFlyout>
                         </DropDownButton.Flyout>
-                        <StackPanel Orientation="Horizontal">
-                            <SymbolIcon Symbol="Add" Height="18" Margin="0,0,4,0"/>
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <SymbolIcon Symbol="Add" Height="18" />
                             <TextBlock>Добавить</TextBlock>
                         </StackPanel>
                     </DropDownButton>
@@ -132,7 +133,6 @@
                 HorizontalAlignment="Stretch"
                 Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
                 Padding="16"
-                Margin="0,8,0,0"
             >
                 <Grid ColumnDefinitions="*,Auto">
                     <TextBlock
@@ -154,8 +154,8 @@
                                 />
                             </MenuFlyout>
                         </DropDownButton.Flyout>
-                        <StackPanel Orientation="Horizontal">
-                            <SymbolIcon Symbol="Add" Height="18" Margin="0,0,4,0"/>
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <SymbolIcon Symbol="Add" Height="18" />
                             <TextBlock>Добавить</TextBlock>
                         </StackPanel>
                     </DropDownButton>
@@ -206,7 +206,6 @@
                 HorizontalAlignment="Stretch"
                 Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
                 Padding="16"
-                Margin="0,8,0,0"
             >
                 <TextBlock
                     Grid.Column="0"
@@ -230,7 +229,6 @@
                 HorizontalAlignment="Stretch"
                 Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
                 Padding="16"
-                Margin="0,8,0,0"
             >
                 <TextBlock
                     Grid.Column="0"
@@ -254,7 +252,6 @@
                 HorizontalAlignment="Stretch"
                 Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
                 Padding="16"
-                Margin="0,8,0,0"
             >
                 <TextBlock
                     Text="О приложении"

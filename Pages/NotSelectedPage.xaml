@@ -12,8 +12,9 @@
         VerticalAlignment="Center"
         HorizontalAlignment="Center"
         Orientation="Horizontal"
+        Spacing="8"
     >
-        <FontIcon Glyph="&#xF0B0;" Margin="0,4,8,0" FontSize="24" VerticalAlignment="Center" />
+        <FontIcon Glyph="&#xF0B0;" Margin="0,4,0,0" FontSize="24" VerticalAlignment="Center" />
         <TextBlock
             Text="Создайте или выберите сборку"
             FontSize="24"

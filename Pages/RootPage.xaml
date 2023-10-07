@@ -137,7 +137,13 @@
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <SplitButton Grid.Row="1" Click="CreateMod_Click" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="8">
+                    <SplitButton
+                        Grid.Row="1"
+                        Click="CreateMod_Click"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center"
+                        Margin="8,0"
+                    >
                         <SplitButton.Flyout>
                             <MenuFlyout>
                                 <MenuFlyoutItem
@@ -154,8 +160,8 @@
                                 />
                             </MenuFlyout>
                         </SplitButton.Flyout>
-                        <StackPanel Orientation="Horizontal">
-                            <SymbolIcon Symbol="Add" Margin="0,0,4,0" />
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <SymbolIcon Symbol="Add" />
                             <TextBlock>Создать сборку</TextBlock>
                         </StackPanel>
                     </SplitButton>
@@ -191,13 +197,13 @@
                         </ListView.ItemTemplate>
                     </ListView>
                     <Button
-                        Grid.Row="4"
+                        Grid.Row="3"
                         Click="SettingsButton_Click"
                         Margin="8"
                         HorizontalAlignment="Stretch"
                     >
-                        <StackPanel Orientation="Horizontal">
-                            <AnimatedIcon Height="18" Margin="0,0,4,0">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <AnimatedIcon Height="18">
                                 <AnimatedIcon.Source>
                                     <animatedvisuals:AnimatedSettingsVisualSource />
                                 </AnimatedIcon.Source>
@@ -288,8 +294,8 @@
                             <SymbolIcon Symbol="More" />
                         </DropDownButton>
                         <Button Margin="8,0,0,0" Width="180" VerticalAlignment="Center" Click="Start_Click" Style="{ThemeResource AccentButtonStyle}">
-                            <StackPanel Orientation="Horizontal">
-                                <FontIcon Glyph="&#xE7FC;" Margin="0,0,4,0" />
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <FontIcon Glyph="&#xE7FC;" />
                                 <TextBlock>Запустить</TextBlock>
                             </StackPanel>
                         </Button>

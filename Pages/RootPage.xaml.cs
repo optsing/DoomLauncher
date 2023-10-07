@@ -379,13 +379,13 @@ public sealed partial class RootPage : Page
         {
             entry.LastLaunch = DateTime.Now;
             await JumpListHelper.Update();
+            WinApi.SetForegroundWindow(LaunchHelper.CurrentProcess.MainWindowHandle);
             if (Settings.Current.CloseOnLaunch || forceClose)
             {
                 Application.Current.Exit();
             }
             else
             {
-                WinApi.MinimizeAndSwitchToAnotherWindow(LaunchHelper.CurrentProcess.MainWindowHandle);
                 await LaunchHelper.CurrentProcess.WaitForExitAsync();
                 WinApi.RestoreAndSwitchToThisWindow();
                 if (LaunchHelper.CurrentProcess.ExitCode != 0)
@@ -405,10 +405,7 @@ public sealed partial class RootPage : Page
         }
         else if (result == LaunchResult.AlreadyLaunched && LaunchHelper.CurrentProcess != null)
         {
-            if (await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске", "Игра уже запущена, закройте текущую игру", "Переключить на игру", "Отмена"))
-            {
-                WinApi.MinimizeAndSwitchToAnotherWindow(LaunchHelper.CurrentProcess.MainWindowHandle);
-            }
+            await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске", "Игра уже запущена, закройте текущую игру", "", "Отмена");
         }
         else if (result == LaunchResult.PathNotValid)
         {

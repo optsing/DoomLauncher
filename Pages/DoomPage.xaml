@@ -13,13 +13,13 @@
 >
     <Grid
         RowDefinitions="*,Auto"
-        AllowDrop="True"
     >
         <ScrollView
             Grid.Row="0"
         >
             <Grid
-                RowDefinitions="Auto,*,Auto,Auto"
+                RowDefinitions="*,Auto,Auto"
+                RowSpacing="8"
                 MaxWidth="992"
                 Margin="16,8"
                 ChildrenTransitions="{StaticResource PageCardsAnimations}"
@@ -29,6 +29,7 @@
                     Orientation="Vertical"
                     CornerRadius="8"
                     HorizontalAlignment="Stretch"
+                    VerticalAlignment="Top"
                     Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
                     Padding="16"
                 >
@@ -47,8 +48,8 @@
                                     Opening="MenuFlyout_Opening"
                                 />
                             </DropDownButton.Flyout>
-                            <StackPanel Orientation="Horizontal">
-                                <SymbolIcon Symbol="Add" Height="18" Margin="0,0,4,0"/>
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <SymbolIcon Symbol="Add" Height="18" />
                                 <TextBlock>Добавить</TextBlock>
                             </StackPanel>
                         </DropDownButton>
@@ -109,12 +110,11 @@
                     </ListView>
                 </StackPanel>
                 <Border
-                    Grid.Row="2"
+                    Grid.Row="1"
                     CornerRadius="8"
                     HorizontalAlignment="Stretch"
                     Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
                     Padding="16"
-                    Margin="0,8,0,0"
                 >
                     <TextBlock
                         Grid.Column="0"
@@ -130,12 +130,11 @@
                     </TextBlock>
                 </Border>
                 <ScrollView
-                    Grid.Row="3"
+                    Grid.Row="2"
                     MaxHeight="256"
                     Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
                     CornerRadius="8"
                     HorizontalAlignment="Stretch"
-                    Margin="0,8,0,0"
                     Visibility="{x:Bind local:XamlHelper.HasText(entry.LongDescription), Mode=OneWay}"
                 >
                     <TextBlock
