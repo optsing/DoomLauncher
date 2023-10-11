@@ -32,6 +32,7 @@
                     VerticalAlignment="Top"
                     Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
                     Padding="16"
+                    Spacing="4"
                 >
                     <Grid ColumnDefinitions="*,Auto">
                         <TextBlock
@@ -49,7 +50,7 @@
                                 />
                             </DropDownButton.Flyout>
                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                <SymbolIcon Symbol="Add" Height="18" />
+                                <FontIcon FontSize="14" Glyph="&#xE710;" />
                                 <TextBlock>Добавить</TextBlock>
                             </StackPanel>
                         </DropDownButton>
@@ -59,7 +60,7 @@
                         CanReorderItems="True"
                         AllowDrop="True"
                         ItemsSource="{x:Bind entry.ModFiles}"
-                        Margin="-16,4,-16,0"
+                        Margin="-16,0"
                         Visibility="{x:Bind local:XamlHelper.HasItems(entry.ModFiles.Count), Mode=OneWay}"
                         ItemContainerTransitions="{StaticResource ListViewAnimations}"
                     >
@@ -73,7 +74,7 @@
                                                 Text="{x:Bind local:XamlHelper.FileInFavoritesTooltip(local:Settings.Current.FavoriteFiles, (x:String)), Mode=OneWay}"
                                             >
                                                 <MenuFlyoutItem.Icon>
-                                                    <FontIcon Glyph="{x:Bind local:XamlHelper.FileInFavoritesGlyph(local:Settings.Current.FavoriteFiles, (x:String)), Mode=OneWay}" FontSize="14" />
+                                                    <FontIcon FontSize="14" Glyph="{x:Bind local:XamlHelper.FileInFavoritesGlyph(local:Settings.Current.FavoriteFiles, (x:String)), Mode=OneWay}" />
                                                 </MenuFlyoutItem.Icon>
                                             </MenuFlyoutItem>
                                             <MenuFlyoutItem
@@ -100,9 +101,8 @@
                                             Height="40"
                                             Width="40"
                                             Flyout="{StaticResource flyoutFile}"
-                                        >
-                                            <SymbolIcon Symbol="More" />
-                                        </Button>
+                                            Content="{ui:FontIcon FontSize=14, Glyph=&#xE712;}"
+                                        />
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -114,12 +114,12 @@
                     CornerRadius="8"
                     HorizontalAlignment="Stretch"
                     Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
-                    Padding="16"
                 >
                     <TextBlock
                         Grid.Column="0"
                         FontSize="16"
                         VerticalAlignment="Center"
+                        Margin="16"
                     >
                         <Run Text="{x:Bind local:FileHelper.GZDoomPathToTitle(entry.GZDoomPath, local:Settings.Current.DefaultGZDoomPath), Mode=OneWay}"/>
                         <Run Text="•"/>
@@ -158,9 +158,8 @@
                 Style="{ThemeResource EllipsisButton}"
                 Height="40"
                 Width="40"
-            >
-                <FontIcon Glyph="&#xE710;" FontSize="16" />
-            </Button>
+                Content="{ui:FontIcon FontSize=16, Glyph=&#xE710;}"
+            />
             <Button
                 ToolTipService.ToolTip="Предыдущий фон"
                 Click="PreviousBackground_Click" 
@@ -168,9 +167,8 @@
                 Height="40"
                 Width="40"
                 IsEnabled="{x:Bind local:XamlHelper.HasMoreItems(entry.ImageFiles.Count, 1), Mode=OneWay}"
-            >
-                <FontIcon Glyph="&#xE892;" FontSize="16" />
-            </Button>
+                Content="{ui:FontIcon FontSize=16, Glyph=&#xE892;}"
+            />
             <Button
                 ToolTipService.ToolTip="Слайд-шоу"
                 Click="Slideshow_Click"
@@ -202,9 +200,8 @@
                 Height="40"
                 Width="40"
                 IsEnabled="{x:Bind local:XamlHelper.HasMoreItems(entry.ImageFiles.Count, 1), Mode=OneWay}"
-            >
-                <FontIcon Glyph="&#xE893;" FontSize="16" />
-            </Button>
+                Content="{ui:FontIcon FontSize=16, Glyph=&#xE893;}"
+            />
             <Button
                 ToolTipService.ToolTip="Удалить фон"
                 Style="{ThemeResource EllipsisButton}"

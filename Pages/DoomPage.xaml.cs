@@ -108,7 +108,7 @@ public sealed partial class DoomPage : Page
                 Icon = new FontIcon()
                 {
                     Glyph = "\uEC50",
-                    FontSize = 16,
+                    FontSize = 14,
                 }
             };
             browseItem.Click += Append_Click;
@@ -121,7 +121,7 @@ public sealed partial class DoomPage : Page
                 Icon = new FontIcon()
                 {
                     Glyph = "\uE735",
-                    FontSize = 16,
+                    FontSize = 14,
                 }
             });
             if (Settings.Current.FavoriteFiles.Any())

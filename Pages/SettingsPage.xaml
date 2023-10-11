@@ -58,6 +58,7 @@
                 HorizontalAlignment="Stretch"
                 Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
                 Padding="16"
+                Spacing="4"
             >
                 <Grid ColumnDefinitions="*,Auto">
                     <TextBlock
@@ -85,7 +86,7 @@
                             </MenuFlyout>
                         </DropDownButton.Flyout>
                         <StackPanel Orientation="Horizontal" Spacing="4">
-                            <SymbolIcon Symbol="Add" Height="18" />
+                            <FontIcon FontSize="14" Glyph="&#xE710;" />
                             <TextBlock>Добавить</TextBlock>
                         </StackPanel>
                     </DropDownButton>
@@ -94,7 +95,7 @@
                     ItemsSource="{x:Bind local:Settings.Current.GZDoomInstalls, Mode=OneWay}"
                     HorizontalAlignment="Stretch"
                     SelectionMode="None"
-                    Margin="-16,4,-16,0"
+                    Margin="-16,0"
                     CanReorderItems="True"
                     AllowDrop="True"
                     Visibility="{x:Bind local:XamlHelper.HasItems(local:Settings.Current.IWadFiles.Count), Mode=OneWay}"
@@ -119,9 +120,8 @@
                                     Height="40"
                                     Width="40"
                                     Flyout="{StaticResource flyoutPackage}"
-                                >
-                                    <SymbolIcon Symbol="More" />
-                                </Button>
+                                    Content="{ui:FontIcon FontSize=14, Glyph=&#xE712;}"
+                                />
                             </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>
@@ -133,6 +133,7 @@
                 HorizontalAlignment="Stretch"
                 Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
                 Padding="16"
+                Spacing="4"
             >
                 <Grid ColumnDefinitions="*,Auto">
                     <TextBlock
@@ -155,7 +156,7 @@
                             </MenuFlyout>
                         </DropDownButton.Flyout>
                         <StackPanel Orientation="Horizontal" Spacing="4">
-                            <SymbolIcon Symbol="Add" Height="18" />
+                            <FontIcon FontSize="14" Glyph="&#xE710;" />
                             <TextBlock>Добавить</TextBlock>
                         </StackPanel>
                     </DropDownButton>
@@ -163,7 +164,7 @@
                 <ListView
                     ItemsSource="{x:Bind local:Settings.Current.IWadFiles, Mode=OneWay}"
                     HorizontalAlignment="Stretch"
-                    Margin="-16,4,-16,0"
+                    Margin="-16,0"
                     CanReorderItems="True"
                     AllowDrop="True"
                     SelectionMode="None"
@@ -192,9 +193,8 @@
                                     Height="40"
                                     Width="40"
                                     Flyout="{StaticResource flyoutIWad}"
-                                >
-                                    <SymbolIcon Symbol="More" />
-                                </Button>
+                                    Content="{ui:FontIcon FontSize=14, Glyph=&#xE712;}"
+                                />
                             </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>
@@ -252,10 +252,10 @@
                 HorizontalAlignment="Stretch"
                 Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
                 Padding="16"
+                Spacing="4"
             >
                 <TextBlock
                     Text="О приложении"
-                    Margin="0,0,0,4"
                     Style="{ThemeResource BaseTextBlockStyle}"
                     FontSize="16"
                 />

@@ -55,7 +55,7 @@ public sealed partial class RootPage : Page
 
     private readonly TimeSpan SlideshowAnimationDuration = TimeSpan.FromMilliseconds(150);
 
-    private RootPageViewModel ViewModel { get; set; } = new();
+    private RootPageViewModel ViewModel { get; set; }
 
     public RootPage()
     {
@@ -65,8 +65,6 @@ public sealed partial class RootPage : Page
         EventBus.OnChangeBackground += EventBus_OnChangeBackground;
         EventBus.OnChangeCaption += EventBus_OnChangeCaption;
         EventBus.OnDropHelper += EventBus_OnDropHelper;
-
-        ViewModel.PropertyChanged += ViewModel_PropertyChanged;
 
         if (Settings.IsCustomTitlebar)
         {
@@ -88,40 +86,16 @@ public sealed partial class RootPage : Page
                 TitleBarHeight = new GridLength(appWindow.TitleBar.Height / scaleAdjustment);
             }
         }
-
-        if (Settings.Current.SelectedModIndex >= 0 && Settings.Current.SelectedModIndex < Settings.Current.Entries.Count)
+        ViewModel = new()
         {
-            ViewModel.CurrentEntry = Settings.Current.Entries[Settings.Current.SelectedModIndex];
-        }
-        else
-        {
-            frameMain.Navigate(typeof(NotSelectedPage));
-        }
+            CurrentEntry = Settings.Current.Entries.ElementAtOrDefault(Settings.Current.SelectedModIndex),
+        };
+        NavigateToEntry(ViewModel.CurrentEntry);
     }
 
     private void EventBus_OnDropHelper(object? sender, bool e)
     {
         ViewModel.IsRightDropHelperVisible = e;
-    }
-
-    private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(ViewModel.CurrentEntry))
-        {
-            if (ViewModel.CurrentEntry != null)
-            {
-                Settings.Current.SelectedModIndex = Settings.Current.Entries.IndexOf(ViewModel.CurrentEntry);
-                frameMain.Navigate(typeof(DoomPage), ViewModel.CurrentEntry);
-            } 
-            else if (frameMain.Content is not SettingsPage)
-            {
-                frameMain.Navigate(typeof(NotSelectedPage));
-            }
-            if (swMain.DisplayMode == SplitViewDisplayMode.Overlay)
-            {
-                swMain.IsPaneOpen = false;
-            }
-        } 
     }
 
     private void EventBus_OnChangeCaption(object? sender, string? e)
@@ -297,6 +271,10 @@ public sealed partial class RootPage : Page
     {
         if (await AskDialog.ShowAsync(XamlRoot, "Удаление сборки", $"Вы уверены, что хотите удалить сборку '{entry.Name}'?", "Удалить", "Отмена"))
         {
+            if (entry == ViewModel.CurrentEntry)
+            {
+                SetCurrentEntry(null);
+            }
             Settings.Current.Entries.Remove(entry);
             Settings.Save();
             await JumpListHelper.Update();
@@ -338,9 +316,7 @@ public sealed partial class RootPage : Page
             ModFiles = new(entry.ModFiles),
             ImageFiles = new(entry.ImageFiles),
         };
-        Settings.Current.Entries.Add(newEntry);
-        ViewModel.CurrentEntry = newEntry;
-        Settings.Save();
+        AddEntries(new[] { newEntry });
     }
 
     private void Start_Click(object sender, RoutedEventArgs e)
@@ -373,13 +349,12 @@ public sealed partial class RootPage : Page
             await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске", "Не удалось найти нужную сборку", "", "Отмена");
             return;
         }
-        ViewModel.CurrentEntry = entry;
+        SetCurrentEntry(entry);
         var result = LaunchHelper.LaunchEntry(entry);
         if (result == LaunchResult.Success && LaunchHelper.CurrentProcess != null)
         {
             entry.LastLaunch = DateTime.Now;
             await JumpListHelper.Update();
-            WinApi.SetForegroundWindow(LaunchHelper.CurrentProcess.MainWindowHandle);
             if (Settings.Current.CloseOnLaunch || forceClose)
             {
                 Application.Current.Exit();
@@ -387,7 +362,6 @@ public sealed partial class RootPage : Page
             else
             {
                 await LaunchHelper.CurrentProcess.WaitForExitAsync();
-                WinApi.RestoreAndSwitchToThisWindow();
                 if (LaunchHelper.CurrentProcess.ExitCode != 0)
                 {
                     var error = await LaunchHelper.CurrentProcess.StandardError.ReadToEndAsync();
@@ -399,7 +373,6 @@ public sealed partial class RootPage : Page
                     {
                         await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске", $"Игра завершилась с ошибкой, вывод:\n{error}", "", "Отмена");
                     }
-                    
                 }
             }
         }
@@ -430,7 +403,7 @@ public sealed partial class RootPage : Page
         if (frameMain.Content is not SettingsPage)
         {
             frameMain.Navigate(typeof(SettingsPage));
-            ViewModel.CurrentEntry = null;
+            SetCurrentEntry(null);
         }
     }
 
@@ -458,9 +431,7 @@ public sealed partial class RootPage : Page
             var newEntry = await EntryHelper.CreateEntryFromFiles(XamlRoot, files, withConfirm: true, SetProgress);
             if (newEntry != null)
             {
-                Settings.Current.Entries.Add(newEntry);
-                ViewModel.CurrentEntry = newEntry;
-                Settings.Save();
+                AddEntries(new[] { newEntry });
             }
         }
     }
@@ -483,9 +454,7 @@ public sealed partial class RootPage : Page
                 UniqueSavesFolder = result.uniqueSavesFolder,
                 SelectedImageIndex = 0,
             };
-            Settings.Current.Entries.Add(newEntry);
-            ViewModel.CurrentEntry = newEntry;
-            Settings.Save();
+            AddEntries(new[] { newEntry });
         }
     }
 
@@ -553,21 +522,16 @@ public sealed partial class RootPage : Page
 
     public async Task ImportEntriesFromGZDLFiles(IReadOnlyList<StorageFile> files, bool withConfirm)
     {
-        DoomEntry? lastAddedEntry = null;
+        var addedEntries = new List<DoomEntry>();
         foreach (var file in files)
         {
             var newEntry = await EntryHelper.ImportFromGZDLFile(XamlRoot, file, withConfirm, SetProgress);
             if (newEntry != null)
             {
-                Settings.Current.Entries.Add(newEntry);
-                lastAddedEntry = newEntry;
+                addedEntries.Add(newEntry);
             }
         }
-        if (lastAddedEntry != null)
-        {
-            ViewModel.CurrentEntry = lastAddedEntry;
-            Settings.Save();
-        }
+        AddEntries(addedEntries);
     }
 
     public async Task ImportEntryFromDoomWorldId(string wadId, bool withConfirm)
@@ -579,9 +543,7 @@ public sealed partial class RootPage : Page
             var newEntry = await EntryHelper.ImportFromDoomWorld(XamlRoot, wadInfo, withConfirm, SetProgress);
             if (newEntry != null)
             {
-                Settings.Current.Entries.Add(newEntry);
-                ViewModel.CurrentEntry = newEntry;
-                Settings.Save();
+                AddEntries(new[] { newEntry });
             }
         }
         SetProgress(null);
@@ -658,9 +620,7 @@ public sealed partial class RootPage : Page
                     var newEntry = await EntryHelper.CreateEntryFromFiles(XamlRoot, otherFiles, withConfirm: true, SetProgress);
                     if (newEntry != null)
                     {
-                        Settings.Current.Entries.Add(newEntry);
-                        ViewModel.CurrentEntry = newEntry;
-                        Settings.Save();
+                        AddEntries(new[] { newEntry });
                     }
                 }
             }
@@ -690,5 +650,59 @@ public sealed partial class RootPage : Page
     private void RightDropHelper_DragLeave(object sender, DragEventArgs e)
     {
         ViewModel.IsRightDropHelperVisible = false;
+    }
+
+    public void AddEntries(IEnumerable<DoomEntry> entries)
+    {
+        if (entries.Any())
+        {
+            foreach (var entry in entries)
+            {
+                Settings.Current.Entries.Add(entry);
+            }
+            SetCurrentEntry(entries.Last());
+            Settings.Save();
+        }
+    }
+
+    public void SetCurrentEntry(DoomEntry? entry)
+    {
+        if (entry != ViewModel.CurrentEntry)
+        {
+            ViewModel.CurrentEntry = entry;
+            NavigateToEntry(entry);
+        }
+    }
+
+    public void NavigateToEntry(DoomEntry? entry)
+    {
+        if (entry != null)
+        {
+            Settings.Current.SelectedModIndex = Settings.Current.Entries.IndexOf(entry);
+            frameMain.Navigate(typeof(DoomPage), entry);
+        }
+        else if (frameMain.Content is not SettingsPage)
+        {
+            frameMain.Navigate(typeof(NotSelectedPage));
+        }
+        if (swMain.DisplayMode == SplitViewDisplayMode.Overlay)
+        {
+            swMain.IsPaneOpen = false;
+        }
+    }
+
+    private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (sender is ListView listView)
+        {
+            if (listView.SelectedItem is DoomEntry entry)
+            {
+                SetCurrentEntry(entry);
+            }
+            else
+            {
+                SetCurrentEntry(null);
+            }
+        }
     }
 }
