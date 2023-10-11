@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
@@ -134,7 +133,7 @@ public sealed partial class SettingsPage : Page
                     Version = package.Version,
                     Arch = package.Arch,
                 };
-                Settings.Current.GZDoomInstalls.Add(newPackage);
+                Settings.Current.GZDoomInstalls.Insert(0, newPackage);
             }
             finally
             {
@@ -169,7 +168,7 @@ public sealed partial class SettingsPage : Page
                     Version = version,
                     Arch = AssetArch.manual,
                 };
-                Settings.Current.GZDoomInstalls.Add(newPackage);
+                Settings.Current.GZDoomInstalls.Insert(0, newPackage);
             }
         }
     }
@@ -202,7 +201,7 @@ public sealed partial class SettingsPage : Page
             await FileHelper.CopyFileWithConfirmation(XamlRoot, file, FileHelper.IWadFolderPath);
             if (!Settings.Current.IWadFiles.Contains(file.Name))
             {
-                Settings.Current.IWadFiles.Add(file.Name);
+                Settings.Current.IWadFiles.Insert(0, file.Name);
             }
         }
         EventBus.Progress(this, null);

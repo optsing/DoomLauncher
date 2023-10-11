@@ -84,6 +84,7 @@ internal static partial class EntryHelper
                 return new DoomEntry()
                 {
                     Id = Guid.NewGuid().ToString(),
+                    Created = DateTime.Now,
                     Name = entryProperties.name,
                     Description = entryProperties.description,
                     LongDescription = entryProperties.longDescription,
@@ -162,6 +163,7 @@ internal static partial class EntryHelper
                 return new DoomEntry()
                 {
                     Id = Guid.NewGuid().ToString(),
+                    Created = DateTime.Now,
                     Name = entryProperties.name,
                     Description = entryProperties.description,
                     LongDescription = entryProperties.longDescription,
@@ -187,7 +189,7 @@ internal static partial class EntryHelper
     [GeneratedRegex(@"\s*<br>\s*")]
     private static partial Regex reLineBreak();
 
-    public static async Task<DoomEntry?> CreateEntryFromFiles(XamlRoot xamlRoot, IReadOnlyList<StorageFile> files, bool withConfirm, Action<string?> SetProgress)
+    public static async Task<DoomEntry?> CreateFromFiles(XamlRoot xamlRoot, IReadOnlyList<StorageFile> files, bool withConfirm, Action<string?> SetProgress)
     {
         try
         {
@@ -246,6 +248,7 @@ internal static partial class EntryHelper
                 return new DoomEntry()
                 {
                     Id = Guid.NewGuid().ToString(),
+                    Created = DateTime.Now,
                     Name = entryProperties.name,
                     Description = entryProperties.description,
                     LongDescription = entryProperties.longDescription,
@@ -282,6 +285,7 @@ internal static partial class EntryHelper
             var newEntry = new DoomEntry()
             {
                 Id = entry.Id,
+                Created = entry.Created,
                 Name = entry.Name,
                 Description = entry.Description,
                 LongDescription = entry.LongDescription,

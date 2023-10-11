@@ -304,6 +304,7 @@ public sealed partial class RootPage : Page
         var newEntry = new DoomEntry()
         {
             Id = Guid.NewGuid().ToString(),
+            Created = DateTime.Now,
             Name = entry.Name,
             Description = entry.Description,
             LongDescription = entry.LongDescription,
@@ -428,7 +429,7 @@ public sealed partial class RootPage : Page
 
         if (files.Any())
         {
-            var newEntry = await EntryHelper.CreateEntryFromFiles(XamlRoot, files, withConfirm: true, SetProgress);
+            var newEntry = await EntryHelper.CreateFromFiles(XamlRoot, files, withConfirm: true, SetProgress);
             if (newEntry != null)
             {
                 AddEntries(new[] { newEntry });
@@ -444,6 +445,7 @@ public sealed partial class RootPage : Page
             var newEntry = new DoomEntry()
             {
                 Id = Guid.NewGuid().ToString(),
+                Created = DateTime.Now,
                 Name = result.name,
                 Description = result.description,
                 LongDescription = result.longDescription,
@@ -617,7 +619,7 @@ public sealed partial class RootPage : Page
                 }
                 if (otherFiles.Any())
                 {
-                    var newEntry = await EntryHelper.CreateEntryFromFiles(XamlRoot, otherFiles, withConfirm: true, SetProgress);
+                    var newEntry = await EntryHelper.CreateFromFiles(XamlRoot, otherFiles, withConfirm: true, SetProgress);
                     if (newEntry != null)
                     {
                         AddEntries(new[] { newEntry });
@@ -658,7 +660,7 @@ public sealed partial class RootPage : Page
         {
             foreach (var entry in entries)
             {
-                Settings.Current.Entries.Add(entry);
+                Settings.Current.Entries.Insert(0, entry);
             }
             SetCurrentEntry(entries.Last());
             Settings.Save();

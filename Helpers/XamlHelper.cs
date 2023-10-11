@@ -28,7 +28,7 @@ static class XamlHelper
 
     public static string DateToText(DateTime? lastLaunch)
     {
-        return lastLaunch?.ToString() ?? "Никогда";
+        return lastLaunch?.ToString() ?? "Неизвестно";
     }
 
     public static string FileInFavoritesGlyph(Collection<string> list, string value)

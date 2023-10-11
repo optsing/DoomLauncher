@@ -111,6 +111,14 @@ public partial class DoomEntry: ObservableObject
     public ObservableCollection<string> ImageFiles { get; set; } = new();
     public ObservableCollection<string> ModFiles { get; set; } = new();
 
+    private DateTime? created = null;
+
+    public DateTime? Created
+    {
+        get => created;
+        set => SetProperty(ref created, value);
+    }
+
     private DateTime? lastLaunch = null;
 
     public DateTime? LastLaunch
