@@ -125,11 +125,11 @@
                         <Run Text="•"/>
                         <Run Text="{x:Bind local:FileHelper.GetIWadFileTitle(entry.IWadFile, local:Settings.Current.DefaultIWadFile), Mode=OneWay}" />
                         <Run Text="•"/>
-                        <Run Text="Создано:"/>
-                        <Run Text="{x:Bind local:XamlHelper.DateToText(entry.Created), Mode=OneWay}"/>
-                        <Run Text="•"/>
                         <Run Text="Последний запуск:"/>
                         <Run Text="{x:Bind local:XamlHelper.DateToText(entry.LastLaunch), Mode=OneWay}"/>
+                        <Run Text="•"/>
+                        <Run Text="Вы играли:"/>
+                        <Run Text="{x:Bind local:XamlHelper.TimeSpanToText(entry.PlayTime), Mode=OneWay}"/>
                     </TextBlock>
                 </Border>
                 <ScrollView

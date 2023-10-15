@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using System;
@@ -7,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
@@ -21,9 +23,20 @@ public enum AssetArch
     x64, x86, arm64, x64legacy, x86legacy, unknown, manual, notSelected
 }
 
+public partial class SettingsPageViewModel : ObservableObject
+{
+    public required List<KeyValue> SteamGames { init; get; }
+
+    [ObservableProperty]
+    public KeyValue steamGame;
+
+    public required string AppVersion { init; get; }
+}
+
 public sealed partial class SettingsPage : Page
 {
-    private readonly string appVersion;
+
+    public SettingsPageViewModel ViewModel;
 
     public SettingsPage()
     {
@@ -41,11 +54,32 @@ public sealed partial class SettingsPage : Page
                 appVersion = assemblyVersion.Version.ToString();
             }
         }
-        this.appVersion = $"{appName} {appVersion}";
 #else
+        var appName = Package.Current.DisplayName;
         var version = Package.Current.Id.Version;
-        appVersion = $"{Package.Current.DisplayName} {version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+        var appVersion = $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
 #endif
+        var steamGames = FileHelper.SteamAppIds.Select(item => new KeyValue(item.Key, item.Value.title)).ToList();
+        ViewModel = new()
+        {
+            AppVersion = $"{appName} {appVersion}",
+            SteamGames = steamGames,
+            SteamGame = steamGames.FirstOrDefault(steamGame => steamGame.Key == Settings.Current.SteamGame, steamGames.First()),
+        };
+        ViewModel.PropertyChanged += ViewModel_PropertyChanged;
+    }
+
+    private void Page_Unloaded(object sender, RoutedEventArgs e)
+    {
+        ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
+    }
+
+    private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ViewModel.SteamGame))
+        {
+            Settings.Current.SteamGame = ViewModel.SteamGame.Key;
+        }
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)

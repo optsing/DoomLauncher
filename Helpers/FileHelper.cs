@@ -89,9 +89,10 @@ internal static class FileHelper
 
     public static int GetSteamAppIdForEntry (DoomEntry entry)
     {
-        if (Settings.Current.SteamIntegration)
+        var steamGame = string.IsNullOrEmpty(entry.SteamGame) ? Settings.Current.SteamGame : entry.SteamGame;
+        if (!string.IsNullOrEmpty(steamGame) && steamGame !=  "off")
         {
-            if (entry.SteamGame == "")
+            if (steamGame == "iwad")
             {
                 var resolvedIWad = ResolveIWadFile(entry.IWadFile, Settings.Current.DefaultIWadFile).ToLower();
                 if (!string.IsNullOrEmpty(resolvedIWad) && IWads.ContainsKey(resolvedIWad))
@@ -99,9 +100,9 @@ internal static class FileHelper
                     return IWads[resolvedIWad].appId;
                 }
             }
-            else if (entry.SteamGame != "off" && SteamAppIds.ContainsKey(entry.SteamGame))
+            else if (SteamAppIds.ContainsKey(steamGame))
             {
-                return SteamAppIds[entry.SteamGame].appId;
+                return SteamAppIds[steamGame].appId;
             }
         }
         return 0;
@@ -109,7 +110,8 @@ internal static class FileHelper
 
     public static Dictionary<string, TitleAppId> SteamAppIds = new()
     {
-        { "off", new("Отключить", 0) },
+        { "off", new("Отключено", 0) },
+        { "iwad", new("Согласно iWad", -1) },
         { "doom", new("Ultimate Doom", 2280) },
         { "doom2", new("Doom 2", 2300) },
         { "doom64", new("Doom 64", 1148590) },

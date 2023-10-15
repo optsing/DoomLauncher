@@ -32,7 +32,7 @@ public sealed partial class EditEntryDialog : ContentDialog
         IWadFiles.AddRange(Settings.Current.IWadFiles.Select(iWadFile => new KeyValue(iWadFile, FileHelper.IWadFileToTitle(iWadFile))));
         IWadFile = IWadFiles.FirstOrDefault(iWad => iWad.Key == initial.iWadFile, IWadFiles.First());
 
-        SteamGames = new() { new KeyValue("", "Согласно iWad") };
+        SteamGames = new() { new KeyValue("", "По умолчанию") };
         SteamGames.AddRange(FileHelper.SteamAppIds.Select(item => new KeyValue(item.Key, item.Value.title)));
         SteamGame = SteamGames.FirstOrDefault(steamGame => steamGame.Key == initial.steamGame, SteamGames.First());
 

@@ -18,7 +18,7 @@ public class Settings: ObservableObject
     public static bool IsCustomTitlebar = false;
     private string defaultGZDoomPath = "";
     private string defaultIWadFile = "";
-    private bool steamIntegration = false;
+    private string steamGame = "off";
 
     public static Settings Current { get; set; } = new();
     public ObservableCollection<GZDoomPackage> GZDoomInstalls { get; set; } = new();
@@ -27,7 +27,7 @@ public class Settings: ObservableObject
     public string DefaultIWadFile { get => defaultIWadFile; set => SetProperty(ref defaultIWadFile, value); }
     public ObservableCollection<string> FavoriteFiles { get; set; } = new();
     public bool CloseOnLaunch { get; set; } = false;
-    public bool SteamIntegration { get => steamIntegration; set => SetProperty(ref steamIntegration, value); }
+    public string SteamGame { get => steamGame; set => SetProperty(ref steamGame, value); }
     public int SelectedModIndex { get; set; } = 0;
     public ObservableCollection<DoomEntry> Entries { get; set; } = new();
 
@@ -125,6 +125,13 @@ public partial class DoomEntry: ObservableObject
     {
         get => lastLaunch;
         set => SetProperty(ref lastLaunch, value);
+    }
+
+    private TimeSpan? playTime;
+    public TimeSpan? PlayTime
+    {
+        get => playTime;
+        set => SetProperty(ref playTime, value);
     }
 }
 

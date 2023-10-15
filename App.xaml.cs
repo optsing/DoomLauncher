@@ -24,6 +24,10 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
+        //var gcTimer = new DispatcherTimer();
+        //gcTimer.Tick += (sender, e) => { GC.Collect(); };
+        //gcTimer.Interval = TimeSpan.FromSeconds(1);
+        //gcTimer.Start();
     }
 
     /// <summary>

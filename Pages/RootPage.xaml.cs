@@ -363,6 +363,7 @@ public sealed partial class RootPage : Page
             else
             {
                 await LaunchHelper.CurrentProcess.WaitForExitAsync();
+                entry.PlayTime = (entry.PlayTime ?? new()) + (LaunchHelper.CurrentProcess.ExitTime - LaunchHelper.CurrentProcess.StartTime);
                 if (LaunchHelper.CurrentProcess.ExitCode != 0)
                 {
                     var error = await LaunchHelper.CurrentProcess.StandardError.ReadToEndAsync();

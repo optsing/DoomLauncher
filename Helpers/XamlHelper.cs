@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using System;
 using System.Collections.ObjectModel;
+using Humanizer;
 
 namespace DoomLauncher;
 
@@ -28,7 +29,12 @@ static class XamlHelper
 
     public static string DateToText(DateTime? lastLaunch)
     {
-        return lastLaunch?.ToString() ?? "Неизвестно";
+        return lastLaunch?.Humanize() ?? "Неизвестно";
+    }
+
+    public static string TimeSpanToText(TimeSpan? time)
+    {
+        return time?.ToString(@"hh\:mm") ?? "Неизвестно";
     }
 
     public static string FileInFavoritesGlyph(Collection<string> list, string value)

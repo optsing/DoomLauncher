@@ -7,6 +7,7 @@
     xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:local="using:DoomLauncher"
     mc:Ignorable="d"
+    Unloaded="Page_Unloaded"
 >
     <Page.Resources>
         <MenuFlyout x:Key="flyoutPackage" Placement="Bottom" >
@@ -214,14 +215,18 @@
                     FontSize="16"
                     VerticalAlignment="Center"
                 />
-                <ToggleSwitch
+                <ComboBox
                     Grid.Column="1"
                     VerticalAlignment="Center"
-                    OnContent=""
-                    OffContent=""
-                    MinWidth="0"
-                    IsOn="{x:Bind local:Settings.Current.SteamIntegration, Mode=TwoWay}"
-                />
+                    SelectedItem="{x:Bind ViewModel.SteamGame, Mode=TwoWay}"
+                    ItemsSource="{x:Bind ViewModel.SteamGames}"
+                >
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="local:KeyValue">
+                            <TextBlock Text="{x:Bind Value}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
             </Grid>
             <Grid
                 ColumnDefinitions="*,Auto"
@@ -259,7 +264,7 @@
                     Style="{ThemeResource BaseTextBlockStyle}"
                     FontSize="16"
                 />
-                <TextBlock Text="{x:Bind appVersion}" />
+                <TextBlock Text="{x:Bind ViewModel.AppVersion}" />
             </StackPanel>
         </StackPanel>
     </ScrollView>
