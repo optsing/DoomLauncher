@@ -9,6 +9,8 @@
     DefaultButton="Primary"
     CloseButtonText="Отмена"
     Style="{ThemeResource DefaultContentDialogStyle}"
+    Title="{x:Bind ViewModel.Title}"
+    PrimaryButtonText="{x:Bind ViewModel.PrimaryButtonText}"
     PrimaryButtonClick="EditEntryDialog_PrimaryButtonClick"
 >
     <ScrollView
@@ -23,14 +25,14 @@
                 x:Name="tbModName"
                 HorizontalAlignment="Stretch"
                 Margin="0,8,0,8"
-                Text="{x:Bind ModName, Mode=TwoWay}"
+                Text="{x:Bind ViewModel.Name, Mode=TwoWay}"
                 PlaceholderText="Введите название"
             />
             <TextBlock>Описание</TextBlock>
             <TextBox
                 HorizontalAlignment="Stretch"
                 Margin="0,8,0,8"
-                Text="{x:Bind ModDescription, Mode=TwoWay}"
+                Text="{x:Bind ViewModel.Description, Mode=TwoWay}"
                 PlaceholderText="Введите краткое описание"
             />
             <TextBlock>Подробное описание</TextBlock>
@@ -40,15 +42,15 @@
                 TextWrapping="Wrap" 
                 HorizontalAlignment="Stretch"
                 Margin="0,8,0,8"
-                Text="{x:Bind ModLongDescription, Mode=TwoWay}"
+                Text="{x:Bind ViewModel.LongDescription, Mode=TwoWay}"
                 PlaceholderText="Введите подробное описание"
             />
             <TextBlock>Версия GZDoom</TextBlock>
             <ComboBox
                 HorizontalAlignment="Stretch"
                 Margin="0,8,0,8"
-                SelectedItem="{x:Bind GZDoomPackage, Mode=TwoWay}"
-                ItemsSource="{x:Bind GZDoomPackages}"
+                SelectedItem="{x:Bind ViewModel.GZDoomPackage, Mode=TwoWay}"
+                ItemsSource="{x:Bind ViewModel.GZDoomPackages}"
             >
                 <ComboBox.ItemTemplate>
                     <DataTemplate x:DataType="local:GZDoomPackage">
@@ -60,8 +62,8 @@
             <ComboBox
                 HorizontalAlignment="Stretch"
                 Margin="0,8,0,8"
-                SelectedItem="{x:Bind IWadFile, Mode=TwoWay}"
-                ItemsSource="{x:Bind IWadFiles}"
+                SelectedItem="{x:Bind ViewModel.IWadFile, Mode=TwoWay}"
+                ItemsSource="{x:Bind ViewModel.IWadFiles}"
             >
                 <ComboBox.ItemTemplate>
                     <DataTemplate x:DataType="local:KeyValue">
@@ -73,8 +75,8 @@
             <ComboBox
                 HorizontalAlignment="Stretch"
                 Margin="0,8,0,8"
-                SelectedItem="{x:Bind SteamGame, Mode=TwoWay}"
-                ItemsSource="{x:Bind SteamGames}"
+                SelectedItem="{x:Bind ViewModel.SteamGame, Mode=TwoWay}"
+                ItemsSource="{x:Bind ViewModel.SteamGames}"
             >
                 <ComboBox.ItemTemplate>
                     <DataTemplate x:DataType="local:KeyValue">
@@ -84,17 +86,17 @@
             </ComboBox>
             <CheckBox
                 Content="Использовать уникальный файл настроек"
-                IsChecked="{x:Bind UniqueConfig, Mode=TwoWay}"
+                IsChecked="{x:Bind ViewModel.UniqueConfig, Mode=TwoWay}"
             />
             <CheckBox
                 Content="Использовать уникальную папку сохранений"
-                IsChecked="{x:Bind UniqueSavesFolder, Mode=TwoWay}"
+                IsChecked="{x:Bind ViewModel.UniqueSavesFolder, Mode=TwoWay}"
             />
-            <TextBlock Visibility="{x:Bind local:XamlHelper.HasItems(ModFiles.Count)}">Файлы</TextBlock>
+            <TextBlock Visibility="{x:Bind local:XamlHelper.HasItems(ViewModel.ModFiles.Count)}">Файлы</TextBlock>
             <ListView
-                ItemsSource="{x:Bind ModFiles}"
+                ItemsSource="{x:Bind ViewModel.ModFiles}"
                 SelectionMode="None"
-                Visibility="{x:Bind local:XamlHelper.HasItems(ModFiles.Count)}"
+                Visibility="{x:Bind local:XamlHelper.HasItems(ViewModel.ModFiles.Count)}"
             >
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
@@ -111,11 +113,11 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <TextBlock Visibility="{x:Bind local:XamlHelper.HasItems(ImageFiles.Count)}">Изображения</TextBlock>
+            <TextBlock Visibility="{x:Bind local:XamlHelper.HasItems(ViewModel.ImageFiles.Count)}">Изображения</TextBlock>
             <ListView
-                ItemsSource="{x:Bind ImageFiles}"
+                ItemsSource="{x:Bind ViewModel.ImageFiles}"
                 SelectionMode="None"
-                Visibility="{x:Bind local:XamlHelper.HasItems(ImageFiles.Count)}"
+                Visibility="{x:Bind local:XamlHelper.HasItems(ViewModel.ImageFiles.Count)}"
             >
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">

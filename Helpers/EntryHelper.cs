@@ -31,7 +31,8 @@ internal static partial class EntryHelper
             {
                 Name = Path.GetFileNameWithoutExtension(file.Name),
             };
-            var entryProperties = new EditEntryDialogResult(newEntry);
+            var modFiles = new List<string>();
+            var imageFiles = new List<string>();
             if (withConfirm)
             {
                 foreach (var zipFileEntry in archive.Entries)
@@ -39,30 +40,39 @@ internal static partial class EntryHelper
                     var ext = Path.GetExtension(zipFileEntry.Name).ToLowerInvariant();
                     if (FileHelper.SupportedModExtensions.Contains(ext))
                     {
-                        entryProperties.modFiles.Add(zipFileEntry.Name);
+                        modFiles.Add(zipFileEntry.Name);
                     }
                     else if (FileHelper.SupportedImageExtensions.Contains(ext))
                     {
-                        entryProperties.imageFiles.Add(zipFileEntry.Name);
+                        imageFiles.Add(zipFileEntry.Name);
                     }
                 }
-                entryProperties = await EditEntryDialog.ShowAsync(xamlRoot, entryProperties, EditDialogMode.Import);
+                if (await EditEntryDialog.ShowAsync(xamlRoot, newEntry, EditDialogMode.Import, modFiles, imageFiles) is EditEntryDialogViewModel result)
+                {
+                    result.UpdateEntry(newEntry);
+                    modFiles = result.GetModFiles();
+                    imageFiles = result.GetImageFiles();
+                }
+                else
+                {
+                    newEntry = null;
+                }
             }
-            if (entryProperties != null)
+            if (newEntry != null)
             {
                 var modsCopied = new List<string>();
                 var imagesCopied = new List<string>();
                 foreach (var zipFileEntry in archive.Entries)
                 {
                     var ext = Path.GetExtension(zipFileEntry.Name).ToLowerInvariant();
-                    if (FileHelper.SupportedModExtensions.Contains(ext) && (!withConfirm || entryProperties.modFiles.Contains(zipFileEntry.Name)))
+                    if (FileHelper.SupportedModExtensions.Contains(ext) && (!withConfirm || modFiles.Contains(zipFileEntry.Name)))
                     {
                         SetProgress($"Извлечение: {zipFileEntry.Name}");
                         using var fileStream = zipFileEntry.Open();
                         await FileHelper.CopyFileWithConfirmation(xamlRoot, fileStream, zipFileEntry.Name, FileHelper.ModsFolderPath);
                         modsCopied.Add(zipFileEntry.Name);
                     }
-                    else if (FileHelper.SupportedImageExtensions.Contains(ext) && (!withConfirm || entryProperties.imageFiles.Contains(zipFileEntry.Name)))
+                    else if (FileHelper.SupportedImageExtensions.Contains(ext) && (!withConfirm || imageFiles.Contains(zipFileEntry.Name)))
                     {
                         SetProgress($"Извлечение: {zipFileEntry.Name}");
                         using var fileStream = zipFileEntry.Open();
@@ -71,32 +81,21 @@ internal static partial class EntryHelper
                     }
                 }
 
-                var finalModFiles = newEntry.ModFiles
+                newEntry.Id = Guid.NewGuid().ToString();
+                newEntry.Created = DateTime.Now;
+                newEntry.ModFiles = new(newEntry.ModFiles
                     .Where(modsCopied.Contains)
                     .Concat(modsCopied
-                        .Where(fileName => !newEntry.ModFiles.Contains(fileName)));
-                var finalImageFiles = newEntry.ImageFiles
+                        .Where(fileName => !newEntry.ModFiles.Contains(fileName))
+                     ));
+                newEntry.ImageFiles = new(newEntry.ImageFiles
                     .Where(imagesCopied.Contains)
                     .Concat(imagesCopied
-                        .Where(fileName => !newEntry.ImageFiles.Contains(fileName)));
+                        .Where(fileName => !newEntry.ImageFiles.Contains(fileName))
+                    ));
 
                 SetProgress(null);
-                return new DoomEntry()
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Created = DateTime.Now,
-                    Name = entryProperties.name,
-                    Description = entryProperties.description,
-                    LongDescription = entryProperties.longDescription,
-                    GZDoomPath = entryProperties.gZDoomPath,
-                    IWadFile = entryProperties.iWadFile,
-                    SteamGame = entryProperties.steamGame,
-                    UniqueConfig = entryProperties.uniqueConfig,
-                    UniqueSavesFolder = entryProperties.uniqueSavesFolder,
-                    SelectedImageIndex = newEntry.SelectedImageIndex,
-                    ModFiles = new(finalModFiles),
-                    ImageFiles = new(finalImageFiles),
-                };
+                return newEntry;
             }
         }
         catch (Exception ex)
@@ -115,11 +114,13 @@ internal static partial class EntryHelper
             using var zipToRead = await WebAPI.Current.DownloadDoomWorldWadArchive(wadInfo);
             using var archive = new ZipArchive(zipToRead, ZipArchiveMode.Read);
 
-            var entryProperties = new EditEntryDialogResult(new DoomEntry()
+            var newEntry = new DoomEntry()
             {
                 Name = wadInfo.Title,
                 LongDescription = reLineBreak().Replace(wadInfo.Description, "\n"),
-            });
+            };
+            var modFiles = new List<string>();
+            var imageFiles = new List<string>();
             if (withConfirm)
             {
                 foreach (var zipFileEntry in archive.Entries)
@@ -127,30 +128,39 @@ internal static partial class EntryHelper
                     var ext = Path.GetExtension(zipFileEntry.Name).ToLowerInvariant();
                     if (FileHelper.SupportedModExtensions.Contains(ext))
                     {
-                        entryProperties.modFiles.Add(zipFileEntry.Name);
+                        modFiles.Add(zipFileEntry.Name);
                     }
                     else if (FileHelper.SupportedImageExtensions.Contains(ext))
                     {
-                        entryProperties.imageFiles.Add(zipFileEntry.Name);
+                        imageFiles.Add(zipFileEntry.Name);
                     }
                 }
-                entryProperties = await EditEntryDialog.ShowAsync(xamlRoot, entryProperties, EditDialogMode.Import);
+                if (await EditEntryDialog.ShowAsync(xamlRoot, newEntry, EditDialogMode.Import, modFiles, imageFiles) is EditEntryDialogViewModel result)
+                {
+                    result.UpdateEntry(newEntry);
+                    modFiles = result.GetModFiles();
+                    imageFiles = result.GetImageFiles();
+                }
+                else
+                {
+                    newEntry = null;
+                }
             }
-            if (entryProperties != null)
+            if (newEntry != null)
             {
                 var modsCopied = new List<string>();
                 var imagesCopied = new List<string>();
                 foreach (var zipFileEntry in archive.Entries)
                 {
                     var ext = Path.GetExtension(zipFileEntry.Name).ToLowerInvariant();
-                    if (FileHelper.SupportedModExtensions.Contains(ext) && (!withConfirm || entryProperties.modFiles.Contains(zipFileEntry.Name)))
+                    if (FileHelper.SupportedModExtensions.Contains(ext) && (!withConfirm || modFiles.Contains(zipFileEntry.Name)))
                     {
                         SetProgress($"Извлечение: {zipFileEntry.Name}");
                         using var fileStream = zipFileEntry.Open();
                         await FileHelper.CopyFileWithConfirmation(xamlRoot, fileStream, zipFileEntry.Name, FileHelper.ModsFolderPath);
                         modsCopied.Add(zipFileEntry.Name);
                     }
-                    else if (FileHelper.SupportedImageExtensions.Contains(ext) && (!withConfirm || entryProperties.imageFiles.Contains(zipFileEntry.Name)))
+                    else if (FileHelper.SupportedImageExtensions.Contains(ext) && (!withConfirm || imageFiles.Contains(zipFileEntry.Name)))
                     {
                         SetProgress($"Извлечение: {zipFileEntry.Name}");
                         using var fileStream = zipFileEntry.Open();
@@ -158,24 +168,13 @@ internal static partial class EntryHelper
                         imagesCopied.Add(zipFileEntry.Name);
                     }
                 }
-
+                newEntry.Id = Guid.NewGuid().ToString();
+                newEntry.Created = DateTime.Now;
+                newEntry.SelectedImageIndex = 0;
+                newEntry.ModFiles = new(modsCopied);
+                newEntry.ImageFiles = new(imagesCopied);
                 SetProgress(null);
-                return new DoomEntry()
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Created = DateTime.Now,
-                    Name = entryProperties.name,
-                    Description = entryProperties.description,
-                    LongDescription = entryProperties.longDescription,
-                    GZDoomPath = entryProperties.gZDoomPath,
-                    IWadFile = entryProperties.iWadFile,
-                    SteamGame = entryProperties.steamGame,
-                    UniqueConfig = entryProperties.uniqueConfig,
-                    UniqueSavesFolder = entryProperties.uniqueSavesFolder,
-                    SelectedImageIndex = 0,
-                    ModFiles = new(modsCopied),
-                    ImageFiles = new(imagesCopied),
-                };
+                return newEntry;
             }
         }
         catch (Exception ex)
@@ -205,29 +204,40 @@ internal static partial class EntryHelper
                 title = Path.GetFileNameWithoutExtension(images.First().Name);
             }
 
-            var entryProperties = new EditEntryDialogResult(new DoomEntry()
+            var newEntry = new DoomEntry()
             {
                 Name = title,
-            });
+            };
+            var modFiles = new List<string>();
+            var imageFiles = new List<string>();
             if (withConfirm)
             {
                 foreach (var mod in mods)
                 {
-                    entryProperties.modFiles.Add(mod.Name);
+                    modFiles.Add(mod.Name);
                 }
                 foreach (var image in images)
                 {
-                    entryProperties.imageFiles.Add(image.Name);
+                    imageFiles.Add(image.Name);
                 }
-                entryProperties = await EditEntryDialog.ShowAsync(xamlRoot, entryProperties, EditDialogMode.Create);
+                if (await EditEntryDialog.ShowAsync(xamlRoot, newEntry, EditDialogMode.Create, modFiles, imageFiles) is EditEntryDialogViewModel result)
+                {
+                    result.UpdateEntry(newEntry);
+                    modFiles = result.GetModFiles();
+                    imageFiles = result.GetImageFiles();
+                }
+                else
+                {
+                    newEntry = null;
+                }
             }
-            if (entryProperties != null)
+            if (newEntry != null)
             {
                 var modsCopied = new List<string>();
                 var imagesCopied = new List<string>();
                 foreach (var mod in mods)
                 {
-                    if (!withConfirm || entryProperties.modFiles.Contains(mod.Name))
+                    if (!withConfirm || modFiles.Contains(mod.Name))
                     {
                         SetProgress($"Копирование: {mod.Name}");
                         await FileHelper.CopyFileWithConfirmation(xamlRoot, mod, FileHelper.ModsFolderPath);
@@ -236,31 +246,20 @@ internal static partial class EntryHelper
                 }
                 foreach (var image in images)
                 {
-                    if (!withConfirm || entryProperties.imageFiles.Contains(image.Name))
+                    if (!withConfirm || imageFiles.Contains(image.Name))
                     {
                         SetProgress($"Копирование: {image.Name}");
                         await FileHelper.CopyFileWithConfirmation(xamlRoot, image, FileHelper.ImagesFolderPath);
                         imagesCopied.Add(image.Name);
                     }
                 }
-
+                newEntry.Id = Guid.NewGuid().ToString();
+                newEntry.Created = DateTime.Now;
+                newEntry.SelectedImageIndex = 0;
+                newEntry.ModFiles = new(modsCopied);
+                newEntry.ImageFiles = new(imagesCopied);
                 SetProgress(null);
-                return new DoomEntry()
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Created = DateTime.Now,
-                    Name = entryProperties.name,
-                    Description = entryProperties.description,
-                    LongDescription = entryProperties.longDescription,
-                    GZDoomPath = entryProperties.gZDoomPath,
-                    IWadFile = entryProperties.iWadFile,
-                    SteamGame = entryProperties.steamGame,
-                    UniqueConfig = entryProperties.uniqueConfig,
-                    UniqueSavesFolder = entryProperties.uniqueSavesFolder,
-                    SelectedImageIndex = 0,
-                    ModFiles = new(modsCopied),
-                    ImageFiles = new(imagesCopied),
-                };
+                return newEntry;
             }
         }
         catch (Exception ex)

@@ -187,11 +187,6 @@ public sealed partial class RootPage : Page
         SetProgress(e);
     }
 
-    private async void Page_OnRemove(object? sender, DoomEntry entry)
-    {
-        await RemoveEntry(entry);
-    }
-
     private async void RemoveMod_Click(object sender, RoutedEventArgs e)
     {
         if (sender is FrameworkElement el)
@@ -201,11 +196,6 @@ public sealed partial class RootPage : Page
                 await RemoveEntry(entry);
             }
         }
-    }
-
-    private async void Page_OnEdit(object? sender, DoomEntry entry)
-    {
-        await EditEntry(entry);
     }
 
     private async void EditMod_Click(object? sender, RoutedEventArgs e)
@@ -219,11 +209,6 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private void Page_OnCopy(object? sender, DoomEntry entry)
-    {
-        CopyEntry(entry);
-    }
-
     private void CopyMod_Click(object? sender, RoutedEventArgs e)
     {
         if (sender is FrameworkElement el)
@@ -235,11 +220,6 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private async void Page_OnCreateShortcut(object? sender, DoomEntry entry)
-    {
-        await CreateShortcut(entry);
-    }
-
     private async void CreateShortcut_Click(object? sender, RoutedEventArgs e)
     {
         if (sender is FrameworkElement el)
@@ -249,11 +229,6 @@ public sealed partial class RootPage : Page
                 await CreateShortcut(entry);
             }
         }
-    }
-
-    private async void Page_OnExport(object? sender, DoomEntry entry)
-    {
-        await ExportEntry(entry);
     }
 
     private async void ExportMod_Click(object? sender, RoutedEventArgs e)
@@ -283,41 +258,29 @@ public sealed partial class RootPage : Page
 
     private async Task EditEntry(DoomEntry entry)
     {
-        var initial = new EditEntryDialogResult(entry);
-        if (await EditEntryDialog.ShowAsync(XamlRoot, initial, EditDialogMode.Edit) is EditEntryDialogResult result)
+        if (await EditEntryDialog.ShowAsync(XamlRoot, entry, EditDialogMode.Edit) is EditEntryDialogViewModel result)
         {
-            entry.Name = result.name;
-            entry.Description = result.description;
-            entry.LongDescription = result.longDescription;
-            entry.GZDoomPath = result.gZDoomPath;
-            entry.IWadFile = result.iWadFile;
-            entry.SteamGame = result.steamGame;
-            entry.UniqueConfig = result.uniqueConfig;
-            entry.UniqueSavesFolder = result.uniqueSavesFolder;
+            result.UpdateEntry(entry);
             Settings.Save();
             await JumpListHelper.Update();
         }
     }
 
-    private void CopyEntry(DoomEntry entry)
+    private async void CopyEntry(DoomEntry entry)
     {
-        var newEntry = new DoomEntry()
+        if (await EditEntryDialog.ShowAsync(XamlRoot, entry, EditDialogMode.Copy) is EditEntryDialogViewModel result)
         {
-            Id = Guid.NewGuid().ToString(),
-            Created = DateTime.Now,
-            Name = entry.Name,
-            Description = entry.Description,
-            LongDescription = entry.LongDescription,
-            GZDoomPath = entry.GZDoomPath,
-            IWadFile = entry.IWadFile,
-            SteamGame = entry.SteamGame,
-            UniqueConfig = entry.UniqueConfig,
-            UniqueSavesFolder = entry.UniqueSavesFolder,
-            SelectedImageIndex = entry.SelectedImageIndex,
-            ModFiles = new(entry.ModFiles),
-            ImageFiles = new(entry.ImageFiles),
-        };
-        AddEntries(new[] { newEntry });
+            var newEntry = new DoomEntry()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Created = DateTime.Now,
+                SelectedImageIndex = entry.SelectedImageIndex,
+                ModFiles = new(entry.ModFiles),
+                ImageFiles = new(entry.ImageFiles),
+            };
+            result.UpdateEntry(newEntry);
+            AddEntries(new[] { newEntry });
+        }
     }
 
     private void Start_Click(object sender, RoutedEventArgs e)
@@ -440,23 +403,15 @@ public sealed partial class RootPage : Page
 
     private async void CreateMod_Click(object sender, SplitButtonClickEventArgs e)
     {
-        var initial = new EditEntryDialogResult(new DoomEntry());
-        if (await EditEntryDialog.ShowAsync(XamlRoot, initial, EditDialogMode.Create) is EditEntryDialogResult result)
+        if (await EditEntryDialog.ShowAsync(XamlRoot, EditDialogMode.Create) is EditEntryDialogViewModel result)
         {
             var newEntry = new DoomEntry()
             {
                 Id = Guid.NewGuid().ToString(),
                 Created = DateTime.Now,
-                Name = result.name,
-                Description = result.description,
-                LongDescription = result.longDescription,
-                GZDoomPath = result.gZDoomPath,
-                IWadFile = result.iWadFile,
-                SteamGame = result.steamGame,
-                UniqueConfig = result.uniqueConfig,
-                UniqueSavesFolder = result.uniqueSavesFolder,
                 SelectedImageIndex = 0,
             };
+            result.UpdateEntry(newEntry);
             AddEntries(new[] { newEntry });
         }
     }

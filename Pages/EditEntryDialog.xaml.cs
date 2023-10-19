@@ -1,139 +1,148 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace DoomLauncher;
+
+public class EditEntryDialogViewModel
+{
+    private static readonly GZDoomPackage DefaultGZDoomPackage = new() { Path = "", Arch = AssetArch.notSelected };
+    private static readonly KeyValue DefaultIWadFile = new("", "По умолчанию");
+    private static readonly KeyValue DefaultSteamGame = new("", "По умолчанию");
+
+    private readonly EditDialogMode mode;
+    public string Title => mode switch
+    {
+        EditDialogMode.Create => "Создание сборки",
+        EditDialogMode.Edit => "Настройка сборки",
+        EditDialogMode.Import => "Импорт сборки",
+        EditDialogMode.Copy => "Дублирование сборки",
+        _ => throw new NotImplementedException(),
+    };
+    public string PrimaryButtonText => mode switch
+    {
+        EditDialogMode.Create => "Создать",
+        EditDialogMode.Edit => "Сохранить",
+        EditDialogMode.Import => "Импортировать",
+        EditDialogMode.Copy => "Дублировать",
+        _ => throw new NotImplementedException(),
+    };
+
+    public string Name { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string LongDescription { get; set; } = "";
+    public bool UniqueConfig { get; set; } = false;
+    public bool UniqueSavesFolder { get; set; } = false;
+
+    public List<GZDoomPackage> GZDoomPackages { get; }
+    public List<KeyValue> IWadFiles { get; }
+    public List<KeyValue> SteamGames { get; }
+
+    public GZDoomPackage GZDoomPackage { get; set; } = DefaultGZDoomPackage;
+    public KeyValue IWadFile { get; set; } = DefaultIWadFile;
+    public KeyValue SteamGame { get; set; } = DefaultSteamGame;
+
+    public List<TitleChecked> ModFiles { get; private set; } = new();
+    public List<TitleChecked> ImageFiles { get; private set; } = new();
+
+    public EditEntryDialogViewModel (EditDialogMode mode)
+    {
+        this.mode = mode;
+
+        GZDoomPackages = new List<GZDoomPackage>() { DefaultGZDoomPackage };
+        GZDoomPackages.AddRange(Settings.Current.GZDoomInstalls);
+
+        IWadFiles = new() { DefaultIWadFile };
+        IWadFiles.AddRange(Settings.Current.IWadFiles.Select(iWadFile => new KeyValue(iWadFile, FileHelper.IWadFileToTitle(iWadFile))));
+
+        SteamGames = new() { DefaultSteamGame };
+        SteamGames.AddRange(FileHelper.SteamAppIds.Select(item => new KeyValue(item.Key, item.Value.title)));
+    }
+
+    public static EditEntryDialogViewModel FromEntry(DoomEntry entry, EditDialogMode mode, List<string>? modFiles = null, List<string>? imageFiles = null)
+    {
+        var vm = new EditEntryDialogViewModel(mode)
+        {
+            Name = entry.Name,
+            Description = entry.Description,
+            LongDescription = entry.LongDescription,
+            UniqueConfig = entry.UniqueConfig,
+            UniqueSavesFolder = entry.UniqueSavesFolder,
+            ModFiles = modFiles?.Select(file => new TitleChecked(file)).ToList() ?? new List<TitleChecked>(),
+            ImageFiles = imageFiles?.Select(file => new TitleChecked(file)).ToList() ?? new List<TitleChecked>(),
+        };
+        vm.GZDoomPackage = vm.GZDoomPackages.FirstOrDefault(package => package.Path == entry.GZDoomPath, DefaultGZDoomPackage);
+        vm.IWadFile = vm.IWadFiles.FirstOrDefault(iWad => iWad.Key == entry.IWadFile, DefaultIWadFile);
+        vm.SteamGame = vm.SteamGames.FirstOrDefault(steamGame => steamGame.Key == entry.SteamGame, DefaultSteamGame);
+        return vm;
+    }
+
+    public List<string> GetModFiles() => ModFiles.Where(tc => tc.IsChecked).Select(tc => tc.Title).ToList();
+    public List<string> GetImageFiles() => ImageFiles.Where(tc => tc.IsChecked).Select(tc => tc.Title).ToList();
+
+    public void UpdateEntry(DoomEntry entry)
+    {
+        entry.Name = Name;
+        entry.Description = Description;
+        entry.LongDescription = LongDescription;
+        entry.GZDoomPath = GZDoomPackage.Path;
+        entry.IWadFile = IWadFile.Key;
+        entry.SteamGame = SteamGame.Key;
+        entry.UniqueConfig = UniqueConfig;
+        entry.UniqueSavesFolder = UniqueSavesFolder;
+    }
+}
+
+
 /// <summary>
 /// An empty page that can be used on its own or navigated to within a Frame.
 /// </summary>
 public sealed partial class EditEntryDialog : ContentDialog
 {
-    public EditEntryDialog(XamlRoot xamlRoot, EditEntryDialogResult initial, EditDialogMode mode)
+    public EditEntryDialogViewModel ViewModel { get; set; }
+
+    public EditEntryDialog(XamlRoot xamlRoot, EditEntryDialogViewModel viewModel)
     {
         InitializeComponent();
         XamlRoot = xamlRoot;
-        ModName = initial.name;
-        ModDescription = initial.description;
-        ModLongDescription = initial.longDescription;
-        UniqueConfig = initial.uniqueConfig;
-        UniqueSavesFolder = initial.uniqueSavesFolder;
-
-        GZDoomPackages = new List<GZDoomPackage>() { new GZDoomPackage { Path = "", Arch = AssetArch.notSelected } };
-        GZDoomPackages.AddRange(Settings.Current.GZDoomInstalls);
-        GZDoomPackage = GZDoomPackages.FirstOrDefault(package => package.Path == initial.gZDoomPath, GZDoomPackages.First());
-
-        IWadFiles = new() { new KeyValue("", "По умолчанию") };
-        IWadFiles.AddRange(Settings.Current.IWadFiles.Select(iWadFile => new KeyValue(iWadFile, FileHelper.IWadFileToTitle(iWadFile))));
-        IWadFile = IWadFiles.FirstOrDefault(iWad => iWad.Key == initial.iWadFile, IWadFiles.First());
-
-        SteamGames = new() { new KeyValue("", "По умолчанию") };
-        SteamGames.AddRange(FileHelper.SteamAppIds.Select(item => new KeyValue(item.Key, item.Value.title)));
-        SteamGame = SteamGames.FirstOrDefault(steamGame => steamGame.Key == initial.steamGame, SteamGames.First());
-
-        PrimaryButtonText = mode switch
-        {
-            EditDialogMode.Create => "Создать",
-            EditDialogMode.Edit => "Сохранить",
-            EditDialogMode.Import => "Импортировать",
-            _ => throw new NotImplementedException(),
-        };
-        Title = mode switch
-        {
-            EditDialogMode.Create => "Создание сборки",
-            EditDialogMode.Edit => "Настройка сборки",
-            EditDialogMode.Import => "Импорт сборки",
-            _ => throw new NotImplementedException(),
-        };
-        ModFiles = initial.modFiles.Select(file => new TitleChecked(file)).ToList();
-        ImageFiles = initial.imageFiles.Select(file => new TitleChecked(file)).ToList();
+        ViewModel = viewModel;
     }
 
     private void EditEntryDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
-        if (ModName == "")
+        if (string.IsNullOrEmpty(ViewModel.Name))
         {
             tbModName.Focus(FocusState.Programmatic);
             args.Cancel = true;
         }
     }
 
-    public string ModName
+    public static async Task<EditEntryDialogViewModel?> ShowAsync(XamlRoot xamlRoot, DoomEntry entry, EditDialogMode mode, List<string>? modFiles = null, List<string>? imageFiles = null)
     {
-        get; private set;
-    }
-
-    public string ModDescription
-    {
-        get; private set;
-    }
-
-    public string ModLongDescription
-    {
-        get; private set;
-    }
-
-    public List<GZDoomPackage> GZDoomPackages
-    {
-        get;
-    }
-
-    public GZDoomPackage GZDoomPackage
-    {
-        get; private set;
-    }
-
-    public List<KeyValue> IWadFiles
-    {
-        get;
-    }
-
-    public KeyValue IWadFile
-    {
-        get; private set;
-    }
-
-    public List<KeyValue> SteamGames { get; }
-
-    public KeyValue SteamGame { get; private set; }
-
-    public bool UniqueConfig
-    {
-        get; private set;
-    }
-
-    public bool UniqueSavesFolder
-    {
-        get; private set;
-    }
-
-    public List<TitleChecked> ModFiles { get; private set; }
-    public List<TitleChecked> ImageFiles { get; private set; }
-
-    public static async Task<EditEntryDialogResult?> ShowAsync(XamlRoot xamlRoot, EditEntryDialogResult initial, EditDialogMode mode)
-    {
-        var dialog = new EditEntryDialog(xamlRoot, initial, mode);
+        var viewModel = EditEntryDialogViewModel.FromEntry(entry, mode, modFiles, imageFiles);
+        var dialog = new EditEntryDialog(xamlRoot, viewModel);
         if (ContentDialogResult.Primary == await dialog.ShowAsync())
         {
-            var modFiles = dialog.ModFiles.Where(tc => tc.IsChecked).Select(tc => tc.Title).ToList();
-            var imageFiles = dialog.ImageFiles.Where(tc => tc.IsChecked).Select(tc => tc.Title).ToList();
-            return new EditEntryDialogResult(
-                new DoomEntry()
-                {
-                    Name = dialog.ModName,
-                    Description = dialog.ModDescription,
-                    LongDescription = dialog.ModLongDescription,
-                    GZDoomPath = dialog.GZDoomPackage.Path,
-                    IWadFile = dialog.IWadFile.Key,
-                    SteamGame = dialog.SteamGame.Key,
-                    UniqueConfig = dialog.UniqueConfig,
-                    UniqueSavesFolder = dialog.UniqueSavesFolder,
-                }, modFiles, imageFiles);
+            return viewModel;
+        }
+        return null;
+    }
+
+    public static async Task<EditEntryDialogViewModel?> ShowAsync(XamlRoot xamlRoot, EditDialogMode mode)
+    {
+        var viewModel = new EditEntryDialogViewModel(mode);
+        var dialog = new EditEntryDialog(xamlRoot, viewModel);
+        if (ContentDialogResult.Primary == await dialog.ShowAsync())
+        {
+            return viewModel;
         }
         return null;
     }
@@ -141,35 +150,7 @@ public sealed partial class EditEntryDialog : ContentDialog
 
 public enum EditDialogMode
 {
-    Create, Edit, Import
-}
-
-public class EditEntryDialogResult
-{
-    public readonly string name;
-    public readonly string description;
-    public readonly string longDescription;
-    public readonly string gZDoomPath;
-    public readonly string iWadFile;
-    public readonly string steamGame;
-    public readonly bool uniqueConfig;
-    public readonly bool uniqueSavesFolder;
-    public readonly List<string> modFiles;
-    public readonly List<string> imageFiles;
-
-    public EditEntryDialogResult(DoomEntry entry, List<string>? modFiles = null, List<string>? imageFiles = null)
-    {
-        name = entry.Name;
-        description = entry.Description;
-        longDescription = entry.LongDescription;
-        gZDoomPath = entry.GZDoomPath;
-        iWadFile = entry.IWadFile;
-        steamGame = entry.SteamGame;
-        uniqueConfig = entry.UniqueConfig;
-        uniqueSavesFolder = entry.UniqueSavesFolder;
-        this.modFiles = modFiles ?? new List<string>();
-        this.imageFiles = imageFiles ?? new List<string>();
-    }
+    Create, Edit, Import, Copy
 }
 
 public class TitleChecked

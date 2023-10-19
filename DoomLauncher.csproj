@@ -35,6 +35,11 @@
 		<UseRidGraph>true</UseRidGraph>
 	</PropertyGroup>
 
+	<ItemGroup>
+		<AppxManifest Include="Package.appxmanifest" Condition="'$(Configuration)'!='Debug'" SubType="Designer"/>
+		<AppxManifest Include="Package.Debug.appxmanifest" Condition="'$(Configuration)'=='Debug'" SubType="Designer"/>
+	</ItemGroup>
+
 	<PropertyGroup Condition="'$(WindowsPackageType)' == 'None'">
 		<DefineConstants>IS_NON_PACKAGED</DefineConstants>
 	</PropertyGroup>
