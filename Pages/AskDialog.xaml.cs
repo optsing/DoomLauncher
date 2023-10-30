@@ -1,7 +1,4 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using System;
-using System.Threading.Tasks;
+﻿using Microsoft.UI.Xaml.Controls;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -14,27 +11,12 @@ public sealed partial class AskDialog : ContentDialog
 {
     public string Text { get; set; }
 
-    public AskDialog(XamlRoot xamlRoot, string title, string text, string primaryButton, string closeButton)
+    public AskDialog(string title, string text, string primaryButton, string closeButton)
     {
-        this.InitializeComponent();
-        this.XamlRoot = xamlRoot;
-        this.Title = title;
-        this.Text = text;
-        this.PrimaryButtonText = primaryButton;
-        this.CloseButtonText = closeButton;
-    }
-
-    public static async Task<bool> ShowAsync(XamlRoot xamlRoot, string title, string text, string primaryButton, string closeButton)
-    {
-        try
-        {
-            var dialog = new AskDialog(xamlRoot, title, text, primaryButton, closeButton);
-            return ContentDialogResult.Primary == await dialog.ShowAsync();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex);
-            return false;
-        }
+        InitializeComponent();
+        Title = title;
+        Text = text;
+        PrimaryButtonText = primaryButton;
+        CloseButtonText = closeButton;
     }
 }

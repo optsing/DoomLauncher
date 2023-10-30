@@ -7,7 +7,6 @@
     xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:local="using:DoomLauncher"
     mc:Ignorable="d"
-    Unloaded="Page_Unloaded"
 >
     <Page.Resources>
         <MenuFlyout x:Key="flyoutPackage" Placement="Bottom" >

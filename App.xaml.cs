@@ -49,12 +49,17 @@ public partial class App : Application
             m_window = new MainWindow();
             if (m_window.Content is RootPage rootPage)
             {
-                rootPage.Loaded += (object sender, RoutedEventArgs e) =>
+                rootPage.Loaded += (sender, e) =>
                 {
+                    DialogHelper.XamlRoot = rootPage.XamlRoot;
                     ParseAppArgs(rootPage, appArgs);
                 };
+                m_window.Activate();
             }
-            m_window.Activate();
+            else
+            {
+                Exit();
+            }
         }
         // If the main instance isn't this current instance
         else

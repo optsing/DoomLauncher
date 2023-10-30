@@ -246,7 +246,7 @@ public sealed partial class DoomPage : Page
         foreach (var file in files)
         {
             EventBus.Progress(this, $"Копирование: {file.Name}");
-            await FileHelper.CopyFileWithConfirmation(XamlRoot, file, FileHelper.ModsFolderPath);
+            await FileHelper.CopyFileWithConfirmation(file, FileHelper.ModsFolderPath);
             if (!entry.ModFiles.Contains(file.Name))
             {
                 entry.ModFiles.Add(file.Name);
@@ -261,7 +261,7 @@ public sealed partial class DoomPage : Page
         foreach (var file in files)
         {
             EventBus.Progress(this, $"Копирование: {file.Name}");
-            await FileHelper.CopyFileWithConfirmation(XamlRoot, file, FileHelper.ImagesFolderPath);
+            await FileHelper.CopyFileWithConfirmation(file, FileHelper.ImagesFolderPath);
             if (!entry.ModFiles.Contains(file.Name))
             {
                 entry.ImageFiles.Add(file.Name);
@@ -311,7 +311,7 @@ public sealed partial class DoomPage : Page
             if (el.DataContext is string filePath)
             {
                 var fileName = GetFileTitle(filePath);
-                if (await AskDialog.ShowAsync(XamlRoot, "Удаление ссылки на файл", $"Вы уверены, что хотите удалить ссылку на файл '{fileName}'?", "Удалить", "Отмена"))
+                if (await DialogHelper.ShowAskAsync("Удаление ссылки на файл", $"Вы уверены, что хотите удалить ссылку на файл '{fileName}'?", "Удалить", "Отмена"))
                 {
                     entry.ModFiles.Remove(filePath);
                 }
@@ -325,7 +325,7 @@ public sealed partial class DoomPage : Page
         {
             ViewModel.IsSlideshowEnabled = false;
             var selectedImageIndex = entry.SelectedImageIndex;
-            if (await AskDialog.ShowAsync(XamlRoot, "Удаление фона", $"Вы уверены, что хотите удалить текущий фон?", "Удалить", "Отмена"))
+            if (await DialogHelper.ShowAskAsync("Удаление фона", $"Вы уверены, что хотите удалить текущий фон?", "Удалить", "Отмена"))
             {
                 entry.ImageFiles.RemoveAt(selectedImageIndex);
                 SetSelectedImageIndex(selectedImageIndex, direction: AnimationDirection.Next);

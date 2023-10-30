@@ -1,11 +1,8 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -109,10 +106,9 @@ public sealed partial class EditEntryDialog : ContentDialog
 {
     public EditEntryDialogViewModel ViewModel { get; set; }
 
-    public EditEntryDialog(XamlRoot xamlRoot, EditEntryDialogViewModel viewModel)
+    public EditEntryDialog(EditEntryDialogViewModel viewModel)
     {
         InitializeComponent();
-        XamlRoot = xamlRoot;
         ViewModel = viewModel;
     }
 
@@ -123,28 +119,6 @@ public sealed partial class EditEntryDialog : ContentDialog
             tbModName.Focus(FocusState.Programmatic);
             args.Cancel = true;
         }
-    }
-
-    public static async Task<EditEntryDialogViewModel?> ShowAsync(XamlRoot xamlRoot, DoomEntry entry, EditDialogMode mode, List<string>? modFiles = null, List<string>? imageFiles = null)
-    {
-        var viewModel = EditEntryDialogViewModel.FromEntry(entry, mode, modFiles, imageFiles);
-        var dialog = new EditEntryDialog(xamlRoot, viewModel);
-        if (ContentDialogResult.Primary == await dialog.ShowAsync())
-        {
-            return viewModel;
-        }
-        return null;
-    }
-
-    public static async Task<EditEntryDialogViewModel?> ShowAsync(XamlRoot xamlRoot, EditDialogMode mode)
-    {
-        var viewModel = new EditEntryDialogViewModel(mode);
-        var dialog = new EditEntryDialog(xamlRoot, viewModel);
-        if (ContentDialogResult.Primary == await dialog.ShowAsync())
-        {
-            return viewModel;
-        }
-        return null;
     }
 }
 

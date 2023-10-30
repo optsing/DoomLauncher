@@ -1,5 +1,4 @@
-﻿using Microsoft.UI.Xaml;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -13,7 +12,7 @@ namespace DoomLauncher;
 
 internal static partial class EntryHelper
 {
-    public static async Task<DoomEntry?> ImportFromGZDLFile(XamlRoot xamlRoot, StorageFile file, bool withConfirm, Action<string?> SetProgress)
+    public static async Task<DoomEntry?> ImportFromGZDLFile(StorageFile file, bool withConfirm, Action<string?> SetProgress)
     {
         try
         {
@@ -47,7 +46,7 @@ internal static partial class EntryHelper
                         imageFiles.Add(zipFileEntry.Name);
                     }
                 }
-                if (await EditEntryDialog.ShowAsync(xamlRoot, newEntry, EditDialogMode.Import, modFiles, imageFiles) is EditEntryDialogViewModel result)
+                if (await DialogHelper.ShowEditEntryAsync(newEntry, EditDialogMode.Import, modFiles, imageFiles) is EditEntryDialogViewModel result)
                 {
                     result.UpdateEntry(newEntry);
                     modFiles = result.GetModFiles();
@@ -69,14 +68,14 @@ internal static partial class EntryHelper
                     {
                         SetProgress($"Извлечение: {zipFileEntry.Name}");
                         using var fileStream = zipFileEntry.Open();
-                        await FileHelper.CopyFileWithConfirmation(xamlRoot, fileStream, zipFileEntry.Name, FileHelper.ModsFolderPath);
+                        await FileHelper.CopyFileWithConfirmation(fileStream, zipFileEntry.Name, FileHelper.ModsFolderPath);
                         modsCopied.Add(zipFileEntry.Name);
                     }
                     else if (FileHelper.SupportedImageExtensions.Contains(ext) && (!withConfirm || imageFiles.Contains(zipFileEntry.Name)))
                     {
                         SetProgress($"Извлечение: {zipFileEntry.Name}");
                         using var fileStream = zipFileEntry.Open();
-                        await FileHelper.CopyFileWithConfirmation(xamlRoot, fileStream, zipFileEntry.Name, FileHelper.ImagesFolderPath);
+                        await FileHelper.CopyFileWithConfirmation(fileStream, zipFileEntry.Name, FileHelper.ImagesFolderPath);
                         imagesCopied.Add(zipFileEntry.Name);
                     }
                 }
@@ -106,7 +105,7 @@ internal static partial class EntryHelper
         return null;
     }
 
-    public static async Task<DoomEntry?> ImportFromDoomWorld(XamlRoot xamlRoot, DoomWorldFileEntry wadInfo, bool withConfirm, Action<string?> SetProgress)
+    public static async Task<DoomEntry?> ImportFromDoomWorld(DoomWorldFileEntry wadInfo, bool withConfirm, Action<string?> SetProgress)
     {
         try
         {
@@ -135,7 +134,7 @@ internal static partial class EntryHelper
                         imageFiles.Add(zipFileEntry.Name);
                     }
                 }
-                if (await EditEntryDialog.ShowAsync(xamlRoot, newEntry, EditDialogMode.Import, modFiles, imageFiles) is EditEntryDialogViewModel result)
+                if (await DialogHelper.ShowEditEntryAsync(newEntry, EditDialogMode.Import, modFiles, imageFiles) is EditEntryDialogViewModel result)
                 {
                     result.UpdateEntry(newEntry);
                     modFiles = result.GetModFiles();
@@ -157,14 +156,14 @@ internal static partial class EntryHelper
                     {
                         SetProgress($"Извлечение: {zipFileEntry.Name}");
                         using var fileStream = zipFileEntry.Open();
-                        await FileHelper.CopyFileWithConfirmation(xamlRoot, fileStream, zipFileEntry.Name, FileHelper.ModsFolderPath);
+                        await FileHelper.CopyFileWithConfirmation(fileStream, zipFileEntry.Name, FileHelper.ModsFolderPath);
                         modsCopied.Add(zipFileEntry.Name);
                     }
                     else if (FileHelper.SupportedImageExtensions.Contains(ext) && (!withConfirm || imageFiles.Contains(zipFileEntry.Name)))
                     {
                         SetProgress($"Извлечение: {zipFileEntry.Name}");
                         using var fileStream = zipFileEntry.Open();
-                        await FileHelper.CopyFileWithConfirmation(xamlRoot, fileStream, zipFileEntry.Name, FileHelper.ImagesFolderPath);
+                        await FileHelper.CopyFileWithConfirmation(fileStream, zipFileEntry.Name, FileHelper.ImagesFolderPath);
                         imagesCopied.Add(zipFileEntry.Name);
                     }
                 }
@@ -188,7 +187,7 @@ internal static partial class EntryHelper
     [GeneratedRegex(@"\s*<br>\s*")]
     private static partial Regex reLineBreak();
 
-    public static async Task<DoomEntry?> CreateFromFiles(XamlRoot xamlRoot, IReadOnlyList<StorageFile> files, bool withConfirm, Action<string?> SetProgress)
+    public static async Task<DoomEntry?> CreateFromFiles(IReadOnlyList<StorageFile> files, bool withConfirm, Action<string?> SetProgress)
     {
         try
         {
@@ -220,7 +219,7 @@ internal static partial class EntryHelper
                 {
                     imageFiles.Add(image.Name);
                 }
-                if (await EditEntryDialog.ShowAsync(xamlRoot, newEntry, EditDialogMode.Create, modFiles, imageFiles) is EditEntryDialogViewModel result)
+                if (await DialogHelper.ShowEditEntryAsync(newEntry, EditDialogMode.Create, modFiles, imageFiles) is EditEntryDialogViewModel result)
                 {
                     result.UpdateEntry(newEntry);
                     modFiles = result.GetModFiles();
@@ -240,7 +239,7 @@ internal static partial class EntryHelper
                     if (!withConfirm || modFiles.Contains(mod.Name))
                     {
                         SetProgress($"Копирование: {mod.Name}");
-                        await FileHelper.CopyFileWithConfirmation(xamlRoot, mod, FileHelper.ModsFolderPath);
+                        await FileHelper.CopyFileWithConfirmation(mod, FileHelper.ModsFolderPath);
                         modsCopied.Add(mod.Name);
                     }
                 }
@@ -249,7 +248,7 @@ internal static partial class EntryHelper
                     if (!withConfirm || imageFiles.Contains(image.Name))
                     {
                         SetProgress($"Копирование: {image.Name}");
-                        await FileHelper.CopyFileWithConfirmation(xamlRoot, image, FileHelper.ImagesFolderPath);
+                        await FileHelper.CopyFileWithConfirmation(image, FileHelper.ImagesFolderPath);
                         imagesCopied.Add(image.Name);
                     }
                 }

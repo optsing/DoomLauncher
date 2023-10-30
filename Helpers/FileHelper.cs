@@ -1,5 +1,4 @@
-﻿using Microsoft.UI.Xaml;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -38,7 +37,7 @@ internal static class FileHelper
         return !string.IsNullOrEmpty(path) && Path.GetExtension(path) == ".exe" && File.Exists(path);
     }
 
-    public static async Task CopyFileWithConfirmation(XamlRoot xamlRoot, StorageFile file, string targetFolder)
+    public static async Task CopyFileWithConfirmation(StorageFile file, string targetFolder)
     {
         var targetPath = Path.Combine(targetFolder, file.Name);
         if (targetPath != file.Path)
@@ -47,8 +46,7 @@ internal static class FileHelper
             {
                 Directory.CreateDirectory(targetFolder);
             }
-            if (!File.Exists(targetPath) || await AskDialog.ShowAsync(
-                xamlRoot,
+            if (!File.Exists(targetPath) || await DialogHelper.ShowAskAsync(
                 "Добавление с заменой",
                 $"Файл '{file.Name}' уже существует в папке лаунчера.\nЗаменить?",
                 "Заменить",
@@ -62,15 +60,14 @@ internal static class FileHelper
         }
     }
 
-    public static async Task CopyFileWithConfirmation(XamlRoot xamlRoot, Stream sourceStream, string fileName, string targetFolder)
+    public static async Task CopyFileWithConfirmation(Stream sourceStream, string fileName, string targetFolder)
     {
         var targetPath = Path.Combine(targetFolder, fileName);
         if (!Directory.Exists(targetFolder))
         {
             Directory.CreateDirectory(targetFolder);
         }
-        if (!File.Exists(targetPath) || await AskDialog.ShowAsync(
-            xamlRoot,
+        if (!File.Exists(targetPath) || await DialogHelper.ShowAskAsync(
             "Добавление с заменой",
             $"Файл '{fileName}' уже существует в папке лаунчера.\nЗаменить?",
             "Заменить",

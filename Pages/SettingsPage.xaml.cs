@@ -25,22 +25,8 @@ public enum AssetArch
 
 public partial class SettingsPageViewModel : ObservableObject
 {
-    public required List<KeyValue> SteamGames { init; get; }
-
-    [ObservableProperty]
-    public KeyValue steamGame;
-
-    public required string AppVersion { init; get; }
-}
-
-public sealed partial class SettingsPage : Page
-{
-
-    public SettingsPageViewModel ViewModel;
-
-    public SettingsPage()
+    public SettingsPageViewModel()
     {
-        InitializeComponent();
 #if IS_NON_PACKAGED
         var appName = "Неизвестное приложение";
         var appVersion = "Неизвестная версия";
@@ -59,27 +45,28 @@ public sealed partial class SettingsPage : Page
         var version = Package.Current.Id.Version;
         var appVersion = $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
 #endif
-        var steamGames = FileHelper.SteamAppIds.Select(item => new KeyValue(item.Key, item.Value.title)).ToList();
-        ViewModel = new()
-        {
-            AppVersion = $"{appName} {appVersion}",
-            SteamGames = steamGames,
-            SteamGame = steamGames.FirstOrDefault(steamGame => steamGame.Key == Settings.Current.SteamGame, steamGames.First()),
-        };
-        ViewModel.PropertyChanged += ViewModel_PropertyChanged;
+        AppVersion = $"{appName} {appVersion}";
+        SteamGames = FileHelper.SteamAppIds.Select(item => new KeyValue(item.Key, item.Value.title)).ToList();
     }
 
-    private void Page_Unloaded(object sender, RoutedEventArgs e)
-    {
-        ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
+    public List<KeyValue> SteamGames { get; }
+
+    public KeyValue SteamGame {
+        get => SteamGames.FirstOrDefault(steamGame => steamGame.Key == Settings.Current.SteamGame, SteamGames.First());
+        set => SetProperty(Settings.Current.SteamGame, value.Key, Settings.Current, (settings, value) => settings.SteamGame = value);
     }
 
-    private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    public string AppVersion { get; }
+}
+
+public sealed partial class SettingsPage : Page
+{
+
+    public SettingsPageViewModel ViewModel = new();
+
+    public SettingsPage()
     {
-        if (e.PropertyName == nameof(ViewModel.SteamGame))
-        {
-            Settings.Current.SteamGame = ViewModel.SteamGame.Key;
-        }
+        InitializeComponent();
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -139,7 +126,7 @@ public sealed partial class SettingsPage : Page
         }
         EventBus.Progress(this, null);
         {
-            var newAsset = await PackageSelectorDialog.ShowAsync(XamlRoot, onlinePackages.OrderByDescending(package => package.Version).ThenBy(package => package.Arch).ToList());
+            var newAsset = await DialogHelper.ShowPackageSelectorAsync(onlinePackages.OrderByDescending(package => package.Version).ThenBy(package => package.Arch).ToList());
             if (newAsset != null)
             {
                 await DownloadPackage(newAsset);
@@ -232,7 +219,7 @@ public sealed partial class SettingsPage : Page
         foreach (var file in files)
         {
             EventBus.Progress(this, $"Копирование: {file.Name}");
-            await FileHelper.CopyFileWithConfirmation(XamlRoot, file, FileHelper.IWadFolderPath);
+            await FileHelper.CopyFileWithConfirmation(file, FileHelper.IWadFolderPath);
             if (!Settings.Current.IWadFiles.Contains(file.Name))
             {
                 Settings.Current.IWadFiles.Insert(0, file.Name);
@@ -275,7 +262,7 @@ public sealed partial class SettingsPage : Page
             if (el.DataContext is GZDoomPackage package)
             {
                 var title = FileHelper.GZDoomPackageToTitle(package);
-                if (await AskDialog.ShowAsync(XamlRoot, "Удаление ссылки", $"Вы уверены, что хотите удалить ссылку на '{title}'?", "Удалить", "Отмена"))
+                if (await DialogHelper.ShowAskAsync("Удаление ссылки", $"Вы уверены, что хотите удалить ссылку на '{title}'?", "Удалить", "Отмена"))
                 {
                     Settings.Current.GZDoomInstalls.Remove(package);
                 }
@@ -312,7 +299,7 @@ public sealed partial class SettingsPage : Page
             if (el.DataContext is string iWadFile)
             {
                 var title = FileHelper.IWadFileToTitle(iWadFile);
-                if (await AskDialog.ShowAsync(XamlRoot, "Удаление ссылки", $"Вы уверены, что хотите удалить ссылку на '{title}'?", "Удалить", "Отмена"))
+                if (await DialogHelper.ShowAskAsync("Удаление ссылки", $"Вы уверены, что хотите удалить ссылку на '{title}'?", "Удалить", "Отмена"))
                 {
                     Settings.Current.IWadFiles.Remove(iWadFile);
                 }

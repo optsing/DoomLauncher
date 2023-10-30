@@ -244,7 +244,7 @@ public sealed partial class RootPage : Page
 
     private async Task RemoveEntry(DoomEntry entry)
     {
-        if (await AskDialog.ShowAsync(XamlRoot, "Удаление сборки", $"Вы уверены, что хотите удалить сборку '{entry.Name}'?", "Удалить", "Отмена"))
+        if (await DialogHelper.ShowAskAsync("Удаление сборки", $"Вы уверены, что хотите удалить сборку '{entry.Name}'?", "Удалить", "Отмена"))
         {
             if (entry == ViewModel.CurrentEntry)
             {
@@ -258,7 +258,7 @@ public sealed partial class RootPage : Page
 
     private async Task EditEntry(DoomEntry entry)
     {
-        if (await EditEntryDialog.ShowAsync(XamlRoot, entry, EditDialogMode.Edit) is EditEntryDialogViewModel result)
+        if (await DialogHelper.ShowEditEntryAsync(entry, EditDialogMode.Edit) is EditEntryDialogViewModel result)
         {
             result.UpdateEntry(entry);
             Settings.Save();
@@ -268,7 +268,7 @@ public sealed partial class RootPage : Page
 
     private async void CopyEntry(DoomEntry entry)
     {
-        if (await EditEntryDialog.ShowAsync(XamlRoot, entry, EditDialogMode.Copy) is EditEntryDialogViewModel result)
+        if (await DialogHelper.ShowEditEntryAsync(entry, EditDialogMode.Copy) is EditEntryDialogViewModel result)
         {
             var newEntry = new DoomEntry()
             {
@@ -310,7 +310,7 @@ public sealed partial class RootPage : Page
     {
         if (entry == null)
         {
-            await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске", "Не удалось найти нужную сборку", "", "Отмена");
+            await DialogHelper.ShowAskAsync("Ошибка при запуске", "Не удалось найти нужную сборку", "", "Отмена");
             return;
         }
         SetCurrentEntry(entry);
@@ -332,29 +332,29 @@ public sealed partial class RootPage : Page
                     var error = await LaunchHelper.CurrentProcess.StandardError.ReadToEndAsync();
                     if (string.IsNullOrEmpty(error))
                     {
-                        await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске", $"Игра завершилась с ошибкой, код ошибки: {LaunchHelper.CurrentProcess.ExitCode}", "", "Отмена");
+                        await DialogHelper.ShowAskAsync("Ошибка при запуске", $"Игра завершилась с ошибкой, код ошибки: {LaunchHelper.CurrentProcess.ExitCode}", "", "Отмена");
                     }
                     else
                     {
-                        await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске", $"Игра завершилась с ошибкой, вывод:\n{error}", "", "Отмена");
+                        await DialogHelper.ShowAskAsync("Ошибка при запуске", $"Игра завершилась с ошибкой, вывод:\n{error}", "", "Отмена");
                     }
                 }
             }
         }
         else if (result == LaunchResult.AlreadyLaunched && LaunchHelper.CurrentProcess != null)
         {
-            await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске", "Игра уже запущена, закройте текущую игру", "", "Отмена");
+            await DialogHelper.ShowAskAsync("Ошибка при запуске", "Игра уже запущена, закройте текущую игру", "", "Отмена");
         }
         else if (result == LaunchResult.PathNotValid)
         {
-            if (await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске", "Не выбрана версия GZDoom, выберите нужную версию в настройках сборки", "Перейти в настройки", "Отмена"))
+            if (await DialogHelper.ShowAskAsync("Ошибка при запуске", "Не выбрана версия GZDoom, выберите нужную версию в настройках сборки", "Перейти в настройки", "Отмена"))
             {
                 await EditEntry(entry);
             }
         }
         else
         {
-            await AskDialog.ShowAsync(XamlRoot, "Ошибка при запуске", "Не удалось запустить игру", "", "Отмена");
+            await DialogHelper.ShowAskAsync("Ошибка при запуске", "Не удалось запустить игру", "", "Отмена");
         }
     }
 
@@ -393,7 +393,7 @@ public sealed partial class RootPage : Page
 
         if (files.Any())
         {
-            var newEntry = await EntryHelper.CreateFromFiles(XamlRoot, files, withConfirm: true, SetProgress);
+            var newEntry = await EntryHelper.CreateFromFiles(files, withConfirm: true, SetProgress);
             if (newEntry != null)
             {
                 AddEntries(new[] { newEntry });
@@ -403,7 +403,7 @@ public sealed partial class RootPage : Page
 
     private async void CreateMod_Click(object sender, SplitButtonClickEventArgs e)
     {
-        if (await EditEntryDialog.ShowAsync(XamlRoot, EditDialogMode.Create) is EditEntryDialogViewModel result)
+        if (await DialogHelper.ShowEditEntryAsync(EditDialogMode.Create) is EditEntryDialogViewModel result)
         {
             var newEntry = new DoomEntry()
             {
@@ -483,7 +483,7 @@ public sealed partial class RootPage : Page
         var addedEntries = new List<DoomEntry>();
         foreach (var file in files)
         {
-            var newEntry = await EntryHelper.ImportFromGZDLFile(XamlRoot, file, withConfirm, SetProgress);
+            var newEntry = await EntryHelper.ImportFromGZDLFile(file, withConfirm, SetProgress);
             if (newEntry != null)
             {
                 addedEntries.Add(newEntry);
@@ -498,7 +498,7 @@ public sealed partial class RootPage : Page
         var wadInfo = await WebAPI.Current.GetDoomWorldWADInfo(wadId);
         if (wadInfo != null)
         {
-            var newEntry = await EntryHelper.ImportFromDoomWorld(XamlRoot, wadInfo, withConfirm, SetProgress);
+            var newEntry = await EntryHelper.ImportFromDoomWorld(wadInfo, withConfirm, SetProgress);
             if (newEntry != null)
             {
                 AddEntries(new[] { newEntry });
@@ -575,7 +575,7 @@ public sealed partial class RootPage : Page
                 }
                 if (otherFiles.Any())
                 {
-                    var newEntry = await EntryHelper.CreateFromFiles(XamlRoot, otherFiles, withConfirm: true, SetProgress);
+                    var newEntry = await EntryHelper.CreateFromFiles(otherFiles, withConfirm: true, SetProgress);
                     if (newEntry != null)
                     {
                         AddEntries(new[] { newEntry });
