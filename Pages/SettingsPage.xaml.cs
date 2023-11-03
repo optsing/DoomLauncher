@@ -212,77 +212,71 @@ public sealed partial class SettingsPage : Page
         EventBus.Progress(this, null);
     }
 
-    private void ToggleDefaultGZDoom_Click(object sender, RoutedEventArgs e)
+    [RelayCommand]
+    private void ToggleDefaultDoomPackage(GZDoomPackage? package)
     {
-        if (sender is FrameworkElement el)
+        if (package == null)
         {
-            if (el.DataContext is GZDoomPackage package)
-            {
-                Settings.Current.DefaultGZDoomPath = Settings.Current.DefaultGZDoomPath == package.Path ? "" : package.Path;
-            }
+            return;
+        }
+        Settings.Current.DefaultGZDoomPath = Settings.Current.DefaultGZDoomPath == package.Path ? "" : package.Path;
+    }
+
+    [RelayCommand]
+    private void OpenFolderDoomPackage(GZDoomPackage? package)
+    {
+        if (package == null)
+        {
+            return;
+        }
+        Process.Start("explorer.exe", "/select," + Path.GetFullPath(package.Path, FileHelper.PackagesFolderPath));
+    }
+
+    [RelayCommand]
+    private async Task RemoveDoomPackage(GZDoomPackage? package)
+    {
+        if (package == null)
+        {
+            return;
+        }
+        var title = FileHelper.GZDoomPackageToTitle(package);
+        if (await DialogHelper.ShowAskAsync("Удаление ссылки", $"Вы уверены, что хотите удалить ссылку на '{title}'?", "Удалить", "Отмена"))
+        {
+            Settings.Current.GZDoomInstalls.Remove(package);
         }
     }
 
-    private void OpenContainFolder_Click(object sender, RoutedEventArgs e)
+    [RelayCommand]
+    private void ToggleDefaultIWad(string? iWadFile)
     {
-        if (sender is FrameworkElement el)
+        if (string.IsNullOrEmpty(iWadFile))
         {
-            if (el.DataContext is GZDoomPackage package)
-            {
-                Process.Start("explorer.exe", "/select," + Path.GetFullPath(package.Path, FileHelper.PackagesFolderPath));
-            }
+            return;
         }
+        Settings.Current.DefaultIWadFile = Settings.Current.DefaultIWadFile == iWadFile ? "" : iWadFile;
     }
 
-    private async void RemovePackage_Click(object sender, RoutedEventArgs e)
+    [RelayCommand]
+    private void OpenFolderIWad(string? iWadFile)
     {
-        if (sender is FrameworkElement el)
+        if (string.IsNullOrEmpty(iWadFile))
         {
-            if (el.DataContext is GZDoomPackage package)
-            {
-                var title = FileHelper.GZDoomPackageToTitle(package);
-                if (await DialogHelper.ShowAskAsync("Удаление ссылки", $"Вы уверены, что хотите удалить ссылку на '{title}'?", "Удалить", "Отмена"))
-                {
-                    Settings.Current.GZDoomInstalls.Remove(package);
-                }
-            }
+            return;
         }
+        Process.Start("explorer.exe", "/select," + Path.GetFullPath(iWadFile, FileHelper.IWadFolderPath));
     }
 
-    private void ToggleDefaultIWad_Click(object sender, RoutedEventArgs e)
+    [RelayCommand]
+    private async Task RemoveIWad(string? iWadFile)
     {
-        if (sender is FrameworkElement el)
+        if (string.IsNullOrEmpty(iWadFile))
         {
-            if (el.DataContext is string iWadFile)
-            {
-                Settings.Current.DefaultIWadFile = Settings.Current.DefaultIWadFile == iWadFile ? "" : iWadFile;
-            }
+            return;
         }
-    }
-
-    private void OpenIWadFolder_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is FrameworkElement el)
+        var title = FileHelper.IWadFileToTitle(iWadFile);
+        if (await DialogHelper.ShowAskAsync("Удаление ссылки", $"Вы уверены, что хотите удалить ссылку на '{title}'?", "Удалить", "Отмена"))
         {
-            if (el.DataContext is string iWadFile)
-            {
-                Process.Start("explorer.exe", "/select," + Path.GetFullPath(iWadFile, FileHelper.IWadFolderPath));
-            }
-        }
-    }
-
-    private async void RemoveIWad_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is FrameworkElement el)
-        {
-            if (el.DataContext is string iWadFile)
-            {
-                var title = FileHelper.IWadFileToTitle(iWadFile);
-                if (await DialogHelper.ShowAskAsync("Удаление ссылки", $"Вы уверены, что хотите удалить ссылку на '{title}'?", "Удалить", "Отмена"))
-                {
-                    Settings.Current.IWadFiles.Remove(iWadFile);
-                }
-            }
+            Settings.Current.IWadFiles.Remove(iWadFile);
         }
     }
 }

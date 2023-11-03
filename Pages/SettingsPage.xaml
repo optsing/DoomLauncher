@@ -11,34 +11,40 @@
     <Page.Resources>
         <MenuFlyout x:Key="flyoutPackage" Placement="Bottom" >
             <MenuFlyoutItem
-                Click="ToggleDefaultGZDoom_Click"
+                Command="{x:Bind ToggleDefaultDoomPackageCommand}"
+                CommandParameter="{Binding}"
                 Text="Назначить по умолчанию"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE73E;}"
             />
             <MenuFlyoutItem
-                Click="OpenContainFolder_Click"
+                Command="{x:Bind OpenFolderDoomPackageCommand}"
+                CommandParameter="{Binding}"
                 Text="Открыть расположение"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE838;}"
             />
             <MenuFlyoutItem
-                Click="RemovePackage_Click"
+                Command="{x:Bind RemoveDoomPackageCommand}"
+                CommandParameter="{Binding}"
                 Text="Удалить ссылку на файл"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
             />
         </MenuFlyout>
         <MenuFlyout x:Key="flyoutIWad" Placement="Bottom" >
             <MenuFlyoutItem
-                Click="ToggleDefaultIWad_Click"
+                Command="{x:Bind ToggleDefaultIWadCommand}"
+                CommandParameter="{Binding}"
                 Text="Назначить по умолчанию"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE73E;}"
             />
             <MenuFlyoutItem
-                Click="OpenIWadFolder_Click"
+                Command="{x:Bind OpenFolderIWadCommand}"
+                CommandParameter="{Binding}"
                 Text="Открыть расположение"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE838;}"
             />
             <MenuFlyoutItem
-                Click="RemoveIWad_Click"
+                Command="{x:Bind RemoveIWadCommand}"
+                CommandParameter="{Binding}"
                 Text="Удалить ссылку на файл"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
             />

@@ -188,63 +188,13 @@ public sealed partial class RootPage : Page
         SetProgress(e);
     }
 
-    private async void RemoveMod_Click(object sender, RoutedEventArgs e)
+    [RelayCommand]
+    private async Task RemoveEntry(DoomEntry? entry)
     {
-        if (sender is FrameworkElement el)
+        if (entry == null)
         {
-            if (el.DataContext is DoomEntry entry)
-            {
-                await RemoveEntry(entry);
-            }
+            return;
         }
-    }
-
-    private async void EditMod_Click(object? sender, RoutedEventArgs e)
-    {
-        if (sender is FrameworkElement el)
-        {
-            if (el.DataContext is DoomEntry entry)
-            {
-                await EditEntry(entry);
-            }
-        }
-    }
-
-    private void CopyMod_Click(object? sender, RoutedEventArgs e)
-    {
-        if (sender is FrameworkElement el)
-        {
-            if (el.DataContext is DoomEntry entry)
-            {
-                CopyEntry(entry);
-            }
-        }
-    }
-
-    private async void CreateShortcut_Click(object? sender, RoutedEventArgs e)
-    {
-        if (sender is FrameworkElement el)
-        {
-            if (el.DataContext is DoomEntry entry)
-            {
-                await CreateShortcut(entry);
-            }
-        }
-    }
-
-    private async void ExportMod_Click(object? sender, RoutedEventArgs e)
-    {
-        if (sender is FrameworkElement el)
-        {
-            if (el.DataContext is DoomEntry entry)
-            {
-                await ExportEntry(entry);
-            }
-        }
-    }
-
-    private async Task RemoveEntry(DoomEntry entry)
-    {
         if (await DialogHelper.ShowAskAsync("Удаление сборки", $"Вы уверены, что хотите удалить сборку '{entry.Name}'?", "Удалить", "Отмена"))
         {
             if (entry == ViewModel.CurrentEntry)
@@ -257,8 +207,13 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private async Task EditEntry(DoomEntry entry)
+    [RelayCommand]
+    private async Task EditEntry(DoomEntry? entry)
     {
+        if (entry == null)
+        {
+            return;
+        }
         if (await DialogHelper.ShowEditEntryAsync(entry, EditDialogMode.Edit) is EditEntryDialogViewModel result)
         {
             result.UpdateEntry(entry);
@@ -267,8 +222,13 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private async void CopyEntry(DoomEntry entry)
+    [RelayCommand]
+    private async Task CopyEntry(DoomEntry? entry)
     {
+        if (entry == null)
+        {
+            return;
+        }
         if (await DialogHelper.ShowEditEntryAsync(entry, EditDialogMode.Copy) is EditEntryDialogViewModel result)
         {
             var newEntry = new DoomEntry()
@@ -284,17 +244,6 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private void Start_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is FrameworkElement el)
-        {
-            if (el.DataContext is DoomEntry entry)
-            {
-                LaunchEntry(entry, forceClose: false);
-            }
-        }
-    }
-
     public void LaunchEntryById(string entryId, bool forceClose)
     {
         var entry = Settings.Current.Entries.FirstOrDefault(entry => string.Equals(entry.Id, entryId));
@@ -305,6 +254,12 @@ public sealed partial class RootPage : Page
     {
         var entry = Settings.Current.Entries.FirstOrDefault(entry => string.Equals(entry.Name, entryName));
         LaunchEntry(entry, forceClose);
+    }
+
+    [RelayCommand]
+    private void LaunchEntry(DoomEntry? entry)
+    {
+        LaunchEntry(entry, false);
     }
 
     private async void LaunchEntry(DoomEntry? entry, bool forceClose)
@@ -441,8 +396,13 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private async Task CreateShortcut(DoomEntry entry)
+    [RelayCommand]
+    private async Task CreateShortcutEntry(DoomEntry? entry)
     {
+        if (entry == null)
+        {
+            return;
+        }
         var picker = new Windows.Storage.Pickers.FileSavePicker();
 
         // Need to initialize the picker object with the hwnd / IInitializeWithWindow
@@ -465,8 +425,13 @@ public sealed partial class RootPage : Page
         SetProgress(null);
     }
 
-    private async Task ExportEntry(DoomEntry entry)
+    [RelayCommand]
+    private async Task ExportEntry(DoomEntry? entry)
     {
+        if (entry == null)
+        {
+            return;
+        }
         var picker = new Windows.Storage.Pickers.FileSavePicker();
 
         // Need to initialize the picker object with the hwnd / IInitializeWithWindow

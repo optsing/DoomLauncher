@@ -15,28 +15,33 @@
         <converters:EmptyObjectToObjectConverter x:Key="NullVisibilityConverter" NotEmptyValue="Visible" EmptyValue="Collapsed" />
         <MenuFlyout x:Key="flyoutEntry" Placement="Bottom">
             <MenuFlyoutItem
+                Command="{x:Bind EditEntryCommand}"
+                CommandParameter="{Binding}"
                 Text="Настроить"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE70F;}"
-                Click="EditMod_Click"
             />
             <MenuFlyoutItem
+                Command="{x:Bind CopyEntryCommand}"
+                CommandParameter="{Binding}"
                 Text="Дублировать"
-                Click="CopyMod_Click"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE8C8;}"
             />
             <MenuFlyoutItem
+                Command="{x:Bind CreateShortcutEntryCommand}"
+                CommandParameter="{Binding}"
                 Text="Создать ярлык"
-                Click="CreateShortcut_Click"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE71B;}"
             />
             <MenuFlyoutItem
+                Command="{x:Bind ExportEntryCommand}"
+                CommandParameter="{Binding}"
                 Text="Экспортировать"
-                Click="ExportMod_Click"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE896;}"
             />
             <MenuFlyoutItem
+                Command="{x:Bind RemoveEntryCommand}"
+                CommandParameter="{Binding}"
                 Text="Удалить"
-                Click="RemoveMod_Click"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
             />
         </MenuFlyout>
@@ -297,9 +302,10 @@
                             Height="32"
                         />
                         <Button 
+                            Command="{x:Bind LaunchEntryCommand}"
+                            CommandParameter="{Binding}"
                             Width="180"
                             VerticalAlignment="Center"
-                            Click="Start_Click"
                             Style="{ThemeResource AccentButtonStyle}"
                         >
                             <StackPanel Orientation="Horizontal" Spacing="4">

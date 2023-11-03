@@ -110,9 +110,9 @@ public sealed partial class DoomPage : Page
                 {
                     Glyph = "\uEC50",
                     FontSize = 14,
-                }
+                },
+                Command = AddLocalFileCommand,
             };
-            browseItem.Click += Append_Click;
             menu.Items.Add(browseItem);
             menu.Items.Add(new MenuFlyoutSeparator());
             menu.Items.Add(new MenuFlyoutItem()
@@ -156,7 +156,8 @@ public sealed partial class DoomPage : Page
         }
     }
 
-    private async void Append_Click(object sender, RoutedEventArgs e)
+    [RelayCommand]
+    private async Task AddLocalFile()
     {
         var picker = new Windows.Storage.Pickers.FileOpenPicker();
 
