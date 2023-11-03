@@ -74,12 +74,12 @@
                                 Placement="Bottom"
                             >
                                 <MenuFlyoutItem
-                                    Click="BrowseButton_Click"
+                                    Command="{x:Bind AddLocalDoomPackageCommand}"
                                     Text="Выбрать на устройстве"
                                     Icon="{ui:FontIcon FontSize=14, Glyph=&#xEC50;}"
                                 />
                                 <MenuFlyoutItem
-                                    Click="SearchPackages_Click"
+                                    Command="{x:Bind AddRemoteDoomPackageCommand}"
                                     Text="Скачать с GitHub"
                                     Icon="{ui:FontIcon FontSize=14, Glyph=&#xE896;}"
                                 />
@@ -149,7 +149,7 @@
                                 Placement="Bottom"
                             >
                                 <MenuFlyoutItem 
-                                    Click="BrowseIWadButton_Click"
+                                    Command="{x:Bind AddLocalIWadCommand}"
                                     Text="Выбрать на устройстве"
                                     Icon="{ui:FontIcon FontSize=14, Glyph=&#xEC50;}"
                                 />

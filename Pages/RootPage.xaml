@@ -139,7 +139,7 @@
                     </Grid.RowDefinitions>
                     <SplitButton
                         Grid.Row="1"
-                        Click="CreateMod_Click"
+                        Command="{x:Bind CreateEntryEmptyCommand}"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Center"
                         Margin="8,0"
@@ -147,13 +147,13 @@
                         <SplitButton.Flyout>
                             <MenuFlyout>
                                 <MenuFlyoutItem
-                                    Click="CreateEntryFromFiles_Click"
+                                    Command="{x:Bind CreateEntryFromFilesCommand}"
                                     HorizontalAlignment="Stretch"
                                     Text="Создать сборку из файлов"
                                     Icon="{ui:FontIcon FontSize=14, Glyph=&#xEC50;}"
                                 />
                                 <MenuFlyoutItem
-                                    Click="ImportButton_Click"
+                                    Command="{x:Bind ImportEntriesCommand}"
                                     HorizontalAlignment="Stretch"
                                     Text="Импортировать из файла"
                                     Icon="{ui:FontIcon FontSize=14, Glyph=&#xE898;}"
@@ -199,7 +199,7 @@
                     </ListView>
                     <Button
                         Grid.Row="3"
-                        Click="SettingsButton_Click"
+                        Command="{x:Bind NavigateToSettingsPageCommand}"
                         Margin="8,0"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Center"
@@ -352,7 +352,7 @@
                 Grid.Column="1"
                 VerticalAlignment="Stretch"
                 HorizontalAlignment="Stretch"
-                Click="ButtonMenu_Click"
+                Command="{x:Bind ToggleSidebarCommand}"
                 Style="{ThemeResource PaneToggleButtonStyle}"
             />
             <Border

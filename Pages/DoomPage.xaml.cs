@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
@@ -175,7 +176,8 @@ public sealed partial class DoomPage : Page
         }
     }
 
-    private async void AddBackground_Click(object sender, RoutedEventArgs e)
+    [RelayCommand]
+    private async Task AddBackground()
     {
         var picker = new Windows.Storage.Pickers.FileOpenPicker();
 
@@ -218,12 +220,14 @@ public sealed partial class DoomPage : Page
         }
     }
 
-    private void PreviousBackground_Click(object sender, RoutedEventArgs e)
+    [RelayCommand]
+    private void GoToPreviousBackground()
     {
         SetSelectedImageIndex(entry.SelectedImageIndex - 1, direction: AnimationDirection.Previous);
     }
 
-    private void NextBackground_Click(object sender, RoutedEventArgs e)
+    [RelayCommand]
+    private void GoToNextBackground()
     {
         SetSelectedImageIndex(entry.SelectedImageIndex + 1, direction: AnimationDirection.Next);
     }
@@ -319,7 +323,8 @@ public sealed partial class DoomPage : Page
         }
     }
 
-    private async void RemoveBackground_Click(object sender, RoutedEventArgs e)
+    [RelayCommand]
+    private async Task RemoveBackground()
     {
         if (entry.SelectedImageIndex >= 0 && entry.SelectedImageIndex < entry.ImageFiles.Count)
         {
@@ -425,7 +430,8 @@ public sealed partial class DoomPage : Page
         ViewModel.IsSlideshowEnabled = entry.Slideshow && entry.ImageFiles.Count > 1;
     }
 
-    private void Slideshow_Click(object sender, RoutedEventArgs e)
+    [RelayCommand]
+    private void ToggleSlideshow()
     {
         entry.Slideshow = !entry.Slideshow;
         ViewModel.CurrentTicksToSlideshow = 0;

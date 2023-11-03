@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -358,12 +359,14 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private void ButtonMenu_Click(object sender, RoutedEventArgs e)
+    [RelayCommand]
+    private void ToggleSidebar()
     {
         swMain.IsPaneOpen = !swMain.IsPaneOpen;
     }
 
-    private void SettingsButton_Click(object sender, RoutedEventArgs e)
+    [RelayCommand]
+    private void NavigateToSettingsPage()
     {
         if (frameMain.Content is not SettingsPage)
         {
@@ -372,7 +375,8 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private async void CreateEntryFromFiles_Click(object sender, RoutedEventArgs e)
+    [RelayCommand]
+    private async Task CreateEntryFromFiles()
     {
         var picker = new Windows.Storage.Pickers.FileOpenPicker();
 
@@ -401,7 +405,8 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private async void CreateMod_Click(object sender, SplitButtonClickEventArgs e)
+    [RelayCommand]
+    private async Task CreateEntryEmpty()
     {
         if (await DialogHelper.ShowEditEntryAsync(EditDialogMode.Create) is EditEntryDialogViewModel result)
         {
@@ -416,7 +421,8 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private async void ImportButton_Click(object sender, RoutedEventArgs e)
+    [RelayCommand]
+    private async Task ImportEntries()
     {
         var picker = new Windows.Storage.Pickers.FileOpenPicker();
 

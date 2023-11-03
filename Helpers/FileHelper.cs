@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
 
@@ -19,7 +21,7 @@ public readonly struct TitleAppId
     }
 }
 
-internal static class FileHelper
+internal static partial class FileHelper
 {
     public static string ConfigFilePath = "";
     public static string ModsFolderPath = "";
@@ -236,4 +238,22 @@ internal static class FileHelper
         }
         return (package.Version?.ToString() ?? "unknown") + ArchToTitle(package.Arch);
     }
+
+    public static string? GetFileVersion(string filePath)
+    {
+        return FileVersionInfo.GetVersionInfo(filePath)?.ProductVersion;
+    }
+
+    public static Version? ParseVersion(string version)
+    {
+        var match = reVersion().Match(version);
+        if (match.Success)
+        {
+            return new(int.Parse(match.Groups[1].Value), int.Parse(match.Groups[2].Value), int.Parse(match.Groups[3].Value));
+        }
+        return null;
+    }
+
+    [GeneratedRegex("(\\d+)[.-](\\d+)[.-](\\d+)")]
+    private static partial Regex reVersion();
 }

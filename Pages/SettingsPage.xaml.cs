@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
@@ -76,17 +77,8 @@ public sealed partial class SettingsPage : Page
         base.OnNavigatedTo(e);
     }
 
-    private static Version? ParseVersion(string version)
-    {
-        var match = reVersion().Match(version);
-        if (match.Success)
-        {
-            return new(int.Parse(match.Groups[1].Value), int.Parse(match.Groups[2].Value), int.Parse(match.Groups[3].Value));
-        }
-        return null;
-    }
-
-    private async Task LoadReleases()
+    [RelayCommand]
+    private async Task AddRemoteDoomPackage()
     {
         EventBus.Progress(this, "Получение списка версий");
         var entries = await WebAPI.Current.GetGZDoomGitHubReleases();
@@ -110,7 +102,7 @@ public sealed partial class SettingsPage : Page
                     {
                         arch = isLegacy ? AssetArch.x64legacy : AssetArch.x64;
                     }
-                    var version = ParseVersion(asset.Name);
+                    var version = FileHelper.ParseVersion(asset.Name);
                     if (!Settings.Current.GZDoomInstalls.Any(package => package.Version == version && package.Arch == arch))
                     {
                         var newAsset = new GZDoomPackage()
@@ -163,7 +155,8 @@ public sealed partial class SettingsPage : Page
         }
     }
 
-    private async Task AddLocalGZDoom()
+    [RelayCommand]
+    private async Task AddLocalDoomPackage()
     {
         var picker = new Windows.Storage.Pickers.FileOpenPicker();
 
@@ -176,7 +169,7 @@ public sealed partial class SettingsPage : Page
         var file = await picker.PickSingleFileAsync();
         if (file != null && FileHelper.ValidateGZDoomPath(file.Path))
         {
-            var version = GetFileVersion(file.Path) is string s ? ParseVersion(s) : null;
+            var version = FileHelper.GetFileVersion(file.Path) is string s ? FileHelper.ParseVersion(s) : null;
             if (Settings.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == file.Path) is GZDoomPackage package)
             {
                 package.Version = version;
@@ -194,17 +187,8 @@ public sealed partial class SettingsPage : Page
         }
     }
 
-    private async void BrowseButton_Click(object sender, RoutedEventArgs e)
-    {
-        await AddLocalGZDoom();
-    }
-
-    private async void SearchPackages_Click(object sender, RoutedEventArgs e)
-    {
-        await LoadReleases();
-    }
-
-    private async void BrowseIWadButton_Click(object sender, RoutedEventArgs e)
+    [RelayCommand]
+    private async Task AddLocalIWad()
     {
         var picker = new Windows.Storage.Pickers.FileOpenPicker();
 
@@ -226,11 +210,6 @@ public sealed partial class SettingsPage : Page
             }
         }
         EventBus.Progress(this, null);
-    }
-
-    private static string? GetFileVersion(string filePath)
-    {
-        return FileVersionInfo.GetVersionInfo(filePath)?.ProductVersion;
     }
 
     private void ToggleDefaultGZDoom_Click(object sender, RoutedEventArgs e)
@@ -306,7 +285,4 @@ public sealed partial class SettingsPage : Page
             }
         }
     }
-
-    [GeneratedRegex("(\\d+)[.-](\\d+)[.-](\\d+)")]
-    private static partial Regex reVersion();
 }

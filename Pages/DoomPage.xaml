@@ -157,7 +157,7 @@
         >
             <Button
                 ToolTipService.ToolTip="Добавить фон"
-                Click="AddBackground_Click"
+                Command="{x:Bind AddBackgroundCommand}"
                 Style="{ThemeResource EllipsisButton}"
                 Height="40"
                 Width="40"
@@ -165,7 +165,7 @@
             />
             <Button
                 ToolTipService.ToolTip="Предыдущий фон"
-                Click="PreviousBackground_Click" 
+                Command="{x:Bind GoToPreviousBackgroundCommand}"
                 Style="{ThemeResource EllipsisButton}"
                 Height="40"
                 Width="40"
@@ -174,7 +174,7 @@
             />
             <Button
                 ToolTipService.ToolTip="Слайд-шоу"
-                Click="Slideshow_Click"
+                Command="{x:Bind ToggleSlideshowCommand}"
                 Style="{ThemeResource EllipsisButton}"
                 Height="40"
                 Width="40"
@@ -198,7 +198,7 @@
             </Button>
             <Button
                 ToolTipService.ToolTip="Следующий фон"
-                Click="NextBackground_Click" 
+                Command="{x:Bind GoToNextBackgroundCommand}"
                 Style="{ThemeResource EllipsisButton}"
                 Height="40"
                 Width="40"
@@ -208,7 +208,7 @@
             <Button
                 ToolTipService.ToolTip="Удалить фон"
                 Style="{ThemeResource EllipsisButton}"
-                Click="RemoveBackground_Click"
+                Command="{x:Bind RemoveBackgroundCommand}"
                 Height="40"
                 Width="40"
                 IsEnabled="{x:Bind local:XamlHelper.HasMoreItems(entry.ImageFiles.Count, 0), Mode=OneWay}"
