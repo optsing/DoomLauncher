@@ -49,12 +49,12 @@
             <ComboBox
                 HorizontalAlignment="Stretch"
                 Margin="0,8,0,8"
-                SelectedItem="{x:Bind ViewModel.GZDoomPackage, Mode=TwoWay}"
-                ItemsSource="{x:Bind ViewModel.GZDoomPackages}"
+                SelectedItem="{x:Bind ViewModel.DoomPackage, Mode=TwoWay}"
+                ItemsSource="{x:Bind ViewModel.DoomPackages}"
             >
                 <ComboBox.ItemTemplate>
-                    <DataTemplate x:DataType="local:GZDoomPackage">
-                        <TextBlock Text="{x:Bind local:FileHelper.GZDoomPackageToTitle((local:GZDoomPackage))}" />
+                    <DataTemplate x:DataType="local:DoomPackageViewModel">
+                        <TextBlock Text="{x:Bind Title}" />
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>

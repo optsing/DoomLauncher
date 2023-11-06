@@ -21,7 +21,7 @@ public class Settings: ObservableObject
     private string steamGame = "off";
 
     public static Settings Current { get; set; } = new();
-    public ObservableCollection<GZDoomPackage> GZDoomInstalls { get; set; } = new();
+    public ObservableCollection<DoomPackageViewModel> GZDoomInstalls { get; set; } = new();
     public ObservableCollection<string> IWadFiles { get; set; } = new();
     public string DefaultGZDoomPath { get => defaultGZDoomPath; set => SetProperty(ref defaultGZDoomPath, value); }
     public string DefaultIWadFile { get => defaultIWadFile; set => SetProperty(ref defaultIWadFile, value); }
@@ -42,21 +42,6 @@ public class Settings: ObservableObject
         var text = JsonSerializer.Serialize(Current, JsonSettingsContext.Default.Settings);
         File.WriteAllText(FileHelper.ConfigFilePath, text);
     }
-}
-
-public class GZDoomPackage: ObservableObject
-{
-    public string Path { get; set; } = "";
-
-    private Version? version = null;
-    public Version? Version
-    {
-        get => version;
-        set => SetProperty(ref version, value);
-    }
-
-    [JsonConverter(typeof(AssetArchJsonConverter))]
-    public AssetArch Arch { get; set; } = AssetArch.unknown;
 }
 
 public partial class DoomEntry: ObservableObject

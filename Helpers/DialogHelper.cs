@@ -67,7 +67,7 @@ internal static class DialogHelper
         return null;
     }
 
-    public static async Task<GZDoomPackage?> ShowPackageSelectorAsync(List<GZDoomPackage> packages)
+    public static async Task<DoomPackageViewModel?> ShowPackageSelectorAsync(List<DoomPackageViewModel> packages)
     {
         if (XamlRoot == null)
         {

@@ -11,7 +11,7 @@ namespace DoomLauncher;
 
 public class EditEntryDialogViewModel
 {
-    private static readonly GZDoomPackage DefaultGZDoomPackage = new() { Path = "", Arch = AssetArch.notSelected };
+    private static readonly DoomPackageViewModel DefaultDoomPackage = new() { Path = "", Arch = AssetArch.notSelected };
     private static readonly KeyValue DefaultIWadFile = new("", "По умолчанию");
     private static readonly KeyValue DefaultSteamGame = new("", "По умолчанию");
 
@@ -39,11 +39,11 @@ public class EditEntryDialogViewModel
     public bool UniqueConfig { get; set; } = false;
     public bool UniqueSavesFolder { get; set; } = false;
 
-    public List<GZDoomPackage> GZDoomPackages { get; }
+    public List<DoomPackageViewModel> DoomPackages { get; }
     public List<KeyValue> IWadFiles { get; }
     public List<KeyValue> SteamGames { get; }
 
-    public GZDoomPackage GZDoomPackage { get; set; } = DefaultGZDoomPackage;
+    public DoomPackageViewModel DoomPackage { get; set; } = DefaultDoomPackage;
     public KeyValue IWadFile { get; set; } = DefaultIWadFile;
     public KeyValue SteamGame { get; set; } = DefaultSteamGame;
 
@@ -54,8 +54,8 @@ public class EditEntryDialogViewModel
     {
         this.mode = mode;
 
-        GZDoomPackages = new List<GZDoomPackage>() { DefaultGZDoomPackage };
-        GZDoomPackages.AddRange(Settings.Current.GZDoomInstalls);
+        DoomPackages = new List<DoomPackageViewModel>() { DefaultDoomPackage };
+        DoomPackages.AddRange(Settings.Current.GZDoomInstalls);
 
         IWadFiles = new() { DefaultIWadFile };
         IWadFiles.AddRange(Settings.Current.IWadFiles.Select(iWadFile => new KeyValue(iWadFile, FileHelper.IWadFileToTitle(iWadFile))));
@@ -76,7 +76,7 @@ public class EditEntryDialogViewModel
             ModFiles = modFiles?.Select(file => new TitleChecked(file)).ToList() ?? new List<TitleChecked>(),
             ImageFiles = imageFiles?.Select(file => new TitleChecked(file)).ToList() ?? new List<TitleChecked>(),
         };
-        vm.GZDoomPackage = vm.GZDoomPackages.FirstOrDefault(package => package.Path == entry.GZDoomPath, DefaultGZDoomPackage);
+        vm.DoomPackage = vm.DoomPackages.FirstOrDefault(package => package.Path == entry.GZDoomPath, DefaultDoomPackage);
         vm.IWadFile = vm.IWadFiles.FirstOrDefault(iWad => iWad.Key == entry.IWadFile, DefaultIWadFile);
         vm.SteamGame = vm.SteamGames.FirstOrDefault(steamGame => steamGame.Key == entry.SteamGame, DefaultSteamGame);
         return vm;
@@ -87,10 +87,10 @@ public class EditEntryDialogViewModel
 
     public void UpdateEntry(DoomEntry entry)
     {
-        entry.Name = Name;
-        entry.Description = Description;
-        entry.LongDescription = LongDescription;
-        entry.GZDoomPath = GZDoomPackage.Path;
+        entry.Name = Name.Trim();
+        entry.Description = Description.Trim();
+        entry.LongDescription = LongDescription.Trim();
+        entry.GZDoomPath = DoomPackage.Path;
         entry.IWadFile = IWadFile.Key;
         entry.SteamGame = SteamGame.Key;
         entry.UniqueConfig = UniqueConfig;
@@ -114,7 +114,7 @@ public sealed partial class EditEntryDialog : ContentDialog
 
     private void EditEntryDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
-        if (string.IsNullOrEmpty(ViewModel.Name))
+        if (string.IsNullOrWhiteSpace(ViewModel.Name))
         {
             tbModName.Focus(FocusState.Programmatic);
             args.Cancel = true;

@@ -28,7 +28,7 @@ internal static partial class EntryHelper
             }
             newEntry ??= new DoomEntry()
             {
-                Name = Path.GetFileNameWithoutExtension(file.Name),
+                Name = Path.GetFileNameWithoutExtension(file.Name).Trim(),
             };
             var modFiles = new List<string>();
             var imageFiles = new List<string>();
@@ -115,8 +115,8 @@ internal static partial class EntryHelper
 
             var newEntry = new DoomEntry()
             {
-                Name = wadInfo.Title,
-                LongDescription = reLineBreak().Replace(wadInfo.Description, "\n"),
+                Name = wadInfo.Title.Trim(),
+                LongDescription = reLineBreak().Replace(wadInfo.Description, "\n").Trim(),
             };
             var modFiles = new List<string>();
             var imageFiles = new List<string>();
@@ -205,7 +205,7 @@ internal static partial class EntryHelper
 
             var newEntry = new DoomEntry()
             {
-                Name = title,
+                Name = title.Trim(),
             };
             var modFiles = new List<string>();
             var imageFiles = new List<string>();

@@ -15,8 +15,8 @@
 
     <ListView SelectedItem="{x:Bind SelectedPackage, Mode=TwoWay}" ItemsSource="{x:Bind OnlinePackage}">
         <ListView.ItemTemplate>
-            <DataTemplate x:DataType="local:GZDoomPackage">
-                <TextBlock Text="{x:Bind local:FileHelper.GZDoomPackageToTitle((local:GZDoomPackage))}" />
+            <DataTemplate x:DataType="local:DoomPackageViewModel">
+                <TextBlock Text="{x:Bind Title}" />
             </DataTemplate>
         </ListView.ItemTemplate>
     </ListView>

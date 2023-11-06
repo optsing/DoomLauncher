@@ -292,10 +292,10 @@
                         Grid.Column="1"
                         Orientation="Horizontal"
                         Visibility="{x:Bind ViewModel.CurrentEntry, Converter={StaticResource NullVisibilityConverter}, Mode=OneWay}"
-                        DataContext="{x:Bind ViewModel.CurrentEntry, Mode=OneWay}"
                         Spacing="8"
                     >
                         <DropDownButton
+                            DataContext="{x:Bind ViewModel.CurrentEntry, Mode=OneWay}"
                             VerticalAlignment="Center"
                             Flyout="{StaticResource flyoutEntry}"
                             Content="{ui:FontIcon FontSize=14, Glyph=&#xE712;}"
@@ -303,7 +303,7 @@
                         />
                         <Button 
                             Command="{x:Bind LaunchEntryCommand}"
-                            CommandParameter="{Binding}"
+                            CommandParameter="{x:Bind ViewModel.CurrentEntry, Mode=OneWay}"
                             Width="180"
                             VerticalAlignment="Center"
                             Style="{ThemeResource AccentButtonStyle}"

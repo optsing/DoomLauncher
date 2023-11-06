@@ -82,7 +82,7 @@ public sealed partial class SettingsPage : Page
     {
         EventBus.Progress(this, "Получение списка версий");
         var entries = await WebAPI.Current.GetGZDoomGitHubReleases();
-        var onlinePackages = new List<GZDoomPackage>();
+        var onlinePackages = new List<DoomPackageViewModel>();
         foreach (var entry in entries)
         {
             foreach (var asset in entry.Assets)
@@ -105,7 +105,7 @@ public sealed partial class SettingsPage : Page
                     var version = FileHelper.ParseVersion(asset.Name);
                     if (!Settings.Current.GZDoomInstalls.Any(package => package.Version == version && package.Arch == arch))
                     {
-                        var newAsset = new GZDoomPackage()
+                        var newAsset = new DoomPackageViewModel()
                         {
                             Path = asset.DownloadUrl,
                             Arch = arch,
@@ -126,7 +126,7 @@ public sealed partial class SettingsPage : Page
         }
     }
 
-    private async Task DownloadPackage(GZDoomPackage package)
+    private async Task DownloadPackage(DoomPackageViewModel package)
     {
         if (!string.IsNullOrEmpty(package.Path))
         {
@@ -140,13 +140,13 @@ public sealed partial class SettingsPage : Page
                 await Task.Run(
                     () => zipArchive.ExtractToDirectory(targetPath, overwriteFiles: true)
                 );
-                var newPackage = new GZDoomPackage()
+                var newPackage = new DoomPackageViewModel()
                 {
                     Path = Path.Combine(folderName, "gzdoom.exe"),
                     Version = package.Version,
                     Arch = package.Arch,
                 };
-                Settings.Current.GZDoomInstalls.Insert(0, newPackage);
+                Settings.Current.GZDoomInstalls.Add(newPackage);
             }
             finally
             {
@@ -170,19 +170,19 @@ public sealed partial class SettingsPage : Page
         if (file != null && FileHelper.ValidateGZDoomPath(file.Path))
         {
             var version = FileHelper.GetFileVersion(file.Path) is string s ? FileHelper.ParseVersion(s) : null;
-            if (Settings.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == file.Path) is GZDoomPackage package)
+            if (Settings.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == file.Path) is DoomPackageViewModel package)
             {
                 package.Version = version;
             }
             else
             {
-                var newPackage = new GZDoomPackage
+                var newPackage = new DoomPackageViewModel
                 {
                     Path = file.Path,
                     Version = version,
                     Arch = AssetArch.manual,
                 };
-                Settings.Current.GZDoomInstalls.Insert(0, newPackage);
+                Settings.Current.GZDoomInstalls.Add(newPackage);
             }
         }
     }
@@ -206,14 +206,14 @@ public sealed partial class SettingsPage : Page
             await FileHelper.CopyFileWithConfirmation(file, FileHelper.IWadFolderPath);
             if (!Settings.Current.IWadFiles.Contains(file.Name))
             {
-                Settings.Current.IWadFiles.Insert(0, file.Name);
+                Settings.Current.IWadFiles.Add(file.Name);
             }
         }
         EventBus.Progress(this, null);
     }
 
     [RelayCommand]
-    private void ToggleDefaultDoomPackage(GZDoomPackage? package)
+    private void ToggleDefaultDoomPackage(DoomPackageViewModel? package)
     {
         if (package == null)
         {
@@ -223,7 +223,7 @@ public sealed partial class SettingsPage : Page
     }
 
     [RelayCommand]
-    private void OpenFolderDoomPackage(GZDoomPackage? package)
+    private void OpenFolderDoomPackage(DoomPackageViewModel? package)
     {
         if (package == null)
         {
@@ -233,14 +233,13 @@ public sealed partial class SettingsPage : Page
     }
 
     [RelayCommand]
-    private async Task RemoveDoomPackage(GZDoomPackage? package)
+    private async Task RemoveDoomPackage(DoomPackageViewModel? package)
     {
         if (package == null)
         {
             return;
         }
-        var title = FileHelper.GZDoomPackageToTitle(package);
-        if (await DialogHelper.ShowAskAsync("Удаление ссылки", $"Вы уверены, что хотите удалить ссылку на '{title}'?", "Удалить", "Отмена"))
+        if (await DialogHelper.ShowAskAsync("Удаление ссылки", $"Вы уверены, что хотите удалить ссылку на '{package.Title}'?", "Удалить", "Отмена"))
         {
             Settings.Current.GZDoomInstalls.Remove(package);
         }

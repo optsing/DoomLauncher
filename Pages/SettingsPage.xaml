@@ -108,13 +108,13 @@
                     ItemContainerTransitions="{StaticResource ListViewAnimations}"
                 >
                     <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="local:GZDoomPackage">
+                        <DataTemplate x:DataType="local:DoomPackageViewModel">
                             <Grid ColumnDefinitions="*,Auto" ContextFlyout="{StaticResource flyoutPackage}">
                                 <TextBlock
                                     Grid.Column="0"
                                     VerticalAlignment="Center"
                                 >
-                                    <Run Text="{x:Bind local:FileHelper.GZDoomPackageToTitle((local:GZDoomPackage)), Mode=OneWay}" />
+                                    <Run Text="{x:Bind Title, Mode=OneWay}" />
                                     <Run
                                         Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
                                         Text="{x:Bind local:XamlHelper.IsDefaultText(local:Settings.Current.DefaultGZDoomPath, Path), Mode=OneWay}"

@@ -11,14 +11,15 @@ namespace DoomLauncher;
 /// </summary>
 public sealed partial class PackageSelectorDialog : ContentDialog
 {
-    public PackageSelectorDialog(List<GZDoomPackage> assets)
+    public PackageSelectorDialog(List<DoomPackageViewModel> assets)
     {
         InitializeComponent();
         OnlinePackage = assets;
         SelectedPackage = assets.FirstOrDefault();
     }
 
-    private List<GZDoomPackage> OnlinePackage { get; }
+    private List<DoomPackageViewModel> OnlinePackage { get; }
 
-    public GZDoomPackage? SelectedPackage { get; set; }
+    public DoomPackageViewModel? SelectedPackage { get; set; }
 }
+

@@ -154,11 +154,11 @@ internal static partial class FileHelper
         return "";
     }
 
-    public static GZDoomPackage? ResolveGZDoomPath(string gZDoomPath, string defaultGZDoomPath)
+    public static DoomPackageViewModel? ResolveGZDoomPath(string gZDoomPath, string defaultGZDoomPath)
     {
         if (!string.IsNullOrEmpty(gZDoomPath))
         {
-            if (Settings.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == gZDoomPath) is GZDoomPackage package)
+            if (Settings.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == gZDoomPath) is DoomPackageViewModel package)
             {
                 return package;
             }
@@ -182,21 +182,10 @@ internal static partial class FileHelper
         {
             return "Не выбрано";
         }
-        return GZDoomPackageToTitle(package);
+        return package.Title;
     }
 
-    private static string ArchToTitle(AssetArch arch) => arch switch
-    {
-        AssetArch.x64 => "",
-        AssetArch.x64legacy => " (legacy)",
-        AssetArch.x86 => " 32 bit",
-        AssetArch.x86legacy => " 32 bit (legacy)",
-        AssetArch.arm64 => " arm64",
-        AssetArch.manual => " user",
-        _ => " unknown",
-    };
-
-    public static string PackageToFolderName(GZDoomPackage package) => (package.Version?.ToString() ?? "unknown") + "-" + ArchToString(package.Arch);
+    public static string PackageToFolderName(DoomPackageViewModel package) => (package.Version?.ToString() ?? "unknown") + "-" + ArchToString(package.Arch);
 
     public static string ArchToString(AssetArch arch) => arch switch
     {
@@ -228,15 +217,6 @@ internal static partial class FileHelper
             return IWads[key].title;
         }
         return iWadFile;
-    }
-
-    public static string GZDoomPackageToTitle(GZDoomPackage? package)
-    {
-        if (package == null || package.Arch == AssetArch.notSelected)
-        {
-            return "По умолчанию";
-        }
-        return (package.Version?.ToString() ?? "unknown") + ArchToTitle(package.Arch);
     }
 
     public static string? GetFileVersion(string filePath)

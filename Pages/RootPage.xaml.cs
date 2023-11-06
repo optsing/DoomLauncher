@@ -587,7 +587,7 @@ public sealed partial class RootPage : Page
         {
             foreach (var entry in entries)
             {
-                Settings.Current.Entries.Insert(0, entry);
+                Settings.Current.Entries.Add(entry);
             }
             SetCurrentEntry(entries.Last());
             Settings.Save();
