@@ -120,7 +120,7 @@ public sealed partial class DoomPage : Page
                     FontSize = 14,
                 }
             });
-            if (Settings.Current.FavoriteFiles.Any())
+            if (Settings.Current.FavoriteFiles.Count > 0)
             {
                 foreach (var filePath in Settings.Current.FavoriteFiles)
                 {
@@ -166,7 +166,7 @@ public sealed partial class DoomPage : Page
         }
 
         var files = await picker.PickMultipleFilesAsync();
-        if (files.Any())
+        if (files.Count > 0)
         {
             await AddFiles(files);
         }
@@ -187,7 +187,7 @@ public sealed partial class DoomPage : Page
         }
 
         var files = await picker.PickMultipleFilesAsync();
-        if (files.Any())
+        if (files.Count > 0)
         {
             await AddImages(files);
         }
@@ -195,7 +195,7 @@ public sealed partial class DoomPage : Page
 
     private void SetSelectedImageIndex(int ind, AnimationDirection direction)
     {
-        if (entry.ImageFiles.Any())
+        if (entry.ImageFiles.Count > 0)
         {
             if (ind < 0)
             {
@@ -339,7 +339,7 @@ public sealed partial class DoomPage : Page
 
     public static BitmapImage? GetCurrentBackground(IList<string> list, int selectedImageIndex)
     {
-        if (list.Any() && selectedImageIndex < list.Count)
+        if (list.Count > 0 && selectedImageIndex < list.Count)
         {
             return new BitmapImage(new Uri(list[selectedImageIndex]));
         }
@@ -402,11 +402,11 @@ public sealed partial class DoomPage : Page
                         }
                     }
                 }
-                if (mods.Count != 0)
+                if (mods.Count > 0)
                 {
                     await AddFiles(mods);
                 }
-                if (images.Count != 0)
+                if (images.Count > 0)
                 {
                     await AddImages(images);
                 }

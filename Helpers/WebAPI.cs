@@ -45,7 +45,7 @@ internal partial class JsonGitHubReleasesContext : JsonSerializerContext
 public class GitHubReleaseEntry
 {
     [JsonPropertyName("assets")]
-    public List<GitHubAssetEntry> Assets { get; set; } = new();
+    public List<GitHubAssetEntry> Assets { get; set; } = [];
 }
 
 public class GitHubAssetEntry
@@ -102,12 +102,12 @@ public class WebAPI
         try
         {
             var jsonResponse = await httpClient.GetFromJsonAsync(GitHubGZDoomEndpoint, JsonGitHubReleasesContext.Default.ListGitHubReleaseEntry);
-            return jsonResponse ?? new();
+            return jsonResponse ?? [];
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine(ex);
-            return new();
+            return [];
         }
     }
 }

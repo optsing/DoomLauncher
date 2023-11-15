@@ -350,7 +350,7 @@ public sealed partial class RootPage : Page
 
         var files = await picker.PickMultipleFilesAsync();
 
-        if (files.Any())
+        if (files.Count > 0)
         {
             var newEntry = await EntryHelper.CreateFromFiles(files, withConfirm: true, SetProgress);
             if (newEntry != null)
@@ -390,7 +390,7 @@ public sealed partial class RootPage : Page
 
         var files = await picker.PickMultipleFilesAsync();
 
-        if (files.Any())
+        if (files.Count > 0)
         {
             await ImportEntriesFromGZDLFiles(files, withConfirm: true);
         }
@@ -540,11 +540,11 @@ public sealed partial class RootPage : Page
                         }
                     }
                 }
-                if (gzdlFiles.Count != 0)
+                if (gzdlFiles.Count > 0)
                 {
                     await ImportEntriesFromGZDLFiles(gzdlFiles, withConfirm: true);
                 }
-                if (otherFiles.Count != 0)
+                if (otherFiles.Count > 0)
                 {
                     var newEntry = await EntryHelper.CreateFromFiles(otherFiles, withConfirm: true, SetProgress);
                     if (newEntry != null)
@@ -581,9 +581,9 @@ public sealed partial class RootPage : Page
         ViewModel.IsRightDropHelperVisible = false;
     }
 
-    public void AddEntries(IEnumerable<DoomEntry> entries)
+    public void AddEntries(List<DoomEntry> entries)
     {
-        if (entries.Any())
+        if (entries.Count > 0)
         {
             foreach (var entry in entries)
             {

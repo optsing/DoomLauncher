@@ -194,11 +194,11 @@ internal static partial class EntryHelper
             var mods = files.Where(file => FileHelper.SupportedModExtensions.Contains(Path.GetExtension(file.Name))).ToList();
             var images = files.Where(file => FileHelper.SupportedImageExtensions.Contains(Path.GetExtension(file.Name))).ToList();
             string title = "Новая сборка";
-            if (mods.Any())
+            if (mods.Count > 0)
             {
                 title = Path.GetFileNameWithoutExtension(mods.First().Name);
             }
-            else if (images.Any())
+            else if (images.Count > 0)
             {
                 title = Path.GetFileNameWithoutExtension(images.First().Name);
             }

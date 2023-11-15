@@ -8,12 +8,12 @@ namespace DoomLauncher;
 
 internal static class BitmapHelper
 {
-    private static readonly Dictionary<string, BitmapImage> BitmapCache = new();
+    private static readonly Dictionary<string, BitmapImage> BitmapCache = [];
     public static async Task<BitmapImage?> CreateBitmapFromFile(string filePath)
     {
-        if (BitmapCache.ContainsKey(filePath))
+        if (BitmapCache.TryGetValue(filePath, out BitmapImage? value))
         {
-            return BitmapCache[filePath];
+            return value;
         }
         try
         {
