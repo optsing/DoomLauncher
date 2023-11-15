@@ -21,15 +21,15 @@ public class Settings: ObservableObject
     private string steamGame = "off";
 
     public static Settings Current { get; set; } = new();
-    public ObservableCollection<DoomPackageViewModel> GZDoomInstalls { get; set; } = new();
-    public ObservableCollection<string> IWadFiles { get; set; } = new();
+    public ObservableCollection<DoomPackageViewModel> GZDoomInstalls { get; set; } = [];
+    public ObservableCollection<string> IWadFiles { get; set; } = [];
     public string DefaultGZDoomPath { get => defaultGZDoomPath; set => SetProperty(ref defaultGZDoomPath, value); }
     public string DefaultIWadFile { get => defaultIWadFile; set => SetProperty(ref defaultIWadFile, value); }
-    public ObservableCollection<string> FavoriteFiles { get; set; } = new();
+    public ObservableCollection<string> FavoriteFiles { get; set; } = [];
     public bool CloseOnLaunch { get; set; } = false;
     public string SteamGame { get => steamGame; set => SetProperty(ref steamGame, value); }
     public int SelectedModIndex { get; set; } = 0;
-    public ObservableCollection<DoomEntry> Entries { get; set; } = new();
+    public ObservableCollection<DoomEntry> Entries { get; set; } = [];
 
     public int? WindowX { get; set; } = null;
     public int? WindowY { get; set; } = null;
@@ -93,8 +93,8 @@ public partial class DoomEntry: ObservableObject
 
     public bool Slideshow { get; set; } = true;
 
-    public ObservableCollection<string> ImageFiles { get; set; } = new();
-    public ObservableCollection<string> ModFiles { get; set; } = new();
+    public ObservableCollection<string> ImageFiles { get; set; } = [];
+    public ObservableCollection<string> ModFiles { get; set; } = [];
 
     private DateTime? created = null;
 

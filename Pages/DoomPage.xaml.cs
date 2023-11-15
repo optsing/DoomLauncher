@@ -18,14 +18,9 @@ using Windows.Storage;
 
 namespace DoomLauncher;
 
-public partial class DoomPageViewModel : ObservableObject
+public partial class DoomPageViewModel(DispatcherTimer timer) : ObservableObject
 {
-    private readonly DispatcherTimer timerSlideshow;
-
-    public DoomPageViewModel(DispatcherTimer timer)
-    {
-        timerSlideshow = timer;
-    }
+    private readonly DispatcherTimer timerSlideshow = timer;
 
     [ObservableProperty]
     private int currentTicksToSlideshow;
@@ -139,7 +134,7 @@ public sealed partial class DoomPage : Page
                         if (File.Exists(fullPath))
                         {
                             var file = await StorageFile.GetFileFromPathAsync(fullPath);
-                            await AddFiles(new StorageFile[] { file });
+                            await AddFiles([file]);
                         }
                     };
                     menu.Items.Add(item);
@@ -298,10 +293,7 @@ public sealed partial class DoomPage : Page
         {
             if (el.DataContext is string filePath)
             {
-                if (Settings.Current.FavoriteFiles.Contains(filePath))
-                {
-                    Settings.Current.FavoriteFiles.Remove(filePath);
-                } else
+                if (!Settings.Current.FavoriteFiles.Remove(filePath))
                 {
                     Settings.Current.FavoriteFiles.Add(filePath);
                 }
@@ -410,11 +402,11 @@ public sealed partial class DoomPage : Page
                         }
                     }
                 }
-                if (mods.Any())
+                if (mods.Count != 0)
                 {
                     await AddFiles(mods);
                 }
-                if (images.Any())
+                if (images.Count != 0)
                 {
                     await AddImages(images);
                 }

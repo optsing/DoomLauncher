@@ -56,4 +56,13 @@ static class XamlHelper
     {
         return isSlideshow ? "\uE769" : "\uE768";
     }
+
+    public static string EntryTooltip(string firstLine, string secondLine)
+    {
+        if (string.IsNullOrWhiteSpace(secondLine))
+        {
+            return firstLine;
+        }
+        return $"{firstLine}\n{secondLine}";
+    }
 }

@@ -9,16 +9,10 @@ using Windows.Storage;
 
 namespace DoomLauncher;
 
-public readonly struct TitleAppId
+public readonly struct TitleAppId(string title, int appId)
 {
-    public readonly string title;
-    public readonly int appId;
-
-    public TitleAppId(string title, int appId)
-    {
-        this.title = title;
-        this.appId = appId;
-    }
+    public readonly string title = title;
+    public readonly int appId = appId;
 }
 
 internal static partial class FileHelper
@@ -31,8 +25,8 @@ internal static partial class FileHelper
     public static string EntriesFolderPath = "";
 
 
-    public static readonly string[] SupportedModExtensions = new[] { ".pk3", ".wad", ".zip" };
-    public static readonly string[] SupportedImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif", ".svg" };
+    public static readonly string[] SupportedModExtensions = [".pk3", ".wad", ".zip"];
+    public static readonly string[] SupportedImageExtensions = [".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif", ".svg"];
 
     public static bool ValidateGZDoomPath(string path)
     {
@@ -94,14 +88,14 @@ internal static partial class FileHelper
             if (steamGame == "iwad")
             {
                 var resolvedIWad = ResolveIWadFile(entry.IWadFile, Settings.Current.DefaultIWadFile).ToLower();
-                if (!string.IsNullOrEmpty(resolvedIWad) && IWads.ContainsKey(resolvedIWad))
+                if (!string.IsNullOrEmpty(resolvedIWad) && IWads.TryGetValue(resolvedIWad, out TitleAppId value))
                 {
-                    return IWads[resolvedIWad].appId;
+                    return value.appId;
                 }
             }
-            else if (SteamAppIds.ContainsKey(steamGame))
+            else if (SteamAppIds.TryGetValue(steamGame, out TitleAppId value))
             {
-                return SteamAppIds[steamGame].appId;
+                return value.appId;
             }
         }
         return 0;
@@ -212,9 +206,9 @@ internal static partial class FileHelper
     public static string IWadFileToTitle(string iWadFile)
     {
         var key = iWadFile.ToLower();
-        if (IWads.ContainsKey(key))
+        if (IWads.TryGetValue(key, out TitleAppId value))
         {
-            return IWads[key].title;
+            return value.title;
         }
         return iWadFile;
     }

@@ -73,7 +73,7 @@ public sealed partial class SettingsPage : Page
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         EventBus.ChangeBackground(this, null, AnimationDirection.None);
-        EventBus.ChangeCaption(this, "Настройки");
+        EventBus.ChangeCaption(this, "Settings");
         base.OnNavigatedTo(e);
     }
 
@@ -118,7 +118,7 @@ public sealed partial class SettingsPage : Page
         }
         EventBus.Progress(this, null);
         {
-            var newAsset = await DialogHelper.ShowPackageSelectorAsync(onlinePackages.OrderByDescending(package => package.Version).ThenBy(package => package.Arch).ToList());
+            var newAsset = await DialogHelper.ShowPackageSelectorAsync([.. onlinePackages.OrderByDescending(package => package.Version).ThenBy(package => package.Arch)]);
             if (newAsset != null)
             {
                 await DownloadPackage(newAsset);
@@ -156,7 +156,7 @@ public sealed partial class SettingsPage : Page
     }
 
     [RelayCommand]
-    private async Task AddLocalDoomPackage()
+    private static async Task AddLocalDoomPackage()
     {
         var picker = new Windows.Storage.Pickers.FileOpenPicker();
 
@@ -213,7 +213,7 @@ public sealed partial class SettingsPage : Page
     }
 
     [RelayCommand]
-    private void ToggleDefaultDoomPackage(DoomPackageViewModel? package)
+    private static void ToggleDefaultDoomPackage(DoomPackageViewModel? package)
     {
         if (package == null)
         {
@@ -223,7 +223,7 @@ public sealed partial class SettingsPage : Page
     }
 
     [RelayCommand]
-    private void OpenFolderDoomPackage(DoomPackageViewModel? package)
+    private static void OpenFolderDoomPackage(DoomPackageViewModel? package)
     {
         if (package == null)
         {
@@ -233,7 +233,7 @@ public sealed partial class SettingsPage : Page
     }
 
     [RelayCommand]
-    private async Task RemoveDoomPackage(DoomPackageViewModel? package)
+    private static async Task RemoveDoomPackage(DoomPackageViewModel? package)
     {
         if (package == null)
         {
@@ -246,7 +246,7 @@ public sealed partial class SettingsPage : Page
     }
 
     [RelayCommand]
-    private void ToggleDefaultIWad(string? iWadFile)
+    private static void ToggleDefaultIWad(string? iWadFile)
     {
         if (string.IsNullOrEmpty(iWadFile))
         {
@@ -256,7 +256,7 @@ public sealed partial class SettingsPage : Page
     }
 
     [RelayCommand]
-    private void OpenFolderIWad(string? iWadFile)
+    private static void OpenFolderIWad(string? iWadFile)
     {
         if (string.IsNullOrEmpty(iWadFile))
         {
@@ -266,7 +266,7 @@ public sealed partial class SettingsPage : Page
     }
 
     [RelayCommand]
-    private async Task RemoveIWad(string? iWadFile)
+    private static async Task RemoveIWad(string? iWadFile)
     {
         if (string.IsNullOrEmpty(iWadFile))
         {

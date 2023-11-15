@@ -9,13 +9,13 @@ using System.Linq;
 
 namespace DoomLauncher;
 
-public class EditEntryDialogViewModel
+public class EditEntryDialogViewModel(EditDialogMode mode)
 {
     private static readonly DoomPackageViewModel DefaultDoomPackage = new() { Path = "", Arch = AssetArch.notSelected };
     private static readonly KeyValue DefaultIWadFile = new("", "По умолчанию");
     private static readonly KeyValue DefaultSteamGame = new("", "По умолчанию");
 
-    private readonly EditDialogMode mode;
+    private readonly EditDialogMode mode = mode;
     public string Title => mode switch
     {
         EditDialogMode.Create => "Создание сборки",
@@ -39,30 +39,20 @@ public class EditEntryDialogViewModel
     public bool UniqueConfig { get; set; } = false;
     public bool UniqueSavesFolder { get; set; } = false;
 
-    public List<DoomPackageViewModel> DoomPackages { get; }
-    public List<KeyValue> IWadFiles { get; }
-    public List<KeyValue> SteamGames { get; }
+    public List<DoomPackageViewModel> DoomPackages => [DefaultDoomPackage, .. Settings.Current.GZDoomInstalls];
+    public List<KeyValue> IWadFiles =>
+        [
+            DefaultIWadFile,
+            .. Settings.Current.IWadFiles.Select(iWadFile => new KeyValue(iWadFile, FileHelper.IWadFileToTitle(iWadFile))),
+        ];
+    public List<KeyValue> SteamGames => [DefaultSteamGame, .. FileHelper.SteamAppIds.Select(item => new KeyValue(item.Key, item.Value.title))];
 
     public DoomPackageViewModel DoomPackage { get; set; } = DefaultDoomPackage;
     public KeyValue IWadFile { get; set; } = DefaultIWadFile;
     public KeyValue SteamGame { get; set; } = DefaultSteamGame;
 
-    public List<TitleChecked> ModFiles { get; private set; } = new();
-    public List<TitleChecked> ImageFiles { get; private set; } = new();
-
-    public EditEntryDialogViewModel (EditDialogMode mode)
-    {
-        this.mode = mode;
-
-        DoomPackages = new List<DoomPackageViewModel>() { DefaultDoomPackage };
-        DoomPackages.AddRange(Settings.Current.GZDoomInstalls);
-
-        IWadFiles = new() { DefaultIWadFile };
-        IWadFiles.AddRange(Settings.Current.IWadFiles.Select(iWadFile => new KeyValue(iWadFile, FileHelper.IWadFileToTitle(iWadFile))));
-
-        SteamGames = new() { DefaultSteamGame };
-        SteamGames.AddRange(FileHelper.SteamAppIds.Select(item => new KeyValue(item.Key, item.Value.title)));
-    }
+    public List<TitleChecked> ModFiles { get; private set; } = [];
+    public List<TitleChecked> ImageFiles { get; private set; } = [];
 
     public static EditEntryDialogViewModel FromEntry(DoomEntry entry, EditDialogMode mode, List<string>? modFiles = null, List<string>? imageFiles = null)
     {
@@ -73,8 +63,8 @@ public class EditEntryDialogViewModel
             LongDescription = entry.LongDescription,
             UniqueConfig = entry.UniqueConfig,
             UniqueSavesFolder = entry.UniqueSavesFolder,
-            ModFiles = modFiles?.Select(file => new TitleChecked(file)).ToList() ?? new List<TitleChecked>(),
-            ImageFiles = imageFiles?.Select(file => new TitleChecked(file)).ToList() ?? new List<TitleChecked>(),
+            ModFiles = modFiles?.Select(file => new TitleChecked(file)).ToList() ?? [],
+            ImageFiles = imageFiles?.Select(file => new TitleChecked(file)).ToList() ?? [],
         };
         vm.DoomPackage = vm.DoomPackages.FirstOrDefault(package => package.Path == entry.GZDoomPath, DefaultDoomPackage);
         vm.IWadFile = vm.IWadFiles.FirstOrDefault(iWad => iWad.Key == entry.IWadFile, DefaultIWadFile);
@@ -127,25 +117,14 @@ public enum EditDialogMode
     Create, Edit, Import, Copy
 }
 
-public class TitleChecked
+public class TitleChecked(string title)
 {
-    public string Title { get; set; }
-    public bool IsChecked { get; set; }
-
-    public TitleChecked(string title)
-    {
-        Title = title;
-        IsChecked = true;
-    }
+    public string Title { get; set; } = title;
+    public bool IsChecked { get; set; } = true;
 }
 
-public readonly struct KeyValue
+public readonly struct KeyValue(string key, string value)
 {
-    public readonly string Key;
-    public readonly string Value;
-
-    public KeyValue(string key, string value) { 
-        Key = key;
-        Value = value;
-    }
+    public readonly string Key = key;
+    public readonly string Value = value;
 }

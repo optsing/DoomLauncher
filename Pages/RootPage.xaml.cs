@@ -125,7 +125,7 @@ public sealed partial class RootPage : Page
                 Width = (int)(titleBar.ActualWidth * scaleAdjustment),
                 Height = (int)(titleBar.ActualHeight * scaleAdjustment),
             };
-            nonClientSource.SetRegionRects(NonClientRegionKind.Caption, new[] { dragRect });
+            nonClientSource.SetRegionRects(NonClientRegionKind.Caption, [dragRect]);
         }
     }
 
@@ -208,7 +208,7 @@ public sealed partial class RootPage : Page
     }
 
     [RelayCommand]
-    private async Task EditEntry(DoomEntry? entry)
+    private static async Task EditEntry(DoomEntry? entry)
     {
         if (entry == null)
         {
@@ -240,7 +240,7 @@ public sealed partial class RootPage : Page
                 ImageFiles = new(entry.ImageFiles),
             };
             result.UpdateEntry(newEntry);
-            AddEntries(new[] { newEntry });
+            AddEntries([newEntry]);
         }
     }
 
@@ -355,7 +355,7 @@ public sealed partial class RootPage : Page
             var newEntry = await EntryHelper.CreateFromFiles(files, withConfirm: true, SetProgress);
             if (newEntry != null)
             {
-                AddEntries(new[] { newEntry });
+                AddEntries([newEntry]);
             }
         }
     }
@@ -372,7 +372,7 @@ public sealed partial class RootPage : Page
                 SelectedImageIndex = 0,
             };
             result.UpdateEntry(newEntry);
-            AddEntries(new[] { newEntry });
+            AddEntries([newEntry]);
         }
     }
 
@@ -472,7 +472,7 @@ public sealed partial class RootPage : Page
             var newEntry = await EntryHelper.ImportFromDoomWorld(wadInfo, withConfirm, SetProgress);
             if (newEntry != null)
             {
-                AddEntries(new[] { newEntry });
+                AddEntries([newEntry]);
             }
         }
         SetProgress(null);
@@ -540,16 +540,16 @@ public sealed partial class RootPage : Page
                         }
                     }
                 }
-                if (gzdlFiles.Any())
+                if (gzdlFiles.Count != 0)
                 {
                     await ImportEntriesFromGZDLFiles(gzdlFiles, withConfirm: true);
                 }
-                if (otherFiles.Any())
+                if (otherFiles.Count != 0)
                 {
                     var newEntry = await EntryHelper.CreateFromFiles(otherFiles, withConfirm: true, SetProgress);
                     if (newEntry != null)
                     {
-                        AddEntries(new[] { newEntry });
+                        AddEntries([newEntry]);
                     }
                 }
             }

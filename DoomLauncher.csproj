@@ -5,13 +5,13 @@
 		<AssemblyVersion>1.1.7.0</AssemblyVersion>
 		<ApplicationIcon>Assets\app.ico</ApplicationIcon>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net7.0-windows10.0.22621.0</TargetFramework>
+		<TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
 		<TargetPlatformMinVersion>10.0.18362.0</TargetPlatformMinVersion>
 		<RootNamespace>DoomLauncher</RootNamespace>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<Platforms>x86;x64;arm64</Platforms>
-		<RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
-		<PublishProfile>win10-$(Platform).pubxml</PublishProfile>
+		<RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+		<PublishProfile>win-$(Platform).pubxml</PublishProfile>
 		<UseWinUI>true</UseWinUI>
 		<EnableMsixTooling>true</EnableMsixTooling>
 		<GenerateAppInstallerFile>False</GenerateAppInstallerFile>
@@ -32,7 +32,7 @@
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<!--<WindowsPackageType>None</WindowsPackageType>-->
-		<UseRidGraph>true</UseRidGraph>
+		<!--<UseRidGraph>true</UseRidGraph>-->
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -59,6 +59,9 @@
 		<Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
 		<Content Include="Assets\Wide310x150Logo.scale-200.png" />
 		<Content Include="Assets\app.ico">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Assets\Fonts\DooM.ttf">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>

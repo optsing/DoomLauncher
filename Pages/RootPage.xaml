@@ -186,6 +186,7 @@
                                     Orientation="Vertical"
                                     Padding="0,8"
                                     ContextFlyout="{StaticResource flyoutEntry}"
+                                    ToolTipService.ToolTip="{x:Bind local:XamlHelper.EntryTooltip(Name, Description), Mode=OneWay}"
                                 >
                                     <TextBlock
                                         Text="{x:Bind Name, Mode=OneWay}"
@@ -283,11 +284,20 @@
                 >
                     <TextBlock
                         VerticalAlignment="Center"
+                        FontFamily="ms-appx:///Assets/Fonts/DooM.ttf#DooM"
                         Text="{x:Bind ViewModel.Caption, Mode=OneWay}"
                         FontSize="20"
                         Style="{ThemeResource BaseTextBlockStyle}"
                         TextTrimming="CharacterEllipsis"
+                        ToolTipService.ToolTip="{x:Bind ViewModel.Caption, Mode=OneWay}"
                     />
+                    <!--<TextBlock.Foreground>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#b30101" Offset="0"/>
+                            <GradientStop Color="#c50101" Offset="0.5"/>
+                            <GradientStop Color="#b30101" Offset="1"/>
+                        </LinearGradientBrush>
+                    </TextBlock.Foreground>-->
                     <StackPanel
                         Grid.Column="1"
                         Orientation="Horizontal"
