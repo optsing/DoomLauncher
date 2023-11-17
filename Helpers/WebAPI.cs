@@ -9,9 +9,8 @@ using System.Threading.Tasks;
 namespace DoomLauncher;
 
 [JsonSerializable(typeof(DoomWorldGetResponse))]
-internal partial class JsonDoomWorldGetResponseContext : JsonSerializerContext
-{
-}
+[JsonSerializable(typeof(List<GitHubReleaseEntry>))]
+internal partial class JsonWebApiContext : JsonSerializerContext { }
 
 public class DoomWorldGetResponse
 {
@@ -35,11 +34,6 @@ public class DoomWorldFileEntry
 
     [JsonPropertyName("filename")]
     public string Filename { get; set; } = "";
-}
-
-[JsonSerializable(typeof(List<GitHubReleaseEntry>))]
-internal partial class JsonGitHubReleasesContext : JsonSerializerContext
-{
 }
 
 public class GitHubReleaseEntry
@@ -75,7 +69,7 @@ public class WebAPI
     {
         try
         {
-            var jsonResponse = await httpClient.GetFromJsonAsync($"https://www.doomworld.com/idgames/api/api.php?action=get&id={wadId}&out=json", JsonDoomWorldGetResponseContext.Default.DoomWorldGetResponse);
+            var jsonResponse = await httpClient.GetFromJsonAsync($"https://www.doomworld.com/idgames/api/api.php?action=get&id={wadId}&out=json", JsonWebApiContext.Default.DoomWorldGetResponse);
             return jsonResponse?.Content;
         }
         catch (Exception ex)
@@ -101,7 +95,7 @@ public class WebAPI
     {
         try
         {
-            var jsonResponse = await httpClient.GetFromJsonAsync(GitHubGZDoomEndpoint, JsonGitHubReleasesContext.Default.ListGitHubReleaseEntry);
+            var jsonResponse = await httpClient.GetFromJsonAsync(GitHubGZDoomEndpoint, JsonWebApiContext.Default.ListGitHubReleaseEntry);
             return jsonResponse ?? [];
         }
         catch (Exception ex)
