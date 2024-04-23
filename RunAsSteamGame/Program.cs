@@ -5,8 +5,10 @@ using System.IO;
 
 try
 {
-    SteamClient.Init(uint.Parse(args[0]), true);
-    ProcessStartInfo startInfo = new ProcessStartInfo()
+    Environment.SetEnvironmentVariable("SteamAppId", args[0]);
+    Environment.SetEnvironmentVariable("SteamGameId", args[0]);
+    SteamAPI.Init();
+    var startInfo = new ProcessStartInfo
     {
         FileName = args[1],
         WorkingDirectory = Path.GetDirectoryName(args[1])
@@ -30,5 +32,5 @@ catch (Exception ex)
 }
 finally
 {
-    SteamClient.Shutdown();
+    SteamAPI.Shutdown();
 }

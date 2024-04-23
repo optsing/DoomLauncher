@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "RunAsSteamGame": {
+      "commandName": "Project",
+      "commandLineArgs": "736260 C:\\windows\\system32\\cmd.exe"
+    }
+  }
+}
