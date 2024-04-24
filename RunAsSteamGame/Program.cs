@@ -2,33 +2,68 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using WindowsShortcutFactory;
 
 try
 {
-    Environment.SetEnvironmentVariable("SteamAppId", args[0]);
-    Environment.SetEnvironmentVariable("SteamGameId", args[0]);
-    SteamAPI.Init();
+    string fileName;
+    string? workingDirectory;
+    if (args.Length == 0)
+    {
+        throw new Exception("No args passed");
+    }
+    else if (args.Length == 1)
+    {
+        if (Path.GetExtension(args[0]) == ".lnk")
+        {
+            using var shortcut = WindowsShortcut.Load(args[0]);
+            if (shortcut?.Path is string path)
+            {
+                fileName = path;
+                workingDirectory = shortcut?.WorkingDirectory;
+            }
+            else
+            {
+                throw new Exception("Can't parse shortcut");
+            }
+        }
+        else
+        {
+            fileName = args[0];
+            workingDirectory = Path.GetDirectoryName(fileName);
+        }
+    }
+    else
+    {
+        Environment.SetEnvironmentVariable("SteamAppId", args[0]);
+        Environment.SetEnvironmentVariable("SteamGameId", args[0]);
+        fileName = args[1];
+        workingDirectory = Path.GetDirectoryName(fileName);
+    }
+    if (!SteamAPI.Init())
+    {
+        throw new Exception("Can't initialize Steam API");
+    }
     var startInfo = new ProcessStartInfo
     {
-        FileName = args[1],
-        WorkingDirectory = Path.GetDirectoryName(args[1])
+        FileName = fileName,
+        WorkingDirectory = workingDirectory,
     };
-    foreach (string sub in args[2..])
+    if (args.Length > 2)
     {
-        startInfo.ArgumentList.Add(sub);
+        foreach (string sub in args[2..])
+        {
+            startInfo.ArgumentList.Add(sub);
+        }
     }
-    var process = Process.Start(startInfo);
-    if (process == null)
-    {
-        Environment.Exit(-1);
-    }
+    var process = Process.Start(startInfo) ?? throw new Exception("No process was created");
     process.WaitForExit();
-    Environment.Exit(process.ExitCode);
+    Environment.ExitCode = process.ExitCode;
 }
 catch (Exception ex)
 {
     Console.Error.WriteLine(ex);
-    Environment.Exit(-1);
+    Environment.ExitCode = -1;
 }
 finally
 {
