@@ -11,19 +11,19 @@
     <Page.Resources>
         <MenuFlyout x:Key="flyoutPackage" Placement="Bottom" >
             <MenuFlyoutItem
-                Command="{x:Bind ToggleDefaultDoomPackageCommand}"
+                Command="{x:Bind ViewModel.ToggleDefaultDoomPackageCommand}"
                 CommandParameter="{Binding}"
                 Text="Назначить по умолчанию"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE73E;}"
             />
             <MenuFlyoutItem
-                Command="{x:Bind OpenFolderDoomPackageCommand}"
+                Command="{x:Bind ViewModel.OpenFolderDoomPackageCommand}"
                 CommandParameter="{Binding}"
                 Text="Открыть расположение"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE838;}"
             />
             <MenuFlyoutItem
-                Command="{x:Bind RemoveDoomPackageCommand}"
+                Command="{x:Bind ViewModel.RemoveDoomPackageCommand}"
                 CommandParameter="{Binding}"
                 Text="Удалить ссылку на файл"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
@@ -31,19 +31,19 @@
         </MenuFlyout>
         <MenuFlyout x:Key="flyoutIWad" Placement="Bottom" >
             <MenuFlyoutItem
-                Command="{x:Bind ToggleDefaultIWadCommand}"
+                Command="{x:Bind ViewModel.ToggleDefaultIWadCommand}"
                 CommandParameter="{Binding}"
                 Text="Назначить по умолчанию"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE73E;}"
             />
             <MenuFlyoutItem
-                Command="{x:Bind OpenFolderIWadCommand}"
+                Command="{x:Bind ViewModel.OpenFolderIWadCommand}"
                 CommandParameter="{Binding}"
                 Text="Открыть расположение"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE838;}"
             />
             <MenuFlyoutItem
-                Command="{x:Bind RemoveIWadCommand}"
+                Command="{x:Bind ViewModel.RemoveIWadCommand}"
                 CommandParameter="{Binding}"
                 Text="Удалить ссылку на файл"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
@@ -80,12 +80,12 @@
                                 Placement="Bottom"
                             >
                                 <MenuFlyoutItem
-                                    Command="{x:Bind AddLocalDoomPackageCommand}"
+                                    Command="{x:Bind ViewModel.AddLocalDoomPackageCommand}"
                                     Text="Выбрать на устройстве"
                                     Icon="{ui:FontIcon FontSize=14, Glyph=&#xEC50;}"
                                 />
                                 <MenuFlyoutItem
-                                    Command="{x:Bind AddRemoteDoomPackageCommand}"
+                                    Command="{x:Bind ViewModel.AddRemoteDoomPackageCommand}"
                                     Text="Скачать с GitHub"
                                     Icon="{ui:FontIcon FontSize=14, Glyph=&#xE896;}"
                                 />
@@ -155,7 +155,7 @@
                                 Placement="Bottom"
                             >
                                 <MenuFlyoutItem 
-                                    Command="{x:Bind AddLocalIWadCommand}"
+                                    Command="{x:Bind ViewModel.AddLocalIWadCommand}"
                                     Text="Выбрать на устройстве"
                                     Icon="{ui:FontIcon FontSize=14, Glyph=&#xEC50;}"
                                 />

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DoomLauncher.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
@@ -17,29 +18,6 @@ using Windows.Storage;
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace DoomLauncher;
-
-public partial class DoomPageViewModel(DispatcherTimer timer) : ObservableObject
-{
-    private readonly DispatcherTimer timerSlideshow = timer;
-
-    [ObservableProperty]
-    private int currentTicksToSlideshow;
-
-    [ObservableProperty]
-    private bool isSlideshowEnabled;
-
-    partial void OnIsSlideshowEnabledChanged(bool value)
-    {
-        if (value)
-        {
-            timerSlideshow.Start();
-        }
-        else
-        {
-            timerSlideshow.Stop();
-        }
-    }
-} 
 
 /// <summary>
 /// An empty page that can be used on its own or navigated to within a Frame.

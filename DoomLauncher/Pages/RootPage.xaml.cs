@@ -1,10 +1,9 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
+using DoomLauncher.ViewModels;
 using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,27 +21,6 @@ namespace DoomLauncher;
 public enum AnimationDirection
 {
     None, Previous, Next
-}
-
-public partial class RootPageViewModel : ObservableObject
-{
-    [ObservableProperty]
-    private string? caption = null;
-
-    [ObservableProperty]
-    private BitmapImage? background = null;
-
-    [ObservableProperty]
-    private DoomEntry? currentEntry = null;
-
-    [ObservableProperty]
-    private string? progressText = null;
-
-    [ObservableProperty]
-    private bool isLeftDropHelperVisible;
-
-    [ObservableProperty]
-    private bool isRightDropHelperVisible;
 }
 
 /// <summary>
