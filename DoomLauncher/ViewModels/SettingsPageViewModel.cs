@@ -41,8 +41,8 @@ public partial class SettingsPageViewModel : ObservableObject
 
     public KeyValue SteamGame
     {
-        get => SteamGames.FirstOrDefault(steamGame => steamGame.Key == Settings.Current.SteamGame, SteamGames.First());
-        set => SetProperty(Settings.Current.SteamGame, value.Key, Settings.Current, (settings, value) => settings.SteamGame = value);
+        get => SteamGames.FirstOrDefault(steamGame => steamGame.Key == SettingsViewModel.Current.SteamGame, SteamGames.First());
+        set => SetProperty(SettingsViewModel.Current.SteamGame, value.Key, SettingsViewModel.Current, (settings, value) => settings.SteamGame = value);
     }
 
     public string AppVersion { get; }
@@ -74,7 +74,7 @@ public partial class SettingsPageViewModel : ObservableObject
                         arch = isLegacy ? AssetArch.x64legacy : AssetArch.x64;
                     }
                     var version = FileHelper.ParseVersion(asset.Name);
-                    if (!Settings.Current.GZDoomInstalls.Any(package => package.Version == version && package.Arch == arch))
+                    if (!SettingsViewModel.Current.GZDoomInstalls.Any(package => package.Version == version && package.Arch == arch))
                     {
                         var newAsset = new DoomPackageViewModel()
                         {
@@ -117,7 +117,7 @@ public partial class SettingsPageViewModel : ObservableObject
                     Version = package.Version,
                     Arch = package.Arch,
                 };
-                Settings.Current.GZDoomInstalls.Add(newPackage);
+                SettingsViewModel.Current.GZDoomInstalls.Add(newPackage);
             }
             finally
             {
@@ -141,7 +141,7 @@ public partial class SettingsPageViewModel : ObservableObject
         if (file != null && FileHelper.ValidateGZDoomPath(file.Path))
         {
             var version = FileHelper.GetFileVersion(file.Path) is string s ? FileHelper.ParseVersion(s) : null;
-            if (Settings.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == file.Path) is DoomPackageViewModel package)
+            if (SettingsViewModel.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == file.Path) is DoomPackageViewModel package)
             {
                 package.Version = version;
             }
@@ -153,7 +153,7 @@ public partial class SettingsPageViewModel : ObservableObject
                     Version = version,
                     Arch = AssetArch.manual,
                 };
-                Settings.Current.GZDoomInstalls.Add(newPackage);
+                SettingsViewModel.Current.GZDoomInstalls.Add(newPackage);
             }
         }
     }
@@ -175,9 +175,9 @@ public partial class SettingsPageViewModel : ObservableObject
         {
             EventBus.Progress(this, $"Копирование: {file.Name}");
             await FileHelper.CopyFileWithConfirmation(file, FileHelper.IWadFolderPath);
-            if (!Settings.Current.IWadFiles.Contains(file.Name))
+            if (!SettingsViewModel.Current.IWadFiles.Contains(file.Name))
             {
-                Settings.Current.IWadFiles.Add(file.Name);
+                SettingsViewModel.Current.IWadFiles.Add(file.Name);
             }
         }
         EventBus.Progress(this, null);
@@ -190,7 +190,7 @@ public partial class SettingsPageViewModel : ObservableObject
         {
             return;
         }
-        Settings.Current.DefaultGZDoomPath = Settings.Current.DefaultGZDoomPath == package.Path ? "" : package.Path;
+        SettingsViewModel.Current.DefaultGZDoomPath = SettingsViewModel.Current.DefaultGZDoomPath == package.Path ? "" : package.Path;
     }
 
     [RelayCommand]
@@ -212,7 +212,7 @@ public partial class SettingsPageViewModel : ObservableObject
         }
         if (await DialogHelper.ShowAskAsync("Удаление ссылки", $"Вы уверены, что хотите удалить ссылку на '{package.Title}'?", "Удалить", "Отмена"))
         {
-            Settings.Current.GZDoomInstalls.Remove(package);
+            SettingsViewModel.Current.GZDoomInstalls.Remove(package);
         }
     }
 
@@ -223,7 +223,7 @@ public partial class SettingsPageViewModel : ObservableObject
         {
             return;
         }
-        Settings.Current.DefaultIWadFile = Settings.Current.DefaultIWadFile == iWadFile ? "" : iWadFile;
+        SettingsViewModel.Current.DefaultIWadFile = SettingsViewModel.Current.DefaultIWadFile == iWadFile ? "" : iWadFile;
     }
 
     [RelayCommand]
@@ -246,7 +246,7 @@ public partial class SettingsPageViewModel : ObservableObject
         var title = FileHelper.IWadFileToTitle(iWadFile);
         if (await DialogHelper.ShowAskAsync("Удаление ссылки", $"Вы уверены, что хотите удалить ссылку на '{title}'?", "Удалить", "Отмена"))
         {
-            Settings.Current.IWadFiles.Remove(iWadFile);
+            SettingsViewModel.Current.IWadFiles.Remove(iWadFile);
         }
     }
 }

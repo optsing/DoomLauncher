@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DoomLauncher.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -75,19 +76,19 @@ internal static partial class FileHelper
         }
     }
 
-    public static async Task CreateEntryShortcut(DoomEntry entry, StorageFile file)
+    public static async Task CreateEntryShortcut(DoomEntryViewModel entry, StorageFile file)
     {
         await FileIO.WriteTextAsync(file, $"[InternetShortcut]\nURL=gzdoomlauncher://launch/?id={entry.Id}\n");
     }
 
-    public static int GetSteamAppIdForEntry (DoomEntry entry)
+    public static int GetSteamAppIdForEntry (DoomEntryViewModel entry)
     {
-        var steamGame = string.IsNullOrEmpty(entry.SteamGame) ? Settings.Current.SteamGame : entry.SteamGame;
+        var steamGame = string.IsNullOrEmpty(entry.SteamGame) ? SettingsViewModel.Current.SteamGame : entry.SteamGame;
         if (!string.IsNullOrEmpty(steamGame) && steamGame !=  "off")
         {
             if (steamGame == "iwad")
             {
-                var resolvedIWad = ResolveIWadFile(entry.IWadFile, Settings.Current.DefaultIWadFile).ToLower();
+                var resolvedIWad = ResolveIWadFile(entry.IWadFile, SettingsViewModel.Current.DefaultIWadFile).ToLower();
                 if (!string.IsNullOrEmpty(resolvedIWad) && IWads.TryGetValue(resolvedIWad, out TitleAppId value))
                 {
                     return value.appId;
@@ -136,12 +137,12 @@ internal static partial class FileHelper
     {
         if (!string.IsNullOrEmpty(iWadFile))
         {
-            if (Settings.Current.IWadFiles.Contains(iWadFile))
+            if (SettingsViewModel.Current.IWadFiles.Contains(iWadFile))
             {
                 return iWadFile;
             }
         }
-        if (Settings.Current.IWadFiles.Contains(defaultIWadFile))
+        if (SettingsViewModel.Current.IWadFiles.Contains(defaultIWadFile))
         {
             return defaultIWadFile;
         }
@@ -152,12 +153,12 @@ internal static partial class FileHelper
     {
         if (!string.IsNullOrEmpty(gZDoomPath))
         {
-            if (Settings.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == gZDoomPath) is DoomPackageViewModel package)
+            if (SettingsViewModel.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == gZDoomPath) is DoomPackageViewModel package)
             {
                 return package;
             }
         }
-        return Settings.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == defaultGZDoomPath);
+        return SettingsViewModel.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == defaultGZDoomPath);
     }
 
     public static string GetIWadFileTitle(string iWadFile, string defaultIWadFile) {

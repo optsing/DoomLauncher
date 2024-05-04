@@ -13,21 +13,21 @@ namespace DoomLauncher;
 
 internal static partial class EntryHelper
 {
-    public static async Task<DoomEntry?> ImportFromGZDLFile(StorageFile file, bool withConfirm, Action<string?> SetProgress)
+    public static async Task<DoomEntryViewModel?> ImportFromGZDLFile(StorageFile file, bool withConfirm, Action<string?> SetProgress)
     {
         try
         {
             SetProgress($"Чтение файла: {file.Name}");
             using var zipToRead = await file.OpenStreamForReadAsync();
             using var archive = new ZipArchive(zipToRead, ZipArchiveMode.Read);
-            DoomEntry? newEntry = null;
+            DoomEntryViewModel? newEntry = null;
             if (archive.Entries.FirstOrDefault(entry => entry.FullName == "entry.json") is ZipArchiveEntry zipConfigEntry)
             {
                 SetProgress($"Извлечение: {zipConfigEntry.Name}");
                 using var configStream = zipConfigEntry.Open();
-                newEntry = await JsonSerializer.DeserializeAsync(configStream, JsonSettingsContext.Default.DoomEntry);
+                newEntry = await JsonSerializer.DeserializeAsync(configStream, JsonSettingsContext.Default.DoomEntryViewModel);
             }
-            newEntry ??= new DoomEntry()
+            newEntry ??= new DoomEntryViewModel()
             {
                 Name = Path.GetFileNameWithoutExtension(file.Name).Trim(),
             };
@@ -106,7 +106,7 @@ internal static partial class EntryHelper
         return null;
     }
 
-    public static async Task<DoomEntry?> ImportFromDoomWorld(DoomWorldFileEntry wadInfo, bool withConfirm, Action<string?> SetProgress)
+    public static async Task<DoomEntryViewModel?> ImportFromDoomWorld(DoomWorldFileEntry wadInfo, bool withConfirm, Action<string?> SetProgress)
     {
         try
         {
@@ -114,7 +114,7 @@ internal static partial class EntryHelper
             using var zipToRead = await WebAPI.Current.DownloadDoomWorldWadArchive(wadInfo);
             using var archive = new ZipArchive(zipToRead, ZipArchiveMode.Read);
 
-            var newEntry = new DoomEntry()
+            var newEntry = new DoomEntryViewModel()
             {
                 Name = wadInfo.Title.Trim(),
                 LongDescription = reLineBreak().Replace(wadInfo.Description, "\n").Trim(),
@@ -188,7 +188,7 @@ internal static partial class EntryHelper
     [GeneratedRegex(@"\s*<br>\s*")]
     private static partial Regex reLineBreak();
 
-    public static async Task<DoomEntry?> CreateFromFiles(IReadOnlyList<StorageFile> files, bool withConfirm, Action<string?> SetProgress)
+    public static async Task<DoomEntryViewModel?> CreateFromFiles(IReadOnlyList<StorageFile> files, bool withConfirm, Action<string?> SetProgress)
     {
         try
         {
@@ -204,7 +204,7 @@ internal static partial class EntryHelper
                 title = Path.GetFileNameWithoutExtension(images.First().Name);
             }
 
-            var newEntry = new DoomEntry()
+            var newEntry = new DoomEntryViewModel()
             {
                 Name = title.Trim(),
             };
@@ -270,7 +270,7 @@ internal static partial class EntryHelper
         return null;
     }
 
-    public static async Task ExportToGZDLFile(DoomEntry entry, StorageFile file, Action<string?> SetProgress)
+    public static async Task ExportToGZDLFile(DoomEntryViewModel entry, StorageFile file, Action<string?> SetProgress)
     {
         SetProgress($"Экспорт: {file.Name}");
         using var zipToWrite = await file.OpenStreamForWriteAsync();
@@ -281,7 +281,7 @@ internal static partial class EntryHelper
         {
             var fileName = "entry.json";
             SetProgress($"Экспорт: {fileName}");
-            var newEntry = new DoomEntry()
+            var newEntry = new DoomEntryViewModel()
             {
                 Id = entry.Id,
                 Created = entry.Created,
@@ -297,7 +297,7 @@ internal static partial class EntryHelper
                 ModFiles = new(entry.ModFiles.Select(path => Path.GetFileName(path))),
                 ImageFiles = new(entry.ImageFiles.Select(path => Path.GetFileName(path))),
             };
-            await JsonSerializer.SerializeAsync(configStream, newEntry, JsonSettingsContext.Default.DoomEntry);
+            await JsonSerializer.SerializeAsync(configStream, newEntry, JsonSettingsContext.Default.DoomEntryViewModel);
         }
 
         foreach (var filePath in entry.ModFiles)

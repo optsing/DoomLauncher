@@ -34,11 +34,11 @@ public class EditEntryDialogViewModel(EditDialogMode mode)
     public bool UniqueConfig { get; set; } = false;
     public bool UniqueSavesFolder { get; set; } = false;
 
-    public List<DoomPackageViewModel> DoomPackages => [DefaultDoomPackage, .. Settings.Current.GZDoomInstalls];
+    public List<DoomPackageViewModel> DoomPackages => [DefaultDoomPackage, .. SettingsViewModel.Current.GZDoomInstalls];
     public List<KeyValue> IWadFiles =>
         [
             DefaultIWadFile,
-            .. Settings.Current.IWadFiles.Select(iWadFile => new KeyValue(iWadFile, FileHelper.IWadFileToTitle(iWadFile))),
+            .. SettingsViewModel.Current.IWadFiles.Select(iWadFile => new KeyValue(iWadFile, FileHelper.IWadFileToTitle(iWadFile))),
         ];
     public List<KeyValue> SteamGames => [DefaultSteamGame, .. FileHelper.SteamAppIds.Select(item => new KeyValue(item.Key, item.Value.title))];
 
@@ -49,7 +49,7 @@ public class EditEntryDialogViewModel(EditDialogMode mode)
     public List<TitleChecked> ModFiles { get; private set; } = [];
     public List<TitleChecked> ImageFiles { get; private set; } = [];
 
-    public static EditEntryDialogViewModel FromEntry(DoomEntry entry, EditDialogMode mode, List<string>? modFiles = null, List<string>? imageFiles = null)
+    public static EditEntryDialogViewModel FromEntry(DoomEntryViewModel entry, EditDialogMode mode, List<string>? modFiles = null, List<string>? imageFiles = null)
     {
         var vm = new EditEntryDialogViewModel(mode)
         {
@@ -70,7 +70,7 @@ public class EditEntryDialogViewModel(EditDialogMode mode)
     public List<string> GetModFiles() => ModFiles.Where(tc => tc.IsChecked).Select(tc => tc.Title).ToList();
     public List<string> GetImageFiles() => ImageFiles.Where(tc => tc.IsChecked).Select(tc => tc.Title).ToList();
 
-    public void UpdateEntry(DoomEntry entry)
+    public void UpdateEntry(DoomEntryViewModel entry)
     {
         entry.Name = Name.Trim();
         entry.Description = Description.Trim();

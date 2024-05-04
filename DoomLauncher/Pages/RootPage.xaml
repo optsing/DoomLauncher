@@ -8,6 +8,7 @@
     xmlns:animations="using:CommunityToolkit.WinUI.Animations"
     xmlns:converters="using:CommunityToolkit.WinUI.Converters"
     xmlns:local="using:DoomLauncher"
+    xmlns:vm="using:DoomLauncher.ViewModels"
     xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
     mc:Ignorable="d"
 >
@@ -174,14 +175,14 @@
                         SelectionMode="Single"
                         Grid.Row="2"
                         VerticalAlignment="Stretch"
-                        ItemsSource="{x:Bind local:Settings.Current.Entries}"
+                        ItemsSource="{x:Bind vm:SettingsViewModel.Current.Entries}"
                         SelectedItem="{x:Bind ViewModel.CurrentEntry, Mode=OneWay}"
                         CanReorderItems="True"
                         AllowDrop="True"
                         SelectionChanged="ListView_SelectionChanged"
                     >
                         <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="local:DoomEntry">
+                            <DataTemplate x:DataType="vm:DoomEntryViewModel">
                                 <StackPanel
                                     Orientation="Vertical"
                                     Padding="0,8"

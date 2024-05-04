@@ -32,7 +32,7 @@ internal static class DialogHelper
         }
     }
 
-    public static async Task<EditEntryDialogViewModel?> ShowEditEntryAsync(DoomEntry entry, EditDialogMode mode, List<string>? modFiles = null, List<string>? imageFiles = null)
+    public static async Task<EditEntryDialogViewModel?> ShowEditEntryAsync(DoomEntryViewModel entry, EditDialogMode mode, List<string>? modFiles = null, List<string>? imageFiles = null)
     {
         if (XamlRoot == null)
         {

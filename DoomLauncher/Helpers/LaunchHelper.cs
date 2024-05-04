@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using DoomLauncher.ViewModels;
+using System.Diagnostics;
 using System.IO;
 
 namespace DoomLauncher;
@@ -11,13 +12,13 @@ public enum LaunchResult
 internal static class LaunchHelper
 {
     public static Process? CurrentProcess { get; private set; }
-    public static LaunchResult LaunchEntry(DoomEntry entry)
+    public static LaunchResult LaunchEntry(DoomEntryViewModel entry)
     {
         if (CurrentProcess != null && !CurrentProcess.HasExited)
         {
             return LaunchResult.AlreadyLaunched;
         }
-        var package = FileHelper.ResolveGZDoomPath(entry.GZDoomPath, Settings.Current.DefaultGZDoomPath);
+        var package = FileHelper.ResolveGZDoomPath(entry.GZDoomPath, SettingsViewModel.Current.DefaultGZDoomPath);
         if (package == null)
         {
             return LaunchResult.PathNotValid;
@@ -67,7 +68,7 @@ internal static class LaunchHelper
             processInfo.ArgumentList.Add("-savedir");
             processInfo.ArgumentList.Add(entrySavesFolderPath);
         }
-        var resolvedIWadFile = FileHelper.ResolveIWadFile(entry.IWadFile, Settings.Current.DefaultIWadFile);
+        var resolvedIWadFile = FileHelper.ResolveIWadFile(entry.IWadFile, SettingsViewModel.Current.DefaultIWadFile);
         if (!string.IsNullOrEmpty(resolvedIWadFile))
         {
             processInfo.ArgumentList.Add("-iwad");

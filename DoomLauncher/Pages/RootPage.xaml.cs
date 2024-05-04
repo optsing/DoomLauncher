@@ -45,7 +45,7 @@ public sealed partial class RootPage : Page
         EventBus.OnChangeCaption += EventBus_OnChangeCaption;
         EventBus.OnDropHelper += EventBus_OnDropHelper;
 
-        if (Settings.IsCustomTitleBar)
+        if (SettingsViewModel.IsCustomTitleBar)
         {
             var appWindow = AppWindow.GetFromWindowId(WinApi.WindowId);
             titleBar.Loaded += TitleBar_Loaded;
@@ -67,7 +67,7 @@ public sealed partial class RootPage : Page
         }
         ViewModel = new()
         {
-            CurrentEntry = Settings.Current.Entries.ElementAtOrDefault(Settings.Current.SelectedModIndex),
+            CurrentEntry = SettingsViewModel.Current.Entries.ElementAtOrDefault(SettingsViewModel.Current.SelectedModIndex),
         };
         NavigateToEntry(ViewModel.CurrentEntry);
     }
@@ -167,7 +167,7 @@ public sealed partial class RootPage : Page
     }
 
     [RelayCommand]
-    private async Task RemoveEntry(DoomEntry? entry)
+    private async Task RemoveEntry(DoomEntryViewModel? entry)
     {
         if (entry == null)
         {
@@ -179,14 +179,14 @@ public sealed partial class RootPage : Page
             {
                 SetCurrentEntry(null);
             }
-            Settings.Current.Entries.Remove(entry);
-            Settings.Current.Save();
+            SettingsViewModel.Current.Entries.Remove(entry);
+            SettingsViewModel.Current.Save();
             await JumpListHelper.Update();
         }
     }
 
     [RelayCommand]
-    private static async Task EditEntry(DoomEntry? entry)
+    private static async Task EditEntry(DoomEntryViewModel? entry)
     {
         if (entry == null)
         {
@@ -195,13 +195,13 @@ public sealed partial class RootPage : Page
         if (await DialogHelper.ShowEditEntryAsync(entry, EditDialogMode.Edit) is EditEntryDialogViewModel result)
         {
             result.UpdateEntry(entry);
-            Settings.Current.Save();
+            SettingsViewModel.Current.Save();
             await JumpListHelper.Update();
         }
     }
 
     [RelayCommand]
-    private async Task CopyEntry(DoomEntry? entry)
+    private async Task CopyEntry(DoomEntryViewModel? entry)
     {
         if (entry == null)
         {
@@ -209,7 +209,7 @@ public sealed partial class RootPage : Page
         }
         if (await DialogHelper.ShowEditEntryAsync(entry, EditDialogMode.Copy) is EditEntryDialogViewModel result)
         {
-            var newEntry = new DoomEntry()
+            var newEntry = new DoomEntryViewModel()
             {
                 Id = Guid.NewGuid().ToString(),
                 Created = DateTime.Now,
@@ -224,23 +224,23 @@ public sealed partial class RootPage : Page
 
     public void LaunchEntryById(string entryId, bool forceClose)
     {
-        var entry = Settings.Current.Entries.FirstOrDefault(entry => string.Equals(entry.Id, entryId));
+        var entry = SettingsViewModel.Current.Entries.FirstOrDefault(entry => string.Equals(entry.Id, entryId));
         LaunchEntry(entry, forceClose);
     }
 
     public void LaunchEntryByName(string entryName, bool forceClose)
     {
-        var entry = Settings.Current.Entries.FirstOrDefault(entry => string.Equals(entry.Name, entryName));
+        var entry = SettingsViewModel.Current.Entries.FirstOrDefault(entry => string.Equals(entry.Name, entryName));
         LaunchEntry(entry, forceClose);
     }
 
     [RelayCommand]
-    private void LaunchEntry(DoomEntry? entry)
+    private void LaunchEntry(DoomEntryViewModel? entry)
     {
         LaunchEntry(entry, false);
     }
 
-    private async void LaunchEntry(DoomEntry? entry, bool forceClose)
+    private async void LaunchEntry(DoomEntryViewModel? entry, bool forceClose)
     {
         if (entry == null)
         {
@@ -253,7 +253,7 @@ public sealed partial class RootPage : Page
         {
             entry.LastLaunch = DateTime.Now;
             await JumpListHelper.Update();
-            if (Settings.Current.CloseOnLaunch || forceClose)
+            if (SettingsViewModel.Current.CloseOnLaunch || forceClose)
             {
                 Application.Current.Exit();
             }
@@ -343,7 +343,7 @@ public sealed partial class RootPage : Page
     {
         if (await DialogHelper.ShowEditEntryAsync(EditDialogMode.Create) is EditEntryDialogViewModel result)
         {
-            var newEntry = new DoomEntry()
+            var newEntry = new DoomEntryViewModel()
             {
                 Id = Guid.NewGuid().ToString(),
                 Created = DateTime.Now,
@@ -375,7 +375,7 @@ public sealed partial class RootPage : Page
     }
 
     [RelayCommand]
-    private async Task CreateShortcutEntry(DoomEntry? entry)
+    private async Task CreateShortcutEntry(DoomEntryViewModel? entry)
     {
         if (entry == null)
         {
@@ -404,7 +404,7 @@ public sealed partial class RootPage : Page
     }
 
     [RelayCommand]
-    private async Task ExportEntry(DoomEntry? entry)
+    private async Task ExportEntry(DoomEntryViewModel? entry)
     {
         if (entry == null)
         {
@@ -429,7 +429,7 @@ public sealed partial class RootPage : Page
 
     public async Task ImportEntriesFromGZDLFiles(IReadOnlyList<StorageFile> files, bool withConfirm)
     {
-        var addedEntries = new List<DoomEntry>();
+        var addedEntries = new List<DoomEntryViewModel>();
         foreach (var file in files)
         {
             var newEntry = await EntryHelper.ImportFromGZDLFile(file, withConfirm, SetProgress);
@@ -559,20 +559,20 @@ public sealed partial class RootPage : Page
         ViewModel.IsRightDropHelperVisible = false;
     }
 
-    public void AddEntries(List<DoomEntry> entries)
+    public void AddEntries(List<DoomEntryViewModel> entries)
     {
         if (entries.Count > 0)
         {
             foreach (var entry in entries)
             {
-                Settings.Current.Entries.Add(entry);
+                SettingsViewModel.Current.Entries.Add(entry);
             }
             SetCurrentEntry(entries.Last());
-            Settings.Current.Save();
+            SettingsViewModel.Current.Save();
         }
     }
 
-    public void SetCurrentEntry(DoomEntry? entry)
+    public void SetCurrentEntry(DoomEntryViewModel? entry)
     {
         if (entry != ViewModel.CurrentEntry)
         {
@@ -581,11 +581,11 @@ public sealed partial class RootPage : Page
         }
     }
 
-    public void NavigateToEntry(DoomEntry? entry)
+    public void NavigateToEntry(DoomEntryViewModel? entry)
     {
         if (entry != null)
         {
-            Settings.Current.SelectedModIndex = Settings.Current.Entries.IndexOf(entry);
+            SettingsViewModel.Current.SelectedModIndex = SettingsViewModel.Current.Entries.IndexOf(entry);
             frameMain.Navigate(typeof(DoomPage), entry);
         }
         else if (frameMain.Content is not SettingsPage)
@@ -602,7 +602,7 @@ public sealed partial class RootPage : Page
     {
         if (sender is ListView listView)
         {
-            if (listView.SelectedItem is DoomEntry entry)
+            if (listView.SelectedItem is DoomEntryViewModel entry)
             {
                 SetCurrentEntry(entry);
             }

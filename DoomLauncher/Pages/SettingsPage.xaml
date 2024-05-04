@@ -6,6 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:local="using:DoomLauncher"
+    xmlns:vm="using:DoomLauncher.ViewModels"
     mc:Ignorable="d"
 >
     <Page.Resources>
@@ -98,13 +99,13 @@
                     </DropDownButton>
                 </Grid>
                 <ListView
-                    ItemsSource="{x:Bind local:Settings.Current.GZDoomInstalls}"
+                    ItemsSource="{x:Bind vm:SettingsViewModel.Current.GZDoomInstalls}"
                     HorizontalAlignment="Stretch"
                     SelectionMode="None"
                     Margin="-16,0"
                     CanReorderItems="True"
                     AllowDrop="True"
-                    Visibility="{x:Bind local:XamlHelper.HasItems(local:Settings.Current.GZDoomInstalls.Count), Mode=OneWay}"
+                    Visibility="{x:Bind local:XamlHelper.HasItems(vm:SettingsViewModel.Current.GZDoomInstalls.Count), Mode=OneWay}"
                     ItemContainerTransitions="{StaticResource ListViewAnimations}"
                 >
                     <ListView.ItemTemplate>
@@ -117,7 +118,7 @@
                                     <Run Text="{x:Bind Title, Mode=OneWay}" />
                                     <Run
                                         Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                        Text="{x:Bind local:XamlHelper.IsDefaultText(local:Settings.Current.DefaultGZDoomPath, Path), Mode=OneWay}"
+                                        Text="{x:Bind local:XamlHelper.IsDefaultText(vm:SettingsViewModel.Current.DefaultGZDoomPath, Path), Mode=OneWay}"
                                     />
                                 </TextBlock>
                                 <Button
@@ -168,13 +169,13 @@
                     </DropDownButton>
                 </Grid>
                 <ListView
-                    ItemsSource="{x:Bind local:Settings.Current.IWadFiles}"
+                    ItemsSource="{x:Bind vm:SettingsViewModel.Current.IWadFiles}"
                     HorizontalAlignment="Stretch"
                     Margin="-16,0"
                     CanReorderItems="True"
                     AllowDrop="True"
                     SelectionMode="None"
-                    Visibility="{x:Bind local:XamlHelper.HasItems(local:Settings.Current.IWadFiles.Count), Mode=OneWay}"
+                    Visibility="{x:Bind local:XamlHelper.HasItems(vm:SettingsViewModel.Current.IWadFiles.Count), Mode=OneWay}"
                     ItemContainerTransitions="{StaticResource ListViewAnimations}"
                 >
                     <ListView.ItemTemplate>
@@ -190,7 +191,7 @@
                                     <Run Text="{x:Bind local:FileHelper.IWadFileToTitle((x:String))}" />
                                     <Run
                                         Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                        Text="{x:Bind local:XamlHelper.IsDefaultText(local:Settings.Current.DefaultIWadFile, (x:String)), Mode=OneWay}"
+                                        Text="{x:Bind local:XamlHelper.IsDefaultText(vm:SettingsViewModel.Current.DefaultIWadFile, (x:String)), Mode=OneWay}"
                                     />
                                 </TextBlock>
                                 <Button
@@ -253,7 +254,7 @@
                     OnContent=""
                     OffContent=""
                     MinWidth="0"
-                    IsOn="{x:Bind local:Settings.Current.CloseOnLaunch, Mode=TwoWay}"
+                    IsOn="{x:Bind vm:SettingsViewModel.Current.CloseOnLaunch, Mode=TwoWay}"
                 />
             </Grid>
             <StackPanel

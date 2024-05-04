@@ -27,7 +27,7 @@ public sealed partial class DoomPage : Page
     private readonly TimeSpan SlideshowInterval = TimeSpan.FromSeconds(1);
     private readonly int TicksToSlideshow = 10;
     private readonly DispatcherTimer timerSlideshow = new();
-    public DoomEntry entry = new();
+    public DoomEntryViewModel entry = new();
 
     public DoomPageViewModel ViewModel;
 
@@ -47,7 +47,7 @@ public sealed partial class DoomPage : Page
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
-        if (e.Parameter is DoomEntry entry)
+        if (e.Parameter is DoomEntryViewModel entry)
         {
             this.entry = entry;
             SetSlideshow();
@@ -93,9 +93,9 @@ public sealed partial class DoomPage : Page
                     FontSize = 14,
                 }
             });
-            if (Settings.Current.FavoriteFiles.Count > 0)
+            if (SettingsViewModel.Current.FavoriteFiles.Count > 0)
             {
-                foreach (var filePath in Settings.Current.FavoriteFiles)
+                foreach (var filePath in SettingsViewModel.Current.FavoriteFiles)
                 {
                     var item = new MenuFlyoutItem()
                     {
@@ -266,9 +266,9 @@ public sealed partial class DoomPage : Page
         {
             if (el.DataContext is string filePath)
             {
-                if (!Settings.Current.FavoriteFiles.Remove(filePath))
+                if (!SettingsViewModel.Current.FavoriteFiles.Remove(filePath))
                 {
-                    Settings.Current.FavoriteFiles.Add(filePath);
+                    SettingsViewModel.Current.FavoriteFiles.Add(filePath);
                 }
             }
         }

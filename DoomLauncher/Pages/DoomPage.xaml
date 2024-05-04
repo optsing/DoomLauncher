@@ -6,7 +6,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:local="using:DoomLauncher"
-    d:DataContext="{d:DesignInstance Type=local:DoomEntry}"
+    xmlns:vm="using:DoomLauncher.ViewModels"
+    d:DataContext="{d:DesignInstance Type=vm:DoomEntryViewModel}"
     mc:Ignorable="d"
     Background="Transparent"
     Unloaded="Page_Unloaded"
@@ -71,10 +72,10 @@
                                         <MenuFlyout x:Key="flyoutFile" Placement="Bottom" >
                                             <MenuFlyoutItem
                                                 Click="ToggleFavoriteFile_Click"
-                                                Text="{x:Bind local:XamlHelper.FileInFavoritesTooltip(local:Settings.Current.FavoriteFiles, (x:String)), Mode=OneWay}"
+                                                Text="{x:Bind local:XamlHelper.FileInFavoritesTooltip(vm:SettingsViewModel.Current.FavoriteFiles, (x:String)), Mode=OneWay}"
                                             >
                                                 <MenuFlyoutItem.Icon>
-                                                    <FontIcon FontSize="14" Glyph="{x:Bind local:XamlHelper.FileInFavoritesGlyph(local:Settings.Current.FavoriteFiles, (x:String)), Mode=OneWay}" />
+                                                    <FontIcon FontSize="14" Glyph="{x:Bind local:XamlHelper.FileInFavoritesGlyph(vm:SettingsViewModel.Current.FavoriteFiles, (x:String)), Mode=OneWay}" />
                                                 </MenuFlyoutItem.Icon>
                                             </MenuFlyoutItem>
                                             <MenuFlyoutItem
@@ -121,9 +122,9 @@
                         VerticalAlignment="Center"
                         Margin="16"
                     >
-                        <Run Text="{x:Bind local:FileHelper.GZDoomPathToTitle(entry.GZDoomPath, local:Settings.Current.DefaultGZDoomPath), Mode=OneWay}"/>
+                        <Run Text="{x:Bind local:FileHelper.GZDoomPathToTitle(entry.GZDoomPath, vm:SettingsViewModel.Current.DefaultGZDoomPath), Mode=OneWay}"/>
                         <Run Text="•"/>
-                        <Run Text="{x:Bind local:FileHelper.GetIWadFileTitle(entry.IWadFile, local:Settings.Current.DefaultIWadFile), Mode=OneWay}" />
+                        <Run Text="{x:Bind local:FileHelper.GetIWadFileTitle(entry.IWadFile, vm:SettingsViewModel.Current.DefaultIWadFile), Mode=OneWay}" />
                         <Run Text="•"/>
                         <Run Text="Последний запуск:"/>
                         <Run Text="{x:Bind local:XamlHelper.DateToText(entry.LastLaunch), Mode=OneWay}"/>

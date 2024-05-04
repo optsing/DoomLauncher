@@ -1,8 +1,25 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace DoomLauncher;
+
+public class AssetArchJsonConverter : JsonConverter<AssetArch>
+{
+    public override AssetArch Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        var str = reader.GetString();
+        return FileHelper.ArchFromString(str);
+    }
+
+    public override void Write(Utf8JsonWriter writer, AssetArch value, JsonSerializerOptions options)
+    {
+        var str = FileHelper.ArchToString(value);
+        writer.WriteStringValue(str);
+    }
+}
+
 
 public partial class DoomPackageViewModel : ObservableObject
 {

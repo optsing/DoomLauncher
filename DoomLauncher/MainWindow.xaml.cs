@@ -1,8 +1,7 @@
-﻿using Microsoft.UI;
-using Microsoft.UI.Dispatching;
+﻿using DoomLauncher.ViewModels;
+using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
-using System;
 using System.IO;
 using System.Text.Json;
 
@@ -23,8 +22,8 @@ public sealed partial class MainWindow : Window
 
         AppWindow.Title = "GZDoom Launcher";
         AppWindow.SetIcon("Assets/app.ico");
-        Settings.IsCustomTitleBar = AppWindowTitleBar.IsCustomizationSupported();
-        if (Settings.IsCustomTitleBar)
+        SettingsViewModel.IsCustomTitleBar = AppWindowTitleBar.IsCustomizationSupported();
+        if (SettingsViewModel.IsCustomTitleBar)
         {
             AppWindow.TitleBar.IconShowOptions = IconShowOptions.HideIconAndSystemMenu;
             AppWindow.TitleBar.ExtendsContentIntoTitleBar = true;
@@ -49,25 +48,25 @@ public sealed partial class MainWindow : Window
         if (File.Exists(FileHelper.ConfigFilePath))
         {
             var text = File.ReadAllText(FileHelper.ConfigFilePath);
-            if (JsonSerializer.Deserialize(text, JsonSettingsContext.Default.Settings) is Settings settings)
+            if (JsonSerializer.Deserialize(text, JsonSettingsContext.Default.SettingsViewModel) is SettingsViewModel settings)
             {
-                Settings.Current = settings;
+                SettingsViewModel.Current = settings;
             }
             var backupConfigFilePath = Path.Combine(dataFolderPath, "config.old.json");
             File.Copy(FileHelper.ConfigFilePath, backupConfigFilePath, true);
         }
 
-        if (Settings.Current.WindowX != null && Settings.Current.WindowY != null && Settings.Current.WindowWidth != null && Settings.Current.WindowHeight != null)
+        if (SettingsViewModel.Current.WindowX != null && SettingsViewModel.Current.WindowY != null && SettingsViewModel.Current.WindowWidth != null && SettingsViewModel.Current.WindowHeight != null)
         {
             AppWindow.MoveAndResize(new()
             {
-                X = (int)Settings.Current.WindowX,
-                Y = (int)Settings.Current.WindowY,
-                Width = (int)Settings.Current.WindowWidth,
-                Height = (int)Settings.Current.WindowHeight,
+                X = (int)SettingsViewModel.Current.WindowX,
+                Y = (int)SettingsViewModel.Current.WindowY,
+                Width = (int)SettingsViewModel.Current.WindowWidth,
+                Height = (int)SettingsViewModel.Current.WindowHeight,
             });
         }
-        if (Settings.Current.WindowMaximized && AppWindow.Presenter is OverlappedPresenter presenter)
+        if (SettingsViewModel.Current.WindowMaximized && AppWindow.Presenter is OverlappedPresenter presenter)
         {
             presenter.Maximize();
         }
@@ -82,21 +81,21 @@ public sealed partial class MainWindow : Window
         {
             if (presenter.State == OverlappedPresenterState.Maximized)
             {
-                Settings.Current.WindowMaximized = true;
+                SettingsViewModel.Current.WindowMaximized = true;
             }
             else if (presenter.State == OverlappedPresenterState.Restored)
             {
-                Settings.Current.WindowMaximized = false;
-                Settings.Current.WindowX = sender.Position.X;
-                Settings.Current.WindowY = sender.Position.Y;
-                Settings.Current.WindowWidth = sender.Size.Width;
-                Settings.Current.WindowHeight = sender.Size.Height;
+                SettingsViewModel.Current.WindowMaximized = false;
+                SettingsViewModel.Current.WindowX = sender.Position.X;
+                SettingsViewModel.Current.WindowY = sender.Position.Y;
+                SettingsViewModel.Current.WindowWidth = sender.Size.Width;
+                SettingsViewModel.Current.WindowHeight = sender.Size.Height;
             }
         }
     }
 
     private void MainWindow_Closed(object sender, WindowEventArgs args)
     {
-        Settings.Current.Save();
+        SettingsViewModel.Current.Save();
     }
 }

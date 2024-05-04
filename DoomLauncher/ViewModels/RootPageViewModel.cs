@@ -11,7 +11,7 @@ public partial class RootPageViewModel : ObservableObject
     private BitmapImage? background = null;
 
     [ObservableProperty]
-    private DoomEntry? currentEntry = null;
+    private DoomEntryViewModel? currentEntry = null;
 
     [ObservableProperty]
     private string? progressText = null;

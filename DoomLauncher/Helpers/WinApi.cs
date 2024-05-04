@@ -2,6 +2,7 @@
 using Microsoft.UI;
 using System;
 using System.Runtime.InteropServices;
+using DoomLauncher.ViewModels;
 
 namespace DoomLauncher;
 
@@ -23,7 +24,7 @@ public partial class WinApi
     {
         if (AppWindow.GetFromWindowId(WindowId).Presenter is OverlappedPresenter presenter && presenter.State == OverlappedPresenterState.Minimized)
         {
-            if (Settings.Current.WindowMaximized)
+            if (SettingsViewModel.Current.WindowMaximized)
             {
                 presenter.Maximize();
             }

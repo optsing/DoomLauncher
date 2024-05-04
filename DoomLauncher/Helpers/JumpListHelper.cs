@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DoomLauncher.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ internal class JumpListHelper
 
         jumpList.SystemGroupKind = JumpListSystemGroupKind.None;
 
-        foreach (var entry in Settings.Current.Entries.Where(entry => entry.LastLaunch != null).OrderByDescending(entry => entry.LastLaunch))
+        foreach (var entry in SettingsViewModel.Current.Entries.Where(entry => entry.LastLaunch != null).OrderByDescending(entry => entry.LastLaunch))
         {
             JumpListItem item = JumpListItem.CreateWithArguments($"launch --id {entry.Id}", entry.Name);
             item.GroupName = "Последние запущенные";
