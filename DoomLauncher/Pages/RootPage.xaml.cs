@@ -67,7 +67,7 @@ public sealed partial class RootPage : Page
         EventBus.OnChangeCaption += EventBus_OnChangeCaption;
         EventBus.OnDropHelper += EventBus_OnDropHelper;
 
-        if (Settings.IsCustomTitlebar)
+        if (Settings.IsCustomTitleBar)
         {
             var appWindow = AppWindow.GetFromWindowId(WinApi.WindowId);
             titleBar.Loaded += TitleBar_Loaded;
@@ -202,7 +202,7 @@ public sealed partial class RootPage : Page
                 SetCurrentEntry(null);
             }
             Settings.Current.Entries.Remove(entry);
-            Settings.Save();
+            Settings.Current.Save();
             await JumpListHelper.Update();
         }
     }
@@ -217,7 +217,7 @@ public sealed partial class RootPage : Page
         if (await DialogHelper.ShowEditEntryAsync(entry, EditDialogMode.Edit) is EditEntryDialogViewModel result)
         {
             result.UpdateEntry(entry);
-            Settings.Save();
+            Settings.Current.Save();
             await JumpListHelper.Update();
         }
     }
@@ -590,7 +590,7 @@ public sealed partial class RootPage : Page
                 Settings.Current.Entries.Add(entry);
             }
             SetCurrentEntry(entries.Last());
-            Settings.Save();
+            Settings.Current.Save();
         }
     }
 

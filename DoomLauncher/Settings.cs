@@ -13,21 +13,26 @@ internal partial class JsonSettingsContext : JsonSerializerContext
 {
 }
 
-public class Settings: ObservableObject
+public partial class Settings: ObservableObject
 {
-    public static bool IsCustomTitlebar = false;
-    private string defaultGZDoomPath = "";
-    private string defaultIWadFile = "";
-    private string steamGame = "off";
+    public static bool IsCustomTitleBar = false;
 
     public static Settings Current { get; set; } = new();
     public ObservableCollection<DoomPackageViewModel> GZDoomInstalls { get; set; } = [];
     public ObservableCollection<string> IWadFiles { get; set; } = [];
-    public string DefaultGZDoomPath { get => defaultGZDoomPath; set => SetProperty(ref defaultGZDoomPath, value); }
-    public string DefaultIWadFile { get => defaultIWadFile; set => SetProperty(ref defaultIWadFile, value); }
+
+    [ObservableProperty]
+    private string defaultGZDoomPath = "";
+
+    [ObservableProperty]
+    private string defaultIWadFile = "";
+
     public ObservableCollection<string> FavoriteFiles { get; set; } = [];
     public bool CloseOnLaunch { get; set; } = false;
-    public string SteamGame { get => steamGame; set => SetProperty(ref steamGame, value); }
+
+    [ObservableProperty]
+    private string steamGame = "off";
+
     public int SelectedModIndex { get; set; } = 0;
     public ObservableCollection<DoomEntry> Entries { get; set; } = [];
 
@@ -37,53 +42,31 @@ public class Settings: ObservableObject
     public int? WindowHeight { get; set; } = null;
     public bool WindowMaximized { get; set; } = false;
 
-    public static void Save()
+    public void Save()
     {
-        var text = JsonSerializer.Serialize(Current, JsonSettingsContext.Default.Settings);
+        var text = JsonSerializer.Serialize(this, JsonSettingsContext.Default.Settings);
         File.WriteAllText(FileHelper.ConfigFilePath, text);
     }
 }
 
 public partial class DoomEntry: ObservableObject
 {
+    [ObservableProperty]
     private string name = "";
+
+    [ObservableProperty]
     private string description = "";
+
+    [ObservableProperty]
     private string longDescription = "";
 
-    public string Name
-    {
-        get => name;
-        set => SetProperty(ref name, value);
-    }
-
-    public string Description
-    {
-        get => description;
-        set => SetProperty(ref description, value);
-    }
-
-    public string LongDescription
-    {
-        get => longDescription;
-        set => SetProperty(ref longDescription, value);
-    }
-
+    [ObservableProperty]
     private string gZDoomPath = "";
-    public string GZDoomPath
-    {
-        get => gZDoomPath;
-        set => SetProperty(ref gZDoomPath, value);
-    }
 
+    [ObservableProperty]
     private string iWadFile = "";
-    public string IWadFile
-    {
-        get => iWadFile;
-        set => SetProperty(ref iWadFile, value);
-    }
 
     public string SteamGame { get; set; } = "";
-
     public bool UniqueConfig { get; set; } = false;
     public bool UniqueSavesFolder { get; set; } = false;
 
@@ -96,28 +79,14 @@ public partial class DoomEntry: ObservableObject
     public ObservableCollection<string> ImageFiles { get; set; } = [];
     public ObservableCollection<string> ModFiles { get; set; } = [];
 
+    [ObservableProperty]
     private DateTime? created = null;
 
-    public DateTime? Created
-    {
-        get => created;
-        set => SetProperty(ref created, value);
-    }
-
+    [ObservableProperty]
     private DateTime? lastLaunch = null;
 
-    public DateTime? LastLaunch
-    {
-        get => lastLaunch;
-        set => SetProperty(ref lastLaunch, value);
-    }
-
+    [ObservableProperty]
     private TimeSpan? playTime;
-    public TimeSpan? PlayTime
-    {
-        get => playTime;
-        set => SetProperty(ref playTime, value);
-    }
 }
 
 public class AssetArchJsonConverter : JsonConverter<AssetArch>

@@ -4,16 +4,12 @@ using System.Text.Json.Serialization;
 
 namespace DoomLauncher;
 
-public class DoomPackageViewModel : ObservableObject
+public partial class DoomPackageViewModel : ObservableObject
 {
     public string Path { get; set; } = "";
 
+    [ObservableProperty]
     private Version? version = null;
-    public Version? Version
-    {
-        get => version;
-        set => SetProperty(ref version, value);
-    }
 
     [JsonConverter(typeof(AssetArchJsonConverter))]
     public AssetArch Arch { get; set; } = AssetArch.unknown;

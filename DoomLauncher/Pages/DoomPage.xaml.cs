@@ -25,23 +25,18 @@ public partial class DoomPageViewModel(DispatcherTimer timer) : ObservableObject
     [ObservableProperty]
     private int currentTicksToSlideshow;
 
+    [ObservableProperty]
     private bool isSlideshowEnabled;
-    public bool IsSlideshowEnabled
+
+    partial void OnIsSlideshowEnabledChanged(bool value)
     {
-        get => isSlideshowEnabled;
-        set
+        if (value)
         {
-            if (SetProperty(ref isSlideshowEnabled, value))
-            {
-                if (value)
-                {
-                    timerSlideshow.Start();
-                }
-                else
-                {
-                    timerSlideshow.Stop();
-                }
-            }
+            timerSlideshow.Start();
+        }
+        else
+        {
+            timerSlideshow.Stop();
         }
     }
 } 

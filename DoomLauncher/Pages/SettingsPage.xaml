@@ -98,13 +98,13 @@
                     </DropDownButton>
                 </Grid>
                 <ListView
-                    ItemsSource="{x:Bind local:Settings.Current.GZDoomInstalls, Mode=OneWay}"
+                    ItemsSource="{x:Bind local:Settings.Current.GZDoomInstalls}"
                     HorizontalAlignment="Stretch"
                     SelectionMode="None"
                     Margin="-16,0"
                     CanReorderItems="True"
                     AllowDrop="True"
-                    Visibility="{x:Bind local:XamlHelper.HasItems(local:Settings.Current.IWadFiles.Count), Mode=OneWay}"
+                    Visibility="{x:Bind local:XamlHelper.HasItems(local:Settings.Current.GZDoomInstalls.Count), Mode=OneWay}"
                     ItemContainerTransitions="{StaticResource ListViewAnimations}"
                 >
                     <ListView.ItemTemplate>
@@ -168,7 +168,7 @@
                     </DropDownButton>
                 </Grid>
                 <ListView
-                    ItemsSource="{x:Bind local:Settings.Current.IWadFiles, Mode=OneWay}"
+                    ItemsSource="{x:Bind local:Settings.Current.IWadFiles}"
                     HorizontalAlignment="Stretch"
                     Margin="-16,0"
                     CanReorderItems="True"
