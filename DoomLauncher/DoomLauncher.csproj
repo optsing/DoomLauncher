@@ -29,13 +29,13 @@
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Platforms>x64;ARM64</Platforms>
-		<WindowsPackageType>None</WindowsPackageType>
+		<!--<WindowsPackageType>None</WindowsPackageType>-->
 	</PropertyGroup>
 
-	<!--<ItemGroup>
+	<ItemGroup>
 		<AppxManifest Include="Package.appxmanifest" Condition="'$(Configuration)'!='Debug'" SubType="Designer" />
 		<AppxManifest Include="Package.Debug.appxmanifest" Condition="'$(Configuration)'=='Debug'" SubType="Designer" />
-	</ItemGroup>-->
+	</ItemGroup>
 
 	<PropertyGroup Condition="'$(WindowsPackageType)' == 'None'">
 		<DefineConstants>IS_NON_PACKAGED</DefineConstants>
@@ -70,7 +70,7 @@
 		<PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.0.240109" />
 		<PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.0.240109" />
 		<PackageReference Include="Humanizer.Core.ru" Version="2.14.1" />
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240404000" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240428000" />
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.3233" />
 		<Manifest Include="$(ApplicationManifest)" />
 	</ItemGroup>
