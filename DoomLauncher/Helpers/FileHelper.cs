@@ -231,4 +231,9 @@ internal static partial class FileHelper
 
     [GeneratedRegex("(\\d+)[.-](\\d+)[.-](\\d+)")]
     private static partial Regex reVersion();
+
+    public static string GetFileTitle(string filePath)
+    {
+        return Path.GetFileName(filePath);
+    }
 }

@@ -27,9 +27,8 @@ public sealed partial class DoomPage : Page
     private readonly TimeSpan SlideshowInterval = TimeSpan.FromSeconds(1);
     private readonly int TicksToSlideshow = 10;
     private readonly DispatcherTimer timerSlideshow = new();
-    public DoomEntryViewModel entry = new();
 
-    public DoomPageViewModel ViewModel;
+    public DoomPageViewModel ViewModel { get; set; }
 
     public DoomPage()
     {
@@ -49,7 +48,7 @@ public sealed partial class DoomPage : Page
     {
         if (e.Parameter is DoomEntryViewModel entry)
         {
-            this.entry = entry;
+            ViewModel.Entry = entry;
             SetSlideshow();
             SetSelectedImageIndex(entry.SelectedImageIndex, direction: AnimationDirection.None);
             EventBus.ChangeCaption(this, entry.Name);
@@ -99,7 +98,7 @@ public sealed partial class DoomPage : Page
                 {
                     var item = new MenuFlyoutItem()
                     {
-                        Text = GetFileTitle(filePath),
+                        Text = FileHelper.GetFileTitle(filePath),
                     };
                     item.Click += async (object sender, RoutedEventArgs e) =>
                     {
@@ -168,23 +167,23 @@ public sealed partial class DoomPage : Page
 
     private void SetSelectedImageIndex(int ind, AnimationDirection direction)
     {
-        if (entry.ImageFiles.Count > 0)
+        if (ViewModel.Entry.ImageFiles.Count > 0)
         {
             if (ind < 0)
             {
-                ind = entry.ImageFiles.Count - 1;
+                ind = ViewModel.Entry.ImageFiles.Count - 1;
             }
-            else if (ind >= entry.ImageFiles.Count)
+            else if (ind >= ViewModel.Entry.ImageFiles.Count)
             {
                 ind = 0;
             }
-            entry.SelectedImageIndex = ind;
-            var imagePath = Path.GetFullPath(entry.ImageFiles[entry.SelectedImageIndex], FileHelper.ImagesFolderPath);
+            ViewModel.Entry.SelectedImageIndex = ind;
+            var imagePath = Path.GetFullPath(ViewModel.Entry.ImageFiles[ViewModel.Entry.SelectedImageIndex], FileHelper.ImagesFolderPath);
             EventBus.ChangeBackground(this, imagePath, direction);
         }
         else
         {
-            entry.SelectedImageIndex = 0;
+            ViewModel.Entry.SelectedImageIndex = 0;
             EventBus.ChangeBackground(this, null, direction);
         }
     }
@@ -192,13 +191,13 @@ public sealed partial class DoomPage : Page
     [RelayCommand]
     private void GoToPreviousBackground()
     {
-        SetSelectedImageIndex(entry.SelectedImageIndex - 1, direction: AnimationDirection.Previous);
+        SetSelectedImageIndex(ViewModel.Entry.SelectedImageIndex - 1, direction: AnimationDirection.Previous);
     }
 
     [RelayCommand]
     private void GoToNextBackground()
     {
-        SetSelectedImageIndex(entry.SelectedImageIndex + 1, direction: AnimationDirection.Next);
+        SetSelectedImageIndex(ViewModel.Entry.SelectedImageIndex + 1, direction: AnimationDirection.Next);
     }
 
     private void Timer_Tick(object? sender, object e)
@@ -209,7 +208,7 @@ public sealed partial class DoomPage : Page
         }
         else
         {
-            SetSelectedImageIndex(entry.SelectedImageIndex + 1, direction: AnimationDirection.Next);
+            SetSelectedImageIndex(ViewModel.Entry.SelectedImageIndex + 1, direction: AnimationDirection.Next);
             ViewModel.CurrentTicksToSlideshow = 0;
         }
     }
@@ -220,9 +219,9 @@ public sealed partial class DoomPage : Page
         {
             EventBus.Progress(this, $"Копирование: {file.Name}");
             await FileHelper.CopyFileWithConfirmation(file, FileHelper.ModsFolderPath);
-            if (!entry.ModFiles.Contains(file.Name))
+            if (!ViewModel.Entry.ModFiles.Contains(file.Name))
             {
-                entry.ModFiles.Add(file.Name);
+                ViewModel.Entry.ModFiles.Add(file.Name);
             }
         }
         EventBus.Progress(this, null);
@@ -235,79 +234,34 @@ public sealed partial class DoomPage : Page
         {
             EventBus.Progress(this, $"Копирование: {file.Name}");
             await FileHelper.CopyFileWithConfirmation(file, FileHelper.ImagesFolderPath);
-            if (!entry.ModFiles.Contains(file.Name))
+            if (!ViewModel.Entry.ModFiles.Contains(file.Name))
             {
-                entry.ImageFiles.Add(file.Name);
+                ViewModel.Entry.ImageFiles.Add(file.Name);
                 hasAddedImages = true;
             }
         }
         EventBus.Progress(this, null);
         if (hasAddedImages)
         {
-            SetSelectedImageIndex(entry.ImageFiles.Count - 1, direction: AnimationDirection.Next);
+            SetSelectedImageIndex(ViewModel.Entry.ImageFiles.Count - 1, direction: AnimationDirection.Next);
             SetSlideshow();
-        }
-    }
-
-    private void OpenContainFolder_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is FrameworkElement el)
-        {
-            if (el.DataContext is string filePath)
-            {
-                Process.Start("explorer.exe", "/select," + Path.GetFullPath(filePath, FileHelper.ModsFolderPath));
-            }
-        }
-    }
-
-    private void ToggleFavoriteFile_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is FrameworkElement el)
-        {
-            if (el.DataContext is string filePath)
-            {
-                if (!SettingsViewModel.Current.FavoriteFiles.Remove(filePath))
-                {
-                    SettingsViewModel.Current.FavoriteFiles.Add(filePath);
-                }
-            }
-        }
-    }
-
-    private async void RemoveFile_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is FrameworkElement el)
-        {
-            if (el.DataContext is string filePath)
-            {
-                var fileName = GetFileTitle(filePath);
-                if (await DialogHelper.ShowAskAsync("Удаление ссылки на файл", $"Вы уверены, что хотите удалить ссылку на файл '{fileName}'?", "Удалить", "Отмена"))
-                {
-                    entry.ModFiles.Remove(filePath);
-                }
-            }
         }
     }
 
     [RelayCommand]
     private async Task RemoveBackground()
     {
-        if (entry.SelectedImageIndex >= 0 && entry.SelectedImageIndex < entry.ImageFiles.Count)
+        if (ViewModel.Entry.SelectedImageIndex >= 0 && ViewModel.Entry.SelectedImageIndex < ViewModel.Entry.ImageFiles.Count)
         {
             ViewModel.IsSlideshowEnabled = false;
-            var selectedImageIndex = entry.SelectedImageIndex;
+            var selectedImageIndex = ViewModel.Entry.SelectedImageIndex;
             if (await DialogHelper.ShowAskAsync("Удаление фона", $"Вы уверены, что хотите удалить текущий фон?", "Удалить", "Отмена"))
             {
-                entry.ImageFiles.RemoveAt(selectedImageIndex);
+                ViewModel.Entry.ImageFiles.RemoveAt(selectedImageIndex);
                 SetSelectedImageIndex(selectedImageIndex, direction: AnimationDirection.Next);
             }
             SetSlideshow();
         }
-    }
-
-    public static string GetFileTitle(string filePath)
-    {
-        return Path.GetFileName(filePath);
     }
 
     public static BitmapImage? GetCurrentBackground(IList<string> list, int selectedImageIndex)
@@ -393,13 +347,13 @@ public sealed partial class DoomPage : Page
 
     private void SetSlideshow()
     {
-        ViewModel.IsSlideshowEnabled = entry.Slideshow && entry.ImageFiles.Count > 1;
+        ViewModel.IsSlideshowEnabled = ViewModel.Entry.Slideshow && ViewModel.Entry.ImageFiles.Count > 1;
     }
 
     [RelayCommand]
     private void ToggleSlideshow()
     {
-        entry.Slideshow = !entry.Slideshow;
+        ViewModel.Entry.Slideshow = !ViewModel.Entry.Slideshow;
         ViewModel.CurrentTicksToSlideshow = 0;
         SetSlideshow();
     }

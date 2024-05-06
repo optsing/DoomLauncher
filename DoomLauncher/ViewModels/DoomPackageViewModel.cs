@@ -21,11 +21,11 @@ public class AssetArchJsonConverter : JsonConverter<AssetArch>
 }
 
 
-public partial class DoomPackageViewModel : ObservableObject
+public class DoomPackageViewModel : ObservableObject
 {
     public string Path { get; set; } = "";
 
-    [ObservableProperty]
+    public Version? Version { get => version; set => SetProperty(ref version, value); }
     private Version? version = null;
 
     [JsonConverter(typeof(AssetArchJsonConverter))]

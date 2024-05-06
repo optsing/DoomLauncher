@@ -10,7 +10,7 @@
     mc:Ignorable="d"
 >
     <Page.Resources>
-        <MenuFlyout x:Key="flyoutPackage" Placement="Bottom" >
+        <MenuFlyout x:Key="flyoutPackage" Placement="Bottom">
             <MenuFlyoutItem
                 Command="{x:Bind ViewModel.ToggleDefaultDoomPackageCommand}"
                 CommandParameter="{Binding}"

@@ -4,21 +4,21 @@ using System.Collections.ObjectModel;
 
 namespace DoomLauncher.ViewModels;
 
-public partial class DoomEntryViewModel : ObservableObject
+public class DoomEntryViewModel : ObservableObject
 {
-    [ObservableProperty]
+    public string Name { get => name; set => SetProperty(ref name, value); }
     private string name = "";
 
-    [ObservableProperty]
+    public string Description { get => description; set => SetProperty(ref description, value); }
     private string description = "";
 
-    [ObservableProperty]
+    public string LongDescription { get => longDescription; set => SetProperty(ref longDescription, value); }
     private string longDescription = "";
 
-    [ObservableProperty]
+    public string GZDoomPath { get => gZDoomPath; set => SetProperty(ref gZDoomPath, value); }
     private string gZDoomPath = "";
 
-    [ObservableProperty]
+    public string IWadFile { get => iWadFile; set => SetProperty(ref iWadFile, value); }
     private string iWadFile = "";
 
     public string SteamGame { get; set; } = "";
@@ -34,13 +34,13 @@ public partial class DoomEntryViewModel : ObservableObject
     public ObservableCollection<string> ImageFiles { get; set; } = [];
     public ObservableCollection<string> ModFiles { get; set; } = [];
 
-    [ObservableProperty]
+    public DateTime? Created { get => created; set => SetProperty(ref created, value); }
     private DateTime? created = null;
 
-    [ObservableProperty]
+    public DateTime? LastLaunch { get => lastLaunch; set => SetProperty(ref lastLaunch, value); }
     private DateTime? lastLaunch = null;
 
-    [ObservableProperty]
+    public TimeSpan? PlayTime { get => playTime; set => SetProperty(ref playTime, value); }
     private TimeSpan? playTime;
 }
 

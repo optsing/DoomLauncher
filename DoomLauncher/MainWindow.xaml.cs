@@ -47,8 +47,7 @@ public sealed partial class MainWindow : Window
 
         if (File.Exists(FileHelper.ConfigFilePath))
         {
-            var text = File.ReadAllText(FileHelper.ConfigFilePath);
-            if (JsonSerializer.Deserialize(text, JsonSettingsContext.Default.SettingsViewModel) is SettingsViewModel settings)
+            if (SettingsViewModel.Load() is SettingsViewModel settings)
             {
                 SettingsViewModel.Current = settings;
             }

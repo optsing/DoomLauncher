@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace DoomLauncher.ViewModels;
 
@@ -13,7 +14,7 @@ internal partial class JsonSettingsContext : JsonSerializerContext
 {
 }
 
-public partial class SettingsViewModel : ObservableObject
+public class SettingsViewModel : ObservableObject
 {
     public static bool IsCustomTitleBar = false;
 
@@ -21,16 +22,16 @@ public partial class SettingsViewModel : ObservableObject
     public ObservableCollection<DoomPackageViewModel> GZDoomInstalls { get; set; } = [];
     public ObservableCollection<string> IWadFiles { get; set; } = [];
 
-    [ObservableProperty]
+    public string DefaultGZDoomPath { get => defaultGZDoomPath; set => SetProperty(ref defaultGZDoomPath, value); }
     private string defaultGZDoomPath = "";
 
-    [ObservableProperty]
+    public string DefaultIWadFile { get => defaultIWadFile; set => SetProperty(ref defaultIWadFile, value); }
     private string defaultIWadFile = "";
 
     public ObservableCollection<string> FavoriteFiles { get; set; } = [];
     public bool CloseOnLaunch { get; set; } = false;
 
-    [ObservableProperty]
+    public string SteamGame { get => steamGame; set => SetProperty(ref steamGame, value); }
     private string steamGame = "off";
 
     public int SelectedModIndex { get; set; } = 0;
@@ -41,6 +42,12 @@ public partial class SettingsViewModel : ObservableObject
     public int? WindowWidth { get; set; } = null;
     public int? WindowHeight { get; set; } = null;
     public bool WindowMaximized { get; set; } = false;
+
+    public static SettingsViewModel? Load()
+    {
+        var text = File.ReadAllText(FileHelper.ConfigFilePath);
+        return JsonSerializer.Deserialize(text, JsonSettingsContext.Default.SettingsViewModel);
+    }
 
     public void Save()
     {
