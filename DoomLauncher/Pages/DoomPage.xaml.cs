@@ -1,17 +1,12 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using DoomLauncher.ViewModels;
+﻿using DoomLauncher.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 
@@ -79,7 +74,7 @@ public sealed partial class DoomPage : Page
                     Glyph = "\uEC50",
                     FontSize = 14,
                 },
-                Command = ViewModel.AddLocalFileCommand,
+                Command = ViewModel.AddLocalModFileCommand,
             };
             menu.Items.Add(browseItem);
             menu.Items.Add(new MenuFlyoutSeparator());
@@ -107,7 +102,7 @@ public sealed partial class DoomPage : Page
                         if (File.Exists(fullPath))
                         {
                             var file = await StorageFile.GetFileFromPathAsync(fullPath);
-                            await ViewModel.AddFiles([file]);
+                            await ViewModel.AddModFiles([file]);
                         }
                     };
                     menu.Items.Add(item);
@@ -191,7 +186,7 @@ public sealed partial class DoomPage : Page
                 }
                 if (mods.Count > 0)
                 {
-                    await ViewModel.AddFiles(mods);
+                    await ViewModel.AddModFiles(mods);
                 }
                 if (images.Count > 0)
                 {

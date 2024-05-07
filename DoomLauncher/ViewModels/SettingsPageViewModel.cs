@@ -249,4 +249,56 @@ public partial class SettingsPageViewModel : ObservableObject
             SettingsViewModel.Current.IWadFiles.Remove(iWadFile);
         }
     }
+
+    [RelayCommand]
+    private async Task AddLocalFavFile()
+    {
+        var picker = new Windows.Storage.Pickers.FileOpenPicker();
+
+        // Need to initialize the picker object with the hwnd / IInitializeWithWindow
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, WinApi.HWND);
+
+        // Now we can use the picker object as normal
+        foreach (var fileExtension in FileHelper.SupportedModExtensions)
+        {
+            picker.FileTypeFilter.Add(fileExtension);
+        }
+
+        var files = await picker.PickMultipleFilesAsync();
+  
+        foreach (var file in files)
+        {
+            EventBus.Progress(this, $"Копирование: {file.Name}");
+            await FileHelper.CopyFileWithConfirmation(file, FileHelper.ModsFolderPath);
+            if (!SettingsViewModel.Current.FavoriteFiles.Contains(file.Name))
+            {
+                SettingsViewModel.Current.FavoriteFiles.Add(file.Name);
+            }
+        }
+        EventBus.Progress(this, null);
+    }
+
+    [RelayCommand]
+    private static void OpenFolderFavFile(string? filePath)
+    {
+        if (string.IsNullOrEmpty(filePath))
+        {
+            return;
+        }
+        Process.Start("explorer.exe", "/select," + Path.GetFullPath(filePath, FileHelper.ModsFolderPath));
+    }
+
+    [RelayCommand]
+    private static async Task RemoveFavFile(string? filePath)
+    {
+        if (string.IsNullOrEmpty(filePath))
+        {
+            return;
+        }
+        var title = FileHelper.GetFileTitle(filePath);
+        if (await DialogHelper.ShowAskAsync("Удаление ссылки", $"Вы уверены, что хотите удалить ссылку на '{title}'?", "Удалить", "Отмена"))
+        {
+            SettingsViewModel.Current.FavoriteFiles.Remove(filePath);
+        }
+    }
 }

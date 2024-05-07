@@ -7,6 +7,7 @@
     xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:local="using:DoomLauncher"
     xmlns:vm="using:DoomLauncher.ViewModels"
+    xmlns:controls="using:DoomLauncher.Controls"
     mc:Ignorable="d"
 >
     <Page.Resources>
@@ -50,6 +51,20 @@
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
             />
         </MenuFlyout>
+        <MenuFlyout x:Key="flyoutFavFile" Placement="Bottom">
+            <MenuFlyoutItem
+                Command="{x:Bind ViewModel.OpenFolderFavFileCommand}"
+                CommandParameter="{Binding}"
+                Text="Открыть расположение"
+                Icon="{ui:FontIcon FontSize=14, Glyph=&#xE838;}"
+            />
+            <MenuFlyoutItem
+                Command="{x:Bind ViewModel.RemoveFavFileCommand}"
+                CommandParameter="{Binding}"
+                Text="Удалить ссылку на файл"
+                Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
+            />
+        </MenuFlyout>
     </Page.Resources>
     <ScrollView>
         <StackPanel
@@ -59,154 +74,137 @@
             ChildrenTransitions="{StaticResource PageCardsAnimations}"
             Spacing="8"
         >
-            <StackPanel
-                Orientation="Vertical"
-                CornerRadius="8"
-                HorizontalAlignment="Stretch"
-                Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
-                Padding="16"
-                Spacing="4"
+            <controls:DoomItemList
+                HeaderTitle="Установленные GZDoom"
+                ItemsSource="{x:Bind vm:SettingsViewModel.Current.GZDoomInstalls}"
             >
-                <Grid ColumnDefinitions="*,Auto">
-                    <TextBlock
-                        Grid.Column="0"
-                        VerticalAlignment="Center"
-                        Text="Установленные GZDoom"
-                        Style="{ThemeResource BaseTextBlockStyle}"
-                        FontSize="16"
-                    />
-                    <DropDownButton Grid.Column="1" VerticalAlignment="Center">
-                        <DropDownButton.Flyout>
-                            <MenuFlyout
-                                Placement="Bottom"
-                            >
-                                <MenuFlyoutItem
-                                    Command="{x:Bind ViewModel.AddLocalDoomPackageCommand}"
-                                    Text="Выбрать на устройстве"
-                                    Icon="{ui:FontIcon FontSize=14, Glyph=&#xEC50;}"
+                <controls:DoomItemList.HeaderFlyout>
+                    <MenuFlyout
+                        Placement="Bottom"
+                    >
+                      <MenuFlyoutItem
+                            Command="{x:Bind ViewModel.AddLocalDoomPackageCommand}"
+                            Text="Выбрать на устройстве"
+                            Icon="{ui:FontIcon FontSize=14, Glyph=&#xEC50;}"
+                       />
+                        <MenuFlyoutItem
+                            Command="{x:Bind ViewModel.AddRemoteDoomPackageCommand}"
+                            Text="Скачать с GitHub"
+                            Icon="{ui:FontIcon FontSize=14, Glyph=&#xE896;}"
+                       />
+                    </MenuFlyout>
+                </controls:DoomItemList.HeaderFlyout>
+                <controls:DoomItemList.ItemTemplate>
+                    <DataTemplate x:DataType="local:DoomPackageViewModel">
+                        <Grid ColumnDefinitions="*,Auto" ContextFlyout="{StaticResource flyoutPackage}">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                            >   
+                                <Run Text="{x:Bind Title, Mode=OneWay}" />
+                                <Run
+                                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                    Text="{x:Bind local:XamlHelper.IsDefaultText(vm:SettingsViewModel.Current.DefaultGZDoomPath, Path), Mode=OneWay}"
                                 />
-                                <MenuFlyoutItem
-                                    Command="{x:Bind ViewModel.AddRemoteDoomPackageCommand}"
-                                    Text="Скачать с GitHub"
-                                    Icon="{ui:FontIcon FontSize=14, Glyph=&#xE896;}"
-                                />
-                            </MenuFlyout>
-                        </DropDownButton.Flyout>
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <FontIcon FontSize="14" Glyph="&#xE710;" />
-                            <TextBlock>Добавить</TextBlock>
-                        </StackPanel>
-                    </DropDownButton>
-                </Grid>
-                <ListView
-                    ItemsSource="{x:Bind vm:SettingsViewModel.Current.GZDoomInstalls}"
-                    HorizontalAlignment="Stretch"
-                    SelectionMode="None"
-                    Margin="-16,0"
-                    CanReorderItems="True"
-                    AllowDrop="True"
-                    Visibility="{x:Bind local:XamlHelper.HasItems(vm:SettingsViewModel.Current.GZDoomInstalls.Count), Mode=OneWay}"
-                    ItemContainerTransitions="{StaticResource ListViewAnimations}"
-                >
-                    <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="local:DoomPackageViewModel">
-                            <Grid ColumnDefinitions="*,Auto" ContextFlyout="{StaticResource flyoutPackage}">
-                                <TextBlock
-                                    Grid.Column="0"
-                                    VerticalAlignment="Center"
-                                >
-                                    <Run Text="{x:Bind Title, Mode=OneWay}" />
-                                    <Run
-                                        Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                        Text="{x:Bind local:XamlHelper.IsDefaultText(vm:SettingsViewModel.Current.DefaultGZDoomPath, Path), Mode=OneWay}"
-                                    />
-                                </TextBlock>
-                                <Button
-                                    Grid.Column="1"
-                                    Style="{ThemeResource EllipsisButton}"
-                                    Height="40"
-                                    Width="40"
-                                    Flyout="{StaticResource flyoutPackage}"
-                                    Content="{ui:FontIcon FontSize=14, Glyph=&#xE712;}"
-                                />
-                            </Grid>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </StackPanel>
-            <StackPanel
-                Orientation="Vertical"
-                CornerRadius="8"
-                HorizontalAlignment="Stretch"
-                Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
-                Padding="16"
-                Spacing="4"
+                            </TextBlock>
+                            <Button
+                                Grid.Column="1"
+                                Style="{ThemeResource EllipsisButton}"
+                                Height="40"
+                                Width="40"
+                                Flyout="{StaticResource flyoutPackage}"
+                                Content="{ui:FontIcon FontSize=14, Glyph=&#xE712;}"
+                            />
+                        </Grid>
+                    </DataTemplate>
+                </controls:DoomItemList.ItemTemplate>
+            </controls:DoomItemList>
+            <controls:DoomItemList
+                HeaderTitle="Установленные iWad"
+                ItemsSource="{x:Bind vm:SettingsViewModel.Current.IWadFiles}"
             >
-                <Grid ColumnDefinitions="*,Auto">
-                    <TextBlock
-                        Grid.Column="0"
-                        VerticalAlignment="Center"
-                        Text="Установленные iWad"
-                        Style="{ThemeResource BaseTextBlockStyle}"
-                        FontSize="16"
-                    />
-                    <DropDownButton Grid.Column="1" VerticalAlignment="Center">
-                        <DropDownButton.Flyout>
-                            <MenuFlyout
-                                Placement="Bottom"
-                            >
-                                <MenuFlyoutItem 
-                                    Command="{x:Bind ViewModel.AddLocalIWadCommand}"
-                                    Text="Выбрать на устройстве"
-                                    Icon="{ui:FontIcon FontSize=14, Glyph=&#xEC50;}"
+                <controls:DoomItemList.HeaderFlyout>
+                    <MenuFlyout
+                        Placement="Bottom"
+                    >
+                        <MenuFlyoutItem 
+                            Command="{x:Bind ViewModel.AddLocalIWadCommand}"
+                            Text="Выбрать на устройстве"
+                            Icon="{ui:FontIcon FontSize=14, Glyph=&#xEC50;}"
+                        />
+                    </MenuFlyout>
+                </controls:DoomItemList.HeaderFlyout>
+                <controls:DoomItemList.ItemTemplate>
+                    <DataTemplate x:DataType="x:String">
+                        <Grid
+                            ColumnDefinitions="*,Auto"
+                            ContextFlyout="{StaticResource flyoutIWad}"
+                        >
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                             >
+                                <Run Text="{x:Bind local:FileHelper.IWadFileToTitle((x:String))}" />
+                                <Run
+                                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                    Text="{x:Bind local:XamlHelper.IsDefaultText(vm:SettingsViewModel.Current.DefaultIWadFile, (x:String)), Mode=OneWay}"
                                 />
-                            </MenuFlyout>
-                        </DropDownButton.Flyout>
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <FontIcon FontSize="14" Glyph="&#xE710;" />
-                            <TextBlock>Добавить</TextBlock>
-                        </StackPanel>
-                    </DropDownButton>
-                </Grid>
-                <ListView
-                    ItemsSource="{x:Bind vm:SettingsViewModel.Current.IWadFiles}"
-                    HorizontalAlignment="Stretch"
-                    Margin="-16,0"
-                    CanReorderItems="True"
-                    AllowDrop="True"
-                    SelectionMode="None"
-                    Visibility="{x:Bind local:XamlHelper.HasItems(vm:SettingsViewModel.Current.IWadFiles.Count), Mode=OneWay}"
-                    ItemContainerTransitions="{StaticResource ListViewAnimations}"
-                >
-                    <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="x:String">
-                            <Grid
-                                ColumnDefinitions="*,Auto"
-                                ContextFlyout="{StaticResource flyoutIWad}"
+                            </TextBlock>
+                            <Button
+                                Grid.Column="1"
+                                Style="{ThemeResource EllipsisButton}"
+                                Height="40"
+                                Width="40"
+                                Flyout="{StaticResource flyoutIWad}"
+                                Content="{ui:FontIcon FontSize=14, Glyph=&#xE712;}"
+                            />
+                        </Grid>
+                    </DataTemplate>
+                </controls:DoomItemList.ItemTemplate>
+            </controls:DoomItemList>
+            <controls:DoomItemList
+                HeaderTitle="Избранные файлы"
+                ItemsSource="{x:Bind vm:SettingsViewModel.Current.FavoriteFiles}"
+            >   
+                <controls:DoomItemList.HeaderFlyout>
+                    <MenuFlyout
+                        Placement="Bottom"
+                    >
+                        <MenuFlyoutItem 
+                            Command="{x:Bind ViewModel.AddLocalFavFileCommand}"
+                            Text="Выбрать на устройстве"
+                            Icon="{ui:FontIcon FontSize=14, Glyph=&#xEC50;}"
+                        />
+                    </MenuFlyout>
+                </controls:DoomItemList.HeaderFlyout>
+                <controls:DoomItemList.ItemTemplate>
+                    <DataTemplate x:DataType="x:String">
+                        <Grid
+                            ColumnDefinitions="*,Auto"
+                            ContextFlyout="{StaticResource flyoutFavFile}"
+                        >
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
                             >
-                                <TextBlock
-                                    Grid.Column="0"
-                                    VerticalAlignment="Center"
-                                >
-                                    <Run Text="{x:Bind local:FileHelper.IWadFileToTitle((x:String))}" />
-                                    <Run
-                                        Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                        Text="{x:Bind local:XamlHelper.IsDefaultText(vm:SettingsViewModel.Current.DefaultIWadFile, (x:String)), Mode=OneWay}"
-                                    />
-                                </TextBlock>
-                                <Button
-                                    Grid.Column="1"
-                                    Style="{ThemeResource EllipsisButton}"
-                                    Height="40"
-                                    Width="40"
-                                    Flyout="{StaticResource flyoutIWad}"
-                                    Content="{ui:FontIcon FontSize=14, Glyph=&#xE712;}"
+                                <Run Text="{x:Bind local:FileHelper.GetFileTitle((x:String))}" />
+                                <Run
+                                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                    Text="{x:Bind local:XamlHelper.IsDefaultText(vm:SettingsViewModel.Current.DefaultIWadFile, (x:String)), Mode=OneWay}"
                                 />
-                            </Grid>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </StackPanel>
+                            </TextBlock>
+                            <Button
+                                Grid.Column="1"
+                                Style="{ThemeResource EllipsisButton}"
+                                Height="40"
+                                Width="40"
+                                Flyout="{StaticResource flyoutFavFile}"
+                                Content="{ui:FontIcon FontSize=14, Glyph=&#xE712;}"
+                            />
+                        </Grid>
+                    </DataTemplate>
+                </controls:DoomItemList.ItemTemplate>
+            </controls:DoomItemList>
             <Grid
                 ColumnDefinitions="*,Auto"
                 CornerRadius="8"

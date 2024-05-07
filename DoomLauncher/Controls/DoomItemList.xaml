@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="DoomLauncher.Controls.DoomItemList"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="using:DoomLauncher"
+    mc:Ignorable="d">
+
+    <StackPanel
+        Orientation="Vertical"
+        CornerRadius="8"
+        HorizontalAlignment="Stretch"
+        Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
+        Padding="16"
+        Spacing="4"
+    >
+        <Grid ColumnDefinitions="*,Auto">
+            <TextBlock
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                Text="{x:Bind HeaderTitle}"
+                Style="{ThemeResource BaseTextBlockStyle}"
+                FontSize="16"
+            />
+            <DropDownButton Grid.Column="1" VerticalAlignment="Center" Flyout="{x:Bind HeaderFlyout}">
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <FontIcon FontSize="14" Glyph="&#xE710;" />
+                    <TextBlock>Добавить</TextBlock>
+                </StackPanel>
+            </DropDownButton>
+        </Grid>
+        <ListView
+            ItemsSource="{x:Bind ItemsSource}"
+            HorizontalAlignment="Stretch"
+            SelectionMode="None"
+            Margin="-16,0"
+            CanReorderItems="True"
+            AllowDrop="True"
+            ItemContainerTransitions="{StaticResource ListViewAnimations}"
+            ItemTemplate="{x:Bind ItemTemplate}"
+            Visibility="{x:Bind IsListItemsVisible, Mode=OneWay}"
+        />
+    </StackPanel>
+</UserControl>

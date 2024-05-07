@@ -100,7 +100,7 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
     }
 
     [RelayCommand]
-    private async Task RemoveFile(ModFileViewModel modFile)
+    private async Task RemoveModFile(ModFileViewModel modFile)
     {
         if (await DialogHelper.ShowAskAsync("Удаление ссылки на файл", $"Вы уверены, что хотите удалить ссылку на файл '{modFile.Title}'?", "Удалить", "Отмена"))
         {
@@ -108,7 +108,7 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
         }
     }
 
-    public async Task AddFiles(IReadOnlyList<StorageFile> files)
+    public async Task AddModFiles(IReadOnlyList<StorageFile> files)
     {
         foreach (var file in files)
         {
@@ -123,7 +123,7 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
     }
 
     [RelayCommand]
-    private async Task AddLocalFile()
+    private async Task AddLocalModFile()
     {
         var picker = new Windows.Storage.Pickers.FileOpenPicker();
 
@@ -139,7 +139,7 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
         var files = await picker.PickMultipleFilesAsync();
         if (files.Count > 0)
         {
-            await AddFiles(files);
+            await AddModFiles(files);
         }
     }
 

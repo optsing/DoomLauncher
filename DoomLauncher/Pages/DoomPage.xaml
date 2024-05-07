@@ -8,6 +8,7 @@
     xmlns:local="using:DoomLauncher"
     xmlns:vm="using:DoomLauncher.ViewModels"
     xmlns:converters="using:CommunityToolkit.WinUI.Converters"
+    xmlns:controls="using:DoomLauncher.Controls"
     d:DataContext="{d:DesignInstance Type=vm:DoomPageViewModel}"
     mc:Ignorable="d"
     Background="Transparent"
@@ -38,7 +39,7 @@
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE838;}"
             />
             <MenuFlyoutItem
-                Command="{x:Bind ViewModel.RemoveFileCommand}"
+                Command="{x:Bind ViewModel.RemoveModFileCommand}"
                 CommandParameter="{Binding}"
                 Text="Удалить ссылку на файл"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
@@ -58,67 +59,38 @@
                 Margin="16,8"
                 ChildrenTransitions="{StaticResource PageCardsAnimations}"
             >
-                <StackPanel
+                <controls:DoomItemList
                     Grid.Row="0"
-                    Orientation="Vertical"
-                    CornerRadius="8"
-                    HorizontalAlignment="Stretch"
+                    HeaderTitle="Файлы"
                     VerticalAlignment="Top"
-                    Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
-                    Padding="16"
-                    Spacing="4"
+                    ItemsSource="{x:Bind ViewModel.ModFileList}"
                 >
-                    <Grid ColumnDefinitions="*,Auto">
-                        <TextBlock
-                            Grid.Column="0"
-                            VerticalAlignment="Center"
-                            Text="Файлы"
-                            Style="{ThemeResource BaseTextBlockStyle}"
-                            FontSize="16"
+                    <controls:DoomItemList.HeaderFlyout>
+                        <MenuFlyout
+                            Placement="Bottom"
+                            Opening="MenuFlyout_Opening"
                         />
-                        <DropDownButton Grid.Column="1" VerticalAlignment="Center">
-                            <DropDownButton.Flyout>
-                                <MenuFlyout
-                                    Placement="Bottom"
-                                    Opening="MenuFlyout_Opening"
+                    </controls:DoomItemList.HeaderFlyout>
+                    <controls:DoomItemList.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ModFileViewModel">
+                            <Grid ColumnDefinitions="*,Auto" ContextFlyout="{StaticResource flyoutFile}">
+                                <TextBlock
+                                    Grid.Column="0"
+                                    Text="{x:Bind Title}"
+                                    VerticalAlignment="Center"
                                 />
-                            </DropDownButton.Flyout>
-                            <StackPanel Orientation="Horizontal" Spacing="4">
-                                <FontIcon FontSize="14" Glyph="&#xE710;" />
-                                <TextBlock>Добавить</TextBlock>
-                            </StackPanel>
-                        </DropDownButton>
-                    </Grid>
-                    <ListView 
-                        SelectionMode="None"
-                        CanReorderItems="True"
-                        AllowDrop="True"
-                        ItemsSource="{x:Bind ViewModel.ModFileList}"
-                        Margin="-16,0"
-                        Visibility="{x:Bind local:XamlHelper.HasItems(ViewModel.ModFileList.Count), Mode=OneWay}"
-                        ItemContainerTransitions="{StaticResource ListViewAnimations}"
-                    >
-                        <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="vm:ModFileViewModel">
-                                <Grid ColumnDefinitions="*,Auto" ContextFlyout="{StaticResource flyoutFile}">
-                                    <TextBlock
-                                        Grid.Column="0"
-                                        Text="{x:Bind Title}"
-                                        VerticalAlignment="Center"
-                                    />
-                                    <Button
-                                        Grid.Column="1"
-                                        Style="{ThemeResource EllipsisButton}"
-                                        Height="40"
-                                        Width="40"
-                                        Flyout="{StaticResource flyoutFile}"
-                                        Content="{ui:FontIcon FontSize=14, Glyph=&#xE712;}"
-                                    />
-                                </Grid>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                </StackPanel>
+                                <Button
+                                    Grid.Column="1"
+                                    Style="{ThemeResource EllipsisButton}"
+                                    Height="40"
+                                    Width="40"
+                                    Flyout="{StaticResource flyoutFile}"
+                                    Content="{ui:FontIcon FontSize=14, Glyph=&#xE712;}"
+                                />
+                            </Grid>
+                        </DataTemplate>
+                    </controls:DoomItemList.ItemTemplate>
+                </controls:DoomItemList>
                 <Border
                     Grid.Row="1"
                     CornerRadius="8"
@@ -126,7 +98,6 @@
                     Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
                 >
                     <TextBlock
-                        Grid.Column="0"
                         FontSize="16"
                         VerticalAlignment="Center"
                         Margin="16"
