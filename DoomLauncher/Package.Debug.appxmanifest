@@ -4,6 +4,7 @@
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  xmlns:uap2="http://schemas.microsoft.com/appx/manifest/uap/windows10/2"
   xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3"
   xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
   xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
@@ -12,7 +13,7 @@
   <Identity
     Name="optsi.GZDoomLauncherDebug"
     Publisher="CN=optsi"
-    Version="1.1.9.0" />
+    Version="1.1.10.0" />
 
   <!--<mp:PhoneIdentity
 	PhoneProductId="1bcbad53-0b76-4d23-96a8-5c1882ca8b8e"
@@ -52,7 +53,7 @@
 		  </uap3:AppExecutionAlias>
 		</uap3:Extension>
 		  <uap:Extension Category="windows.fileTypeAssociation">
-			  <uap:FileTypeAssociation Name="modsets">
+			  <uap:FileTypeAssociation Name="gzdl">
 				  <uap:SupportedFileTypes>
 					  <uap:FileType>.gzdl</uap:FileType>
 				  </uap:SupportedFileTypes>

@@ -57,7 +57,7 @@ public partial class SettingsPageViewModel : ObservableObject
         {
             foreach (var asset in entry.Assets)
             {
-                if (asset.Name.EndsWith(".zip") && !asset.Name.Contains("macOS") && !asset.Name.Contains("ci_deps") && !asset.Name.Contains("AppImage"))
+                if (asset.Name.EndsWith(".zip") && !asset.Name.Contains("macOS") && !asset.Name.Contains("macos") && !asset.Name.Contains("ci_deps") && !asset.Name.Contains("AppImage"))
                 {
                     var isLegacy = asset.Name.Contains("legacy");
                     AssetArch arch;

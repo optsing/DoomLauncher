@@ -34,27 +34,12 @@ static class XamlHelper
 
     public static string TimeSpanToText(TimeSpan? time)
     {
-        return time?.ToString(@"hh\:mm") ?? "Неизвестно";
-    }
-
-    public static string FileInFavoritesGlyph(Collection<string> list, string value)
-    {
-        return list.Contains(value) ? "\uE734" : "\uE735";
-    }
-
-    public static string FileInFavoritesTooltip(Collection<string> list, string value)
-    {
-        return list.Contains(value) ? "Убрать из избранного" : "Добавить в избранное";
+        return time?.Humanize() ?? "Неизвестно";
     }
 
     public static string IsDefaultText(object value1, object value2)
     {
         return Equals(value1, value2) ? " по умолчанию" : "";
-    }
-
-    public static string SlideshowGlyph(bool isSlideshow)
-    {
-        return isSlideshow ? "\uE769" : "\uE768";
     }
 
     public static string EntryTooltip(string firstLine, string secondLine)

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace DoomLauncher.ViewModels;
@@ -32,7 +33,7 @@ public class DoomEntryViewModel : ObservableObject
     public bool Slideshow { get; set; } = true;
 
     public ObservableCollection<string> ImageFiles { get; set; } = [];
-    public ObservableCollection<string> ModFiles { get; set; } = [];
+    public List<string> ModFiles { get; set; } = [];
 
     public DateTime? Created { get => created; set => SetProperty(ref created, value); }
     private DateTime? created = null;
