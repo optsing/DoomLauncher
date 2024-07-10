@@ -16,7 +16,11 @@ internal class JumpListHelper
 
         jumpList.SystemGroupKind = JumpListSystemGroupKind.None;
 
-        foreach (var entry in SettingsViewModel.Current.Entries.Where(entry => entry.LastLaunch != null).OrderByDescending(entry => entry.LastLaunch))
+        var entries = SettingsViewModel.Current.Entries
+            .Where(entry => entry.LastLaunch != null)
+            .OrderByDescending(entry => entry.LastLaunch);
+
+        foreach (var entry in entries)
         {
             JumpListItem item = JumpListItem.CreateWithArguments($"launch --id {entry.Id}", entry.Name);
             item.GroupName = "Последние запущенные";
