@@ -9,29 +9,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoomLauncher", "DoomLaunche
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|ARM64 = Debug|ARM64
 		Debug|x64 = Debug|x64
-		Release|ARM64 = Release|ARM64
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{78C39F78-C33B-466E-A1BC-9C3D12B02A87}.Debug|ARM64.ActiveCfg = Debug|ARM64
-		{78C39F78-C33B-466E-A1BC-9C3D12B02A87}.Debug|ARM64.Build.0 = Debug|ARM64
 		{78C39F78-C33B-466E-A1BC-9C3D12B02A87}.Debug|x64.ActiveCfg = Debug|x64
 		{78C39F78-C33B-466E-A1BC-9C3D12B02A87}.Debug|x64.Build.0 = Debug|x64
-		{78C39F78-C33B-466E-A1BC-9C3D12B02A87}.Release|ARM64.ActiveCfg = Release|ARM64
-		{78C39F78-C33B-466E-A1BC-9C3D12B02A87}.Release|ARM64.Build.0 = Release|ARM64
 		{78C39F78-C33B-466E-A1BC-9C3D12B02A87}.Release|x64.ActiveCfg = Release|x64
 		{78C39F78-C33B-466E-A1BC-9C3D12B02A87}.Release|x64.Build.0 = Release|x64
-		{C0963252-8DC3-4B5A-9555-FFE1E6FC5BAC}.Debug|ARM64.ActiveCfg = Debug|ARM64
-		{C0963252-8DC3-4B5A-9555-FFE1E6FC5BAC}.Debug|ARM64.Build.0 = Debug|ARM64
-		{C0963252-8DC3-4B5A-9555-FFE1E6FC5BAC}.Debug|ARM64.Deploy.0 = Debug|ARM64
 		{C0963252-8DC3-4B5A-9555-FFE1E6FC5BAC}.Debug|x64.ActiveCfg = Debug|x64
 		{C0963252-8DC3-4B5A-9555-FFE1E6FC5BAC}.Debug|x64.Build.0 = Debug|x64
 		{C0963252-8DC3-4B5A-9555-FFE1E6FC5BAC}.Debug|x64.Deploy.0 = Debug|x64
-		{C0963252-8DC3-4B5A-9555-FFE1E6FC5BAC}.Release|ARM64.ActiveCfg = Release|ARM64
-		{C0963252-8DC3-4B5A-9555-FFE1E6FC5BAC}.Release|ARM64.Build.0 = Release|ARM64
-		{C0963252-8DC3-4B5A-9555-FFE1E6FC5BAC}.Release|ARM64.Deploy.0 = Release|ARM64
 		{C0963252-8DC3-4B5A-9555-FFE1E6FC5BAC}.Release|x64.ActiveCfg = Release|x64
 		{C0963252-8DC3-4B5A-9555-FFE1E6FC5BAC}.Release|x64.Build.0 = Release|x64
 		{C0963252-8DC3-4B5A-9555-FFE1E6FC5BAC}.Release|x64.Deploy.0 = Release|x64
