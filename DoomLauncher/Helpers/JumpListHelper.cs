@@ -1,11 +1,10 @@
 ﻿using DoomLauncher.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.UI.StartScreen;
 
-namespace DoomLauncher;
+namespace DoomLauncher.Helpers;
 
 internal class JumpListHelper
 {

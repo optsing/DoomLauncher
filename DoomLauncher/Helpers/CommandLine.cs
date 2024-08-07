@@ -1,36 +1,50 @@
-﻿using CommandLine;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.CommandLine;
 
-namespace DoomLauncher;
+namespace DoomLauncher.Helpers;
 
-[Verb("launch", HelpText = "Launch entry on app start")]
 public class LaunchOptions
 {
-    [Option("id", Group = "Entry", HelpText = "Entry id to launch")]
     public string? EntryId { get; set; }
-
-    [Option("name", Group = "Entry", HelpText = "Entry name to launch")]
     public string? EntryName { get; set; }
-
-    [Option("force-close", Required = false, HelpText = "Force close after launch")]
     public bool ForceClose { get; set; }
 }
 
 internal static class CommandLine
 {
-
-    public static LaunchOptions? ParseCommandLine(string commandline)
+    public static LaunchOptions? ParseCommandLine(string commandLine)
     {
-        var args = WinApi.CommandLineToArgs(commandline);
-        if (Parser.Default.ParseArguments<LaunchOptions>(args) is Parsed<LaunchOptions> result)
+        var idOption = new Option<string?>("--id", "Entry id to launch");
+        var nameOption = new Option<string?>("--name", "Entry name to launch");
+        var forceCloseOption = new Option<bool>("--force-close", "Force close after launch");
+        var launchCommand = new Command("launch", "Launch entry on app start")
         {
-            return result.Value;
-        }
-        return null;
+            idOption,
+            nameOption,
+            forceCloseOption,
+        };
+        var rootCommand = new RootCommand
+        {
+            launchCommand,
+        };
+
+        rootCommand.TreatUnmatchedTokensAsErrors = false;
+
+        LaunchOptions? result = null;
+
+        launchCommand.SetHandler(
+            (id, name, forceClose) => {
+                result = new()
+                {
+                    EntryId = id,
+                    EntryName = name,
+                    ForceClose = forceClose,
+                };
+            },
+            idOption, nameOption, forceCloseOption
+        );
+
+        rootCommand.Invoke(commandLine);
+
+        return result;
     }
 }
-
