@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 
@@ -54,6 +53,7 @@ public partial class SettingsPageViewModel : ObservableObject
         EventBus.Progress(this, "Получение списка версий");
         var entries = await WebAPI.Current.GetGZDoomGitHubReleases();
         var onlinePackages = new List<DoomPackageViewModel>();
+        var nox86Version = new Version(4, 8, 0);
         foreach (var entry in entries)
         {
             foreach (var asset in entry.Assets)
@@ -61,20 +61,20 @@ public partial class SettingsPageViewModel : ObservableObject
                 if (asset.Name.EndsWith(".zip") && !asset.Name.Contains("macOS") && !asset.Name.Contains("macos") && !asset.Name.Contains("ci_deps") && !asset.Name.Contains("AppImage"))
                 {
                     var isLegacy = asset.Name.Contains("legacy");
+                    var version = FileHelper.ParseVersion(asset.Name);
                     AssetArch arch;
                     if (asset.Name.Contains("arm64"))
                     {
                         arch = AssetArch.arm64;
                     }
-                    else if (!asset.Name.Contains("64bit") && !asset.Name.Contains("x64"))
-                    {
-                        arch = isLegacy ? AssetArch.x86legacy : AssetArch.x86;
-                    }
-                    else
+                    else if (version >= nox86Version || asset.Name.Contains("64bit") || asset.Name.Contains("x64"))
                     {
                         arch = isLegacy ? AssetArch.x64legacy : AssetArch.x64;
                     }
-                    var version = FileHelper.ParseVersion(asset.Name);
+                    else
+                    {
+                        arch = isLegacy ? AssetArch.x86legacy : AssetArch.x86;
+                    }
                     if (!SettingsViewModel.Current.GZDoomInstalls.Any(package => package.Version == version && package.Arch == arch))
                     {
                         var newAsset = new DoomPackageViewModel()
