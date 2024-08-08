@@ -7,7 +7,12 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+
+#if IS_NON_PACKAGED
+using System.Reflection;
+#else
 using Windows.ApplicationModel;
+#endif
 
 namespace DoomLauncher.ViewModels;
 

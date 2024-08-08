@@ -32,6 +32,7 @@
 		<Platforms>x64;ARM64</Platforms>
 		 <!--<WindowsPackageType>None</WindowsPackageType>-->
 		<AppendPlatformToOutputPath>false</AppendPlatformToOutputPath>
+		<AppxPackageDir>AppPackages</AppxPackageDir>
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(WindowsPackageType)' != 'None'">	
