@@ -13,7 +13,7 @@ internal partial class JsonSettingsContext : JsonSerializerContext
 {
 }
 
-public class SettingsViewModel : ObservableObject
+public partial class SettingsViewModel : ObservableObject
 {
     public static bool IsCustomTitleBar = false;
 

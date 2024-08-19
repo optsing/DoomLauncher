@@ -5,7 +5,7 @@ using System.Collections.ObjectModel;
 
 namespace DoomLauncher.ViewModels;
 
-public class DoomEntryViewModel : ObservableObject
+public partial class DoomEntryViewModel : ObservableObject
 {
     public string Name { get => name; set => SetProperty(ref name, value); }
     private string name = "";

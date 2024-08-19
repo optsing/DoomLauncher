@@ -21,7 +21,7 @@ public class AssetArchJsonConverter : JsonConverter<AssetArch>
 }
 
 
-public class DoomPackageViewModel : ObservableObject
+public partial class DoomPackageViewModel : ObservableObject
 {
     public string Path { get; set; } = "";
 
