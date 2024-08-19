@@ -28,22 +28,18 @@ internal static class LaunchHelper
         {
             return LaunchResult.PathNotValid;
         }
-        ProcessStartInfo processInfo;
+        var processInfo = new ProcessStartInfo();
         var steamAppId = FileHelper.GetSteamAppIdForEntry(entry);
         if (steamAppId == 0)
         {
-            processInfo = new()
-            {
-                FileName = gZDoomPath,
-                WorkingDirectory = Path.GetDirectoryName(gZDoomPath),
-            };
+            processInfo.FileName = gZDoomPath;
+            processInfo.WorkingDirectory = Path.GetDirectoryName(gZDoomPath);
         }
         else
         {
-            processInfo = new()
-            {
-                FileName = "RunAsSteamGame.exe",
-            };
+            processInfo.FileName = "RunAsSteamGame.exe";
+            processInfo.UseShellExecute = false;
+            processInfo.CreateNoWindow = true;
             processInfo.ArgumentList.Add(steamAppId.ToString());
             processInfo.ArgumentList.Add(gZDoomPath);
         }
