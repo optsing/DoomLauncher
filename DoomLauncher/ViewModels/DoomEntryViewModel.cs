@@ -32,7 +32,7 @@ public partial class DoomEntryViewModel : ObservableObject
 
     public bool Slideshow { get; set; } = true;
 
-    public ObservableCollection<string> ImageFiles { get; set; } = [];
+    public List<string> ImageFiles { get; set; } = [];
     public List<string> ModFiles { get; set; } = [];
 
     public DateTime? Created { get => created; set => SetProperty(ref created, value); }

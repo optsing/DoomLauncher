@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -21,6 +22,27 @@ public partial class ModFileViewModel(string filePath, bool isInFavorites) : Obs
     private bool isInFavorites = isInFavorites;
 }
 
+public partial class ImageFileViewModel : ObservableObject
+{
+    public string Path { get; }
+
+    public string FullPath => System.IO.Path.GetFullPath(Path, FileHelper.ImagesFolderPath);
+
+    [ObservableProperty]
+    private BitmapImage? image = null;
+
+    public ImageFileViewModel(string imagePath)
+    {
+        Path = imagePath;
+        LoadBitmap();
+    }
+
+    private async void LoadBitmap()
+    {
+        Image = await BitmapHelper.CreateBitmapFromFile(FullPath, isPreview: true);
+    }
+}
+
 public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableObject
 {
     public DoomEntryViewModel Entry = new();
@@ -34,6 +56,7 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
     public readonly ObservableCollection<string> FavoriteFiles = settings.FavoriteFiles;
 
     public ObservableCollection<ModFileViewModel> ModFileList { get; } = [];
+    public ObservableCollection<ImageFileViewModel> ImageFileList { get; } = [];
 
     [ObservableProperty]
     private int currentTicksToSlideshow;
@@ -73,6 +96,11 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
         foreach (var filePath in entry.ModFiles)
         {
             ModFileList.Add(new(filePath, FavoriteFiles.Contains(filePath)));
+        }
+        ImageFileList.Clear();
+        foreach (var imagePath in entry.ImageFiles)
+        {
+            ImageFileList.Add(new(imagePath));
         }
         SetSlideshow();
         SetSelectedImageIndex(entry.SelectedImageIndex, direction: AnimationDirection.None);
@@ -150,16 +178,16 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
         {
             EventBus.Progress(this, $"Копирование: {file.Name}");
             await FileHelper.CopyFileWithConfirmation(file, FileHelper.ImagesFolderPath);
-            if (!Entry.ImageFiles.Contains(file.Name))
+            if (!ImageFileList.Any(imageFile => imageFile.Path == file.Name))
             {
-                Entry.ImageFiles.Add(file.Name);
+                ImageFileList.Add(new(file.Name));
                 hasAddedImages = true;
             }
         }
         EventBus.Progress(this, null);
         if (hasAddedImages)
         {
-            SetSelectedImageIndex(Entry.ImageFiles.Count - 1, direction: AnimationDirection.Next);
+            SetSelectedImageIndex(ImageFileList.Count - 1, direction: AnimationDirection.Next);
             SetSlideshow();
         }
     }
@@ -188,13 +216,13 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
     [RelayCommand]
     private async Task RemoveBackground()
     {
-        if (Entry.SelectedImageIndex >= 0 && Entry.SelectedImageIndex < Entry.ImageFiles.Count)
+        if (Entry.SelectedImageIndex >= 0 && Entry.SelectedImageIndex < ImageFileList.Count)
         {
             IsSlideshowEnabled = false;
             var selectedImageIndex = Entry.SelectedImageIndex;
             if (await DialogHelper.ShowAskAsync("Удаление фона", $"Вы уверены, что хотите удалить текущий фон?", "Удалить", "Отмена"))
             {
-                Entry.ImageFiles.RemoveAt(selectedImageIndex);
+                ImageFileList.RemoveAt(selectedImageIndex);
                 SetSelectedImageIndex(selectedImageIndex, direction: AnimationDirection.Next);
             }
             SetSlideshow();
@@ -215,19 +243,18 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
 
     private void SetSelectedImageIndex(int ind, AnimationDirection direction)
     {
-        if (Entry.ImageFiles.Count > 0)
+        if (ImageFileList.Count > 0)
         {
             if (ind < 0)
             {
-                ind = Entry.ImageFiles.Count - 1;
+                ind = ImageFileList.Count - 1;
             }
-            else if (ind >= Entry.ImageFiles.Count)
+            else if (ind >= ImageFileList.Count)
             {
                 ind = 0;
             }
             Entry.SelectedImageIndex = ind;
-            var imagePath = Path.GetFullPath(Entry.ImageFiles[Entry.SelectedImageIndex], FileHelper.ImagesFolderPath);
-            EventBus.ChangeBackground(this, imagePath, direction);
+            EventBus.ChangeBackground(this, ImageFileList[Entry.SelectedImageIndex].FullPath, direction);
         }
         else
         {
@@ -238,7 +265,7 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
 
     private void SetSlideshow()
     {
-        IsSlideshowEnabled = Entry.Slideshow && Entry.ImageFiles.Count > 1;
+        IsSlideshowEnabled = Entry.Slideshow && ImageFileList.Count > 1;
     }
 
     [RelayCommand]

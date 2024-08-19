@@ -112,7 +112,7 @@ public sealed partial class RootPage : Page
     private async void EventBus_OnChangeBackground(object? sender, (string? imagePath, AnimationDirection direction) e)
     {
         await semaphoreAnimation.WaitAsync();
-        var bitmap = string.IsNullOrEmpty(e.imagePath) ? null : await BitmapHelper.CreateBitmapFromFile(e.imagePath);
+        var bitmap = string.IsNullOrEmpty(e.imagePath) ? null : await BitmapHelper.CreateBitmapFromFile(e.imagePath, isPreview: false);
         bool hasPrevBitmap = ViewModel.Background != null;
         if (hasPrevBitmap)
         {

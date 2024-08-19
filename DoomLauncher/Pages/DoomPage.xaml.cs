@@ -44,6 +44,7 @@ public sealed partial class DoomPage : Page
         ViewModel.SlideshowTimer.Interval = ViewModel.SlideshowInterval;
         ViewModel.SlideshowTimer.Tick += ViewModel.Timer_Tick;
         ViewModel.ModFileList.CollectionChanged += ModFileList_CollectionChanged;
+        ViewModel.ImageFileList.CollectionChanged += ImageFileList_CollectionChanged;  
     }
 
     private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -54,11 +55,17 @@ public sealed partial class DoomPage : Page
         ViewModel.SlideshowTimer.Tick -= ViewModel.Timer_Tick;
         ViewModel.SlideshowTimer.Stop();
         ViewModel.ModFileList.CollectionChanged -= ModFileList_CollectionChanged;
+        ViewModel.ImageFileList.CollectionChanged -= ImageFileList_CollectionChanged;
     }
 
     private void ModFileList_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
         ViewModel.Entry.ModFiles = ViewModel.ModFileList.Select(modFile => modFile.Path).ToList();
+    }
+
+    private void ImageFileList_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        ViewModel.Entry.ImageFiles = ViewModel.ImageFileList.Select(imageFile => imageFile.Path).ToList();
     }
 
     private void MenuFlyout_Opening(object sender, object e)

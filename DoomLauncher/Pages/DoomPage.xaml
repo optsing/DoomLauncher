@@ -47,7 +47,7 @@
         </MenuFlyout>
     </Page.Resources>
     <Grid
-        RowDefinitions="*,Auto"
+        RowDefinitions="*,Auto,Auto"
     >
         <ScrollView
             Grid.Row="0"
@@ -131,8 +131,39 @@
                 </ScrollView>
             </Grid>
         </ScrollView>
+        <ListView
+            Grid.Row="1" 
+            ItemsSource="{x:Bind ViewModel.ImageFileList}"
+            Margin="16,8"
+            ScrollViewer.HorizontalScrollBarVisibility="Auto"
+            ScrollViewer.HorizontalScrollMode="Enabled"
+            ScrollViewer.VerticalScrollMode="Disabled"
+            SelectionMode="None"
+            HorizontalAlignment="Center"
+            CanReorderItems="True"
+            AllowDrop="True"
+        >
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="CornerRadius" Value="8" />
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" Spacing="4" />
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="vm:ImageFileViewModel">
+                    <Border CornerRadius="8" Width="192" Height="144">
+                        <Image Source="{x:Bind Image, Mode=OneWay}" Stretch="UniformToFill" />
+                    </Border>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
         <StackPanel
-            Grid.Row="1"
+            Grid.Row="2"
             Orientation="Horizontal"
             HorizontalAlignment="Right"
         >
