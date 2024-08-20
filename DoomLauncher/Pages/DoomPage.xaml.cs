@@ -206,4 +206,16 @@ public sealed partial class DoomPage : Page
             Console.Error.WriteLine(ex);
         }
     }
+
+    private void ListView_ItemClick(object sender, ItemClickEventArgs e)
+    {
+        if (e.ClickedItem is ImageFileViewModel imageFile)
+        {
+            var ind = ViewModel.ImageFileList.IndexOf(imageFile);
+            if (ind != ViewModel.Entry.SelectedImageIndex && ind > -1)
+            {
+                ViewModel.SetSelectedImageIndex(ind, ind > ViewModel.Entry.SelectedImageIndex ? AnimationDirection.Next : AnimationDirection.Previous);
+            }
+        }
+    }
 }

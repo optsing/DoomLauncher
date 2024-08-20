@@ -214,19 +214,22 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
     }
 
     [RelayCommand]
-    private async Task RemoveBackground()
+    private static void OpenImageContainingFolder(ImageFileViewModel imageFile)
     {
-        if (Entry.SelectedImageIndex >= 0 && Entry.SelectedImageIndex < ImageFileList.Count)
+        Process.Start("explorer.exe", "/select," + imageFile.FullPath);
+    }
+
+    [RelayCommand]
+    private async Task RemoveImageFile(ImageFileViewModel imageFile)
+    {
+        IsSlideshowEnabled = false;
+        if (await DialogHelper.ShowAskAsync("Удаление фона", $"Вы уверены, что хотите удалить выбранный фон?", "Удалить", "Отмена"))
         {
-            IsSlideshowEnabled = false;
             var selectedImageIndex = Entry.SelectedImageIndex;
-            if (await DialogHelper.ShowAskAsync("Удаление фона", $"Вы уверены, что хотите удалить текущий фон?", "Удалить", "Отмена"))
-            {
-                ImageFileList.RemoveAt(selectedImageIndex);
-                SetSelectedImageIndex(selectedImageIndex, direction: AnimationDirection.Next);
-            }
-            SetSlideshow();
+            ImageFileList.Remove(imageFile);
+            SetSelectedImageIndex(selectedImageIndex, direction: AnimationDirection.Next);
         }
+        SetSlideshow();
     }
 
     [RelayCommand]
@@ -241,7 +244,7 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
         SetSelectedImageIndex(Entry.SelectedImageIndex + 1, direction: AnimationDirection.Next);
     }
 
-    private void SetSelectedImageIndex(int ind, AnimationDirection direction)
+    public void SetSelectedImageIndex(int ind, AnimationDirection direction)
     {
         if (ImageFileList.Count > 0)
         {

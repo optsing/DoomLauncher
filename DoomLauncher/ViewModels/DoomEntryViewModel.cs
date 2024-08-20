@@ -28,7 +28,8 @@ public partial class DoomEntryViewModel : ObservableObject
 
     public string Id { get; set; } = "";
 
-    public int SelectedImageIndex { get; set; } = 0;
+    public int SelectedImageIndex { get => selectedImageIndex; set => SetProperty(ref selectedImageIndex, value); }
+    private int selectedImageIndex = 0;
 
     public bool Slideshow { get; set; } = true;
 
