@@ -155,7 +155,8 @@
         </ScrollView>
         <ListView
             Grid.Row="1" 
-            Margin="0,8"
+            Margin="0,8,0,0"
+            Padding="0,0,0,16"
             HorizontalAlignment="Center"
             ItemsSource="{x:Bind ViewModel.ImageFileList}"
             SelectedIndex="{x:Bind ViewModel.Entry.SelectedImageIndex, Mode=OneWay}"
@@ -166,7 +167,7 @@
             CanReorderItems="True"
             AllowDrop="True"
             IsItemClickEnabled="True"
-            ItemClick="ListView_ItemClick"
+            ItemClick="ListView_ItemClick"        
         >
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
