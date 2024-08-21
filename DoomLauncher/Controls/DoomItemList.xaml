@@ -27,7 +27,7 @@
             <DropDownButton Grid.Column="1" VerticalAlignment="Center" Flyout="{x:Bind HeaderFlyout}">
                 <StackPanel Orientation="Horizontal" Spacing="4">
                     <FontIcon FontSize="14" Glyph="&#xE710;" />
-                    <TextBlock>Добавить</TextBlock>
+                    <TextBlock Text="{x:Bind HeaderButtonTitle}"/>
                 </StackPanel>
             </DropDownButton>
         </Grid>

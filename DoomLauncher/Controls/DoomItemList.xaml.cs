@@ -18,6 +18,11 @@ public sealed partial class DoomItemList : UserControl
     public static readonly DependencyProperty HeaderTitleProperty =
         DependencyProperty.Register(nameof(HeaderTitle), typeof(string), typeof(DoomItemList), new PropertyMetadata(""));
 
+    public string HeaderButtonTitle { get => (string)GetValue(HeaderButtonProperty); set => SetValue(HeaderButtonProperty, value); }
+
+    public static readonly DependencyProperty HeaderButtonProperty =
+        DependencyProperty.Register(nameof(HeaderButtonTitle), typeof(string), typeof(DoomItemList), new PropertyMetadata(""));
+
     public FlyoutBase HeaderFlyout { get => (FlyoutBase)GetValue(HeaderFlyoutProperty); set => SetValue(HeaderFlyoutProperty, value); }
 
     public static readonly DependencyProperty HeaderFlyoutProperty =

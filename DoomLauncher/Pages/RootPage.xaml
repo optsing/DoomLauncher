@@ -11,6 +11,7 @@
     xmlns:vm="using:DoomLauncher.ViewModels"
     xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
     mc:Ignorable="d"
+    XYFocusKeyboardNavigation="Enabled"
 >
     <Page.Resources>
         <converters:EmptyObjectToObjectConverter x:Key="NullVisibilityConverter" NotEmptyValue="Visible" EmptyValue="Collapsed" />

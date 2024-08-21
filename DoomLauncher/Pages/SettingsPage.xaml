@@ -76,6 +76,7 @@
         >
             <controls:DoomItemList
                 HeaderTitle="Установленные GZDoom"
+                HeaderButtonTitle="Добавить"
                 ItemsSource="{x:Bind vm:SettingsViewModel.Current.GZDoomInstalls}"
             >
                 <controls:DoomItemList.HeaderFlyout>
@@ -121,6 +122,7 @@
             </controls:DoomItemList>
             <controls:DoomItemList
                 HeaderTitle="Установленные iWad"
+                HeaderButtonTitle="Добавить"
                 ItemsSource="{x:Bind vm:SettingsViewModel.Current.IWadFiles}"
             >
                 <controls:DoomItemList.HeaderFlyout>
@@ -164,6 +166,7 @@
             </controls:DoomItemList>
             <controls:DoomItemList
                 HeaderTitle="Избранные файлы"
+                HeaderButtonTitle="Добавить"
                 ItemsSource="{x:Bind vm:SettingsViewModel.Current.FavoriteFiles}"
             >   
                 <controls:DoomItemList.HeaderFlyout>

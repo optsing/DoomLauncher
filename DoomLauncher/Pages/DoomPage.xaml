@@ -84,6 +84,7 @@
                 <controls:DoomItemList
                     Grid.Row="0"
                     HeaderTitle="Файлы"
+                    HeaderButtonTitle="Добавить"
                     VerticalAlignment="Top"
                     ItemsSource="{x:Bind ViewModel.ModFileList}"
                 >
