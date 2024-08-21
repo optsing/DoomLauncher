@@ -134,6 +134,11 @@
                             Text="Выбрать на устройстве"
                             Icon="{ui:FontIcon FontSize=14, Glyph=&#xEC50;}"
                         />
+                        <MenuFlyoutItem 
+                            Command="{x:Bind ViewModel.AddFreedoomIWadFromGitHubCommand}"
+                            Text="Скачать Freedoom"
+                            Icon="{ui:FontIcon FontSize=14, Glyph=&#xE896;}"
+                        />
                     </MenuFlyout>
                 </controls:DoomItemList.HeaderFlyout>
                 <controls:DoomItemList.ItemTemplate>

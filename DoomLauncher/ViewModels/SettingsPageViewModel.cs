@@ -18,6 +18,8 @@ namespace DoomLauncher.ViewModels;
 
 public partial class SettingsPageViewModel : ObservableObject
 {
+    private const string FreedoomVersion = "0.13.0";
+
     public SettingsPageViewModel()
     {
 #if IS_NON_PACKAGED
@@ -187,6 +189,38 @@ public partial class SettingsPageViewModel : ObservableObject
             }
         }
         EventBus.Progress(this, null);
+    }
+
+    [RelayCommand]
+    private async Task AddFreedoomIWadFromGitHub()
+    {
+        if (await DialogHelper.ShowAskAsync("Скачать Freedoom", $"Вы уверены, что хотите скачать Freedoom версии {FreedoomVersion}?", "Скачать", "Отмена"))
+        {
+            EventBus.Progress(this, "Загрузка и извлечение архива");
+            try
+            {
+                using var stream = await WebAPI.Current.DownloadUrl($"https://github.com/freedoom/freedoom/releases/download/v{FreedoomVersion}/freedoom-{FreedoomVersion}.zip");
+                using var zipArchive = new ZipArchive(stream, ZipArchiveMode.Read);
+                foreach (var zipEntry in zipArchive.Entries)
+                {
+                    if (zipEntry.Name == "freedoom1.wad" || zipEntry.Name == "freedoom2.wad")
+                    {
+                        EventBus.Progress(this, $"Извлечение: {zipEntry.Name}");
+                        using var fileStream = zipEntry.Open();
+                        await FileHelper.CopyFileWithConfirmation(fileStream, zipEntry.Name, FileHelper.IWadFolderPath);
+                        if (!SettingsViewModel.Current.IWadFiles.Contains(zipEntry.Name))
+                        {
+                            SettingsViewModel.Current.IWadFiles.Add(zipEntry.Name);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex);
+            }
+            EventBus.Progress(this, null);
+        }
     }
 
     [RelayCommand]

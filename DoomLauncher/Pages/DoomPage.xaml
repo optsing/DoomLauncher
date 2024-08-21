@@ -156,8 +156,7 @@
         </ScrollView>
         <ListView
             Grid.Row="1" 
-            Margin="0,8,0,0"
-            Padding="0,0,0,16"
+            Padding="0,8,0,16"
             HorizontalAlignment="Center"
             ItemsSource="{x:Bind ViewModel.ImageFileList}"
             SelectedIndex="{x:Bind ViewModel.Entry.SelectedImageIndex, Mode=OneWay}"
