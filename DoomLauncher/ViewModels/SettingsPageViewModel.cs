@@ -19,6 +19,8 @@ namespace DoomLauncher.ViewModels;
 public partial class SettingsPageViewModel : ObservableObject
 {
     private const string FreedoomVersion = "0.13.0";
+    private const string FreedoomDownloadUrl = $"https://github.com/freedoom/freedoom/releases/download/v{FreedoomVersion}/freedoom-{FreedoomVersion}.zip";
+    private const string FreedoomSubfolder = $"freedoom-{FreedoomVersion}/";
     private readonly string[] FreedoomIWads = ["freedoom1.wad", "freedoom2.wad"];
 
     public SettingsPageViewModel()
@@ -200,12 +202,12 @@ public partial class SettingsPageViewModel : ObservableObject
             EventBus.Progress(this, "Загрузка и извлечение архива");
             try
             {
-                using var stream = await WebAPI.Current.DownloadUrl($"https://github.com/freedoom/freedoom/releases/download/v{FreedoomVersion}/freedoom-{FreedoomVersion}.zip");
+                using var stream = await WebAPI.Current.DownloadUrl(FreedoomDownloadUrl);
                 using var zipArchive = new ZipArchive(stream, ZipArchiveMode.Read);
                 var zipEntries = new List<ZipArchiveEntry>();
                 foreach (var name in FreedoomIWads)
                 {
-                    var zipEntry = zipArchive.GetEntry(name) ?? throw new Exception($"File '{name}' not found in archive");
+                    var zipEntry = zipArchive.GetEntry(FreedoomSubfolder + name) ?? throw new Exception($"File '{name}' not found in archive");
                     zipEntries.Add(zipEntry);
                 }
                 foreach (var zipEntry in zipEntries)
