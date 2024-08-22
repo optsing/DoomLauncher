@@ -19,6 +19,7 @@ namespace DoomLauncher.ViewModels;
 public partial class SettingsPageViewModel : ObservableObject
 {
     private const string FreedoomVersion = "0.13.0";
+    private readonly string[] FreedoomIWads = ["freedoom1.wad", "freedoom2.wad"];
 
     public SettingsPageViewModel()
     {
@@ -201,17 +202,20 @@ public partial class SettingsPageViewModel : ObservableObject
             {
                 using var stream = await WebAPI.Current.DownloadUrl($"https://github.com/freedoom/freedoom/releases/download/v{FreedoomVersion}/freedoom-{FreedoomVersion}.zip");
                 using var zipArchive = new ZipArchive(stream, ZipArchiveMode.Read);
-                foreach (var zipEntry in zipArchive.Entries)
+                var zipEntries = new List<ZipArchiveEntry>();
+                foreach (var name in FreedoomIWads)
                 {
-                    if (zipEntry.Name == "freedoom1.wad" || zipEntry.Name == "freedoom2.wad")
+                    var zipEntry = zipArchive.GetEntry(name) ?? throw new Exception($"File '{name}' not found in archive");
+                    zipEntries.Add(zipEntry);
+                }
+                foreach (var zipEntry in zipEntries)
+                {
+                    EventBus.Progress(this, $"Извлечение: {zipEntry.Name}");
+                    using var fileStream = zipEntry.Open();
+                    await FileHelper.CopyFileWithConfirmation(fileStream, zipEntry.Name, FileHelper.IWadFolderPath);
+                    if (!SettingsViewModel.Current.IWadFiles.Contains(zipEntry.Name))
                     {
-                        EventBus.Progress(this, $"Извлечение: {zipEntry.Name}");
-                        using var fileStream = zipEntry.Open();
-                        await FileHelper.CopyFileWithConfirmation(fileStream, zipEntry.Name, FileHelper.IWadFolderPath);
-                        if (!SettingsViewModel.Current.IWadFiles.Contains(zipEntry.Name))
-                        {
-                            SettingsViewModel.Current.IWadFiles.Add(zipEntry.Name);
-                        }
+                        SettingsViewModel.Current.IWadFiles.Add(zipEntry.Name);
                     }
                 }
             }
@@ -305,7 +309,7 @@ public partial class SettingsPageViewModel : ObservableObject
         }
 
         var files = await picker.PickMultipleFilesAsync();
-  
+
         foreach (var file in files)
         {
             EventBus.Progress(this, $"Копирование: {file.Name}");
