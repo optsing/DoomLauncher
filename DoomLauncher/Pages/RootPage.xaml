@@ -52,7 +52,7 @@
                 Storyboard.TargetName="imgBackground"
                 Storyboard.TargetProperty="Opacity"
                 From="0"
-                To="0.25"
+                To="0.35"
                 Duration="{x:Bind SlideshowAnimationDuration}"
             />
         </Storyboard>
@@ -60,7 +60,7 @@
             <DoubleAnimation
                 Storyboard.TargetName="imgBackground"
                 Storyboard.TargetProperty="Opacity"
-                From="0.25"
+                From="0.35"
                 To="0"
                 Duration="{x:Bind SlideshowAnimationDuration}"
             />
@@ -270,7 +270,7 @@
                     Source="{x:Bind ViewModel.Background, Mode=OneWay}"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Center"
-                    Opacity="0.25"
+                    Opacity="0.35"
                     Stretch="UniformToFill"
                 >
                     <Image.RenderTransform>
