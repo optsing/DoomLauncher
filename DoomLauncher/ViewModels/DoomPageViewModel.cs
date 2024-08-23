@@ -53,6 +53,7 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
 
     public readonly string DefaultGZDoomPath = settings.DefaultGZDoomPath;
     public readonly string DefaultIWadFile = settings.DefaultIWadFile;
+    public readonly string DefaultSteamGame = settings.SteamGame;
     public readonly ObservableCollection<string> FavoriteFiles = settings.FavoriteFiles;
 
     public ObservableCollection<ModFileViewModel> ModFileList { get; } = [];

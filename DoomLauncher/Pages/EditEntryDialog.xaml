@@ -58,7 +58,7 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <TextBlock>iWad</TextBlock>
+            <TextBlock>IWAD</TextBlock>
             <ComboBox
                 HorizontalAlignment="Stretch"
                 Margin="0,8,0,8"
@@ -71,7 +71,7 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <TextBlock>Интеграция с Steam</TextBlock>
+            <TextBlock>Интеграция Steam</TextBlock>
             <ComboBox
                 HorizontalAlignment="Stretch"
                 Margin="0,8,0,8"

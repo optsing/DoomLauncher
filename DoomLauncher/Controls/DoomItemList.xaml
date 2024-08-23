@@ -12,7 +12,7 @@
         Orientation="Vertical"
         CornerRadius="8"
         HorizontalAlignment="Stretch"
-        Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
+        Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
         Padding="16"
         Spacing="4"
     >

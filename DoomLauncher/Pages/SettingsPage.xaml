@@ -121,7 +121,7 @@
                 </controls:DoomItemList.ItemTemplate>
             </controls:DoomItemList>
             <controls:DoomItemList
-                HeaderTitle="Установленные iWad"
+                HeaderTitle="Установленные IWAD"
                 HeaderButtonTitle="Добавить"
                 ItemsSource="{x:Bind vm:SettingsViewModel.Current.IWadFiles}"
             >
@@ -217,12 +217,12 @@
                 ColumnDefinitions="*,Auto"
                 CornerRadius="8"
                 HorizontalAlignment="Stretch"
-                Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
+                Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
                 Padding="16"
             >
                 <TextBlock
                     Grid.Column="0"
-                    Text="Интеграция с Steam"
+                    Text="Интеграция Steam"
                     Style="{ThemeResource BaseTextBlockStyle}"
                     FontSize="16"
                     VerticalAlignment="Center"
@@ -244,7 +244,7 @@
                 ColumnDefinitions="*,Auto"
                 CornerRadius="8"
                 HorizontalAlignment="Stretch"
-                Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
+                Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
                 Padding="16"
             >
                 <TextBlock
@@ -267,7 +267,7 @@
                 Orientation="Vertical"
                 CornerRadius="8"
                 HorizontalAlignment="Stretch"
-                Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
+                Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
                 Padding="16"
                 Spacing="4"
             >

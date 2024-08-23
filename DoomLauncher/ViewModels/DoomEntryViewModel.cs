@@ -22,7 +22,9 @@ public partial class DoomEntryViewModel : ObservableObject
     public string IWadFile { get => iWadFile; set => SetProperty(ref iWadFile, value); }
     private string iWadFile = "";
 
-    public string SteamGame { get; set; } = "";
+    public string SteamGame { get => steamGame; set => SetProperty(ref steamGame, value); }
+    private string steamGame = "";
+
     public bool UniqueConfig { get; set; } = false;
     public bool UniqueSavesFolder { get; set; } = false;
 

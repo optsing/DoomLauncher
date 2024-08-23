@@ -81,33 +81,33 @@ internal static partial class FileHelper
         await FileIO.WriteTextAsync(file, $"[InternetShortcut]\nURL=gzdoomlauncher://launch/?id={entry.Id}\n");
     }
 
-    public static int GetSteamAppIdForEntry (DoomEntryViewModel entry)
+    public static TitleAppId ResolveSteamGame(string steamGame, string defaultSteamGame, string iWadFile, string defaultIWadFile)
     {
-        var steamGame = string.IsNullOrEmpty(entry.SteamGame) ? SettingsViewModel.Current.SteamGame : entry.SteamGame;
-        if (!string.IsNullOrEmpty(steamGame) && steamGame !=  "off")
+        var resolvedSteamGame = string.IsNullOrEmpty(steamGame) ? defaultSteamGame : steamGame;
+        if (!string.IsNullOrEmpty(resolvedSteamGame))
         {
-            if (steamGame == "iwad")
+            if (resolvedSteamGame == "iwad")
             {
-                var resolvedIWad = ResolveIWadFile(entry.IWadFile, SettingsViewModel.Current.DefaultIWadFile).ToLower();
-                if (!string.IsNullOrEmpty(resolvedIWad) && IWads.TryGetValue(resolvedIWad, out TitleAppId value))
+                var resolvedIWad = ResolveIWadFile(iWadFile, defaultIWadFile).ToLower();
+                if (!string.IsNullOrEmpty(resolvedIWad) && IWads.TryGetValue(resolvedIWad, out TitleAppId value) && value.appId != 0)
                 {
-                    return value.appId;
+                    return value;
                 }
             }
-            else if (SteamAppIds.TryGetValue(steamGame, out TitleAppId value))
+            else if (SteamAppIds.TryGetValue(resolvedSteamGame, out TitleAppId value))
             {
-                return value.appId;
+                return value;
             }
         }
-        return 0;
+        return SteamAppIds["off"];
     }
 
     public static Dictionary<string, TitleAppId> SteamAppIds = new()
     {
         { "off", new("Отключено", 0) },
-        { "iwad", new("Согласно iWad", -1) },
+        { "iwad", new("Согласно IWAD", 0) },
         { "doom", new("Ultimate Doom", 2280) },
-        { "doom2", new("Doom 2", 2300) },
+        { "doom2", new("Doom II", 2300) },
         { "doom64", new("Doom 64", 1148590) },
         { "heretic", new("Heretic", 2390) },
         { "hexen", new("Hexen", 2360) },
@@ -131,6 +131,7 @@ internal static partial class FileHelper
         { "freedoom1.wad", new("Freedoom: Phase 1", 0) },
         { "freedoom2.wad", new("Freedoom: Phase 2", 0) },
         { "freedm.wad", new("FreeDM", 0) },
+        { "sigil.wad", new TitleAppId("SIGIL", 0) },
     };
 
     public static string ResolveIWadFile(string iWadFile, string defaultIWadFile)
@@ -161,7 +162,12 @@ internal static partial class FileHelper
         return SettingsViewModel.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == defaultGZDoomPath);
     }
 
-    public static string GetIWadFileTitle(string iWadFile, string defaultIWadFile) {
+    public static string SteamGameTitle(string steamGame, string defaultSteamGame, string iWadFile, string defaultIWadFile) =>
+        ResolveSteamGame(steamGame, defaultSteamGame, iWadFile, defaultIWadFile).title;
+
+
+    public static string GetIWadFileTitle(string iWadFile, string defaultIWadFile)
+    {
         var resolvedIWadFile = ResolveIWadFile(iWadFile, defaultIWadFile);
         if (string.IsNullOrEmpty(resolvedIWadFile))
         {

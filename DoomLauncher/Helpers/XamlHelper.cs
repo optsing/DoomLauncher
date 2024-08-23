@@ -29,12 +29,12 @@ static class XamlHelper
 
     public static string DateToText(DateTime? lastLaunch)
     {
-        return lastLaunch?.Humanize() ?? "Неизвестно";
+        return lastLaunch?.Humanize() ?? "–";
     }
 
     public static string TimeSpanToText(TimeSpan? time)
     {
-        return time?.Humanize() ?? "Неизвестно";
+        return time?.Humanize() ?? "–";
     }
 
     public static string IsDefaultText(object value1, object value2)

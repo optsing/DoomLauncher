@@ -29,7 +29,7 @@ internal static class LaunchHelper
             return LaunchResult.PathNotValid;
         }
         var processInfo = new ProcessStartInfo();
-        var steamAppId = FileHelper.GetSteamAppIdForEntry(entry);
+        var steamAppId = FileHelper.ResolveSteamGame(entry.SteamGame, SettingsViewModel.Current.SteamGame, entry.IWadFile, SettingsViewModel.Current.DefaultIWadFile).appId;
         if (steamAppId == 0)
         {
             processInfo.FileName = gZDoomPath;
