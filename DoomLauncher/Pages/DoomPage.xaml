@@ -67,55 +67,87 @@
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
             />
         </MenuFlyout>
+        <ControlTemplate x:Key="PictureListViewItem" TargetType="ListViewItem">
+            <Grid
+                x:Name="Root"
+                CornerRadius="8"
+                Width="192"
+                Height="144"
+            >
+                <VisualStateManager.VisualStateGroups>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal" />
+                        <VisualState x:Name="Selected">
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetName="Selection" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.240" />
+                            </Storyboard>
+                        </VisualState>
+                        <VisualState x:Name="PointerOver">
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetName="SelectionBackground" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.240" />
+                            </Storyboard>
+                        </VisualState>
+                        <VisualState x:Name="PointerOverSelected">
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetName="Selection" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.240" />
+                                <DoubleAnimation Storyboard.TargetName="SelectionBackground" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.240" />
+                            </Storyboard>
+                        </VisualState>
+                        <VisualState x:Name="Pressed">
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetName="SelectionBackground" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.240" />
+                            </Storyboard>
+                        </VisualState>
+                        <VisualState x:Name="PressedSelected">
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetName="Selection" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.240" />
+                                <DoubleAnimation Storyboard.TargetName="SelectionBackground" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.240" />
+                            </Storyboard>
+                        </VisualState>
+                        <VisualStateGroup.Transitions>
+                            <VisualTransition To="Normal" GeneratedDuration="0:0:0.240" />
+                        </VisualStateGroup.Transitions>
+                    </VisualStateGroup>
+                    <VisualStateGroup x:Name="DragStates">
+                        <VisualState x:Name="NotDragging" />
+                        <VisualState x:Name="ReorderedPlaceholder">
+                            <Storyboard>
+                                <FadeOutThemeAnimation TargetName="Root" />
+                            </Storyboard>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateManager.VisualStateGroups>
+                <ContentPresenter />
+                <Rectangle 
+                    x:Name="SelectionBackground"
+                    IsHitTestVisible="False"
+                    Fill="#22ffffff"
+                    Opacity="0"
+                />
+                <Border
+                    x:Name="Selection"
+                    IsHitTestVisible="False"
+                    BorderThickness="2"
+                    CornerRadius="8"
+                    BorderBrush="{ThemeResource AccentFillColorDefaultBrush}"
+                    Opacity="0"
+                />
+            </Grid>
+        </ControlTemplate>
     </Page.Resources>
     <Grid
-        RowDefinitions="*,Auto,Auto"
+        RowDefinitions="*,Auto"
     >
-        <ScrollView
-            Grid.Row="0"
-        >
-            <Grid
-                RowDefinitions="*,Auto,Auto"
-                RowSpacing="8"
-                MaxWidth="992"
-                Margin="16,8"
+        <ScrollView Grid.Row="0">
+            <StackPanel
+                Orientation="Vertical"
+                Spacing="8"
+                VerticalAlignment="Bottom"
                 ChildrenTransitions="{StaticResource PageCardsAnimations}"
             >
-                <controls:DoomItemList
-                    Grid.Row="0"
-                    HeaderTitle="Файлы"
-                    HeaderButtonTitle="Добавить"
-                    VerticalAlignment="Top"
-                    ItemsSource="{x:Bind ViewModel.ModFileList}"
-                >
-                    <controls:DoomItemList.HeaderFlyout>
-                        <MenuFlyout
-                            Placement="Bottom"
-                            Opening="MenuFlyout_Opening"
-                        />
-                    </controls:DoomItemList.HeaderFlyout>
-                    <controls:DoomItemList.ItemTemplate>
-                        <DataTemplate x:DataType="vm:ModFileViewModel">
-                            <Grid ColumnDefinitions="*,Auto" ContextFlyout="{StaticResource flyoutFile}">
-                                <TextBlock
-                                    Grid.Column="0"
-                                    Text="{x:Bind Title}"
-                                    VerticalAlignment="Center"
-                                />
-                                <Button
-                                    Grid.Column="1"
-                                    Style="{ThemeResource EllipsisButton}"
-                                    Height="40"
-                                    Width="40"
-                                    Flyout="{StaticResource flyoutFile}"
-                                    Content="{ui:FontIcon FontSize=14, Glyph=&#xE712;}"
-                                />
-                            </Grid>
-                        </DataTemplate>
-                    </controls:DoomItemList.ItemTemplate>
-                </controls:DoomItemList>
                 <Border
-                    Grid.Row="1"
+                    MaxWidth="992"
+                    Margin="16,0"
                     CornerRadius="8"
                     HorizontalAlignment="Stretch"
                     Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
@@ -137,8 +169,9 @@
                     </TextBlock>
                 </Border>
                 <ScrollView
-                    Grid.Row="2"
                     MaxHeight="256"
+                    MaxWidth="992"
+                    Margin="16,0"
                     Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
                     CornerRadius="8"
                     HorizontalAlignment="Stretch"
@@ -152,132 +185,95 @@
                         TextWrapping="WrapWholeWords"
                     />
                 </ScrollView>
-            </Grid>
-        </ScrollView>
-        <ListView
-            Grid.Row="1" 
-            Padding="0,8,0,16"
-            HorizontalAlignment="Center"
-            ItemsSource="{x:Bind ViewModel.ImageFileList}"
-            SelectedIndex="{x:Bind ViewModel.Entry.SelectedImageIndex, Mode=OneWay}"
-            ScrollViewer.HorizontalScrollMode="Enabled"
-            ScrollViewer.HorizontalScrollBarVisibility="Auto"
-            ScrollViewer.VerticalScrollMode="Disabled"
-            SelectionMode="Single"
-            CanReorderItems="True"
-            AllowDrop="True"
-            IsItemClickEnabled="True"
-            ItemClick="ListView_ItemClick"        
-        >
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="ListViewItem">
-                                <Grid
-                                    x:Name="Root"
-                                    CornerRadius="8"
-                                    Width="192"
-                                    Height="144"
-                                >
-                                    <VisualStateManager.VisualStateGroups>
-                                        <VisualStateGroup x:Name="CommonStates">
-                                            <VisualState x:Name="Normal" />
-                                            <VisualState x:Name="Selected">
-                                                <Storyboard>
-                                                    <DoubleAnimation Storyboard.TargetName="Selection" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.240" />
-                                                </Storyboard>
-                                            </VisualState>
-                                            <VisualState x:Name="PointerOver">
-                                                <Storyboard>
-                                                    <DoubleAnimation Storyboard.TargetName="SelectionBackground" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.240" />
-                                                </Storyboard>
-                                            </VisualState>
-                                            <VisualState x:Name="PointerOverSelected">
-                                                <Storyboard>
-                                                    <DoubleAnimation Storyboard.TargetName="Selection" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.240" />
-                                                    <DoubleAnimation Storyboard.TargetName="SelectionBackground" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.240" />
-                                                </Storyboard>
-                                            </VisualState>
-                                            <VisualState x:Name="Pressed">
-                                                <Storyboard>
-                                                    <DoubleAnimation Storyboard.TargetName="SelectionBackground" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.240" />
-                                                </Storyboard>
-                                            </VisualState>
-                                            <VisualState x:Name="PressedSelected">
-                                                <Storyboard>
-                                                    <DoubleAnimation Storyboard.TargetName="Selection" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.240" />
-                                                    <DoubleAnimation Storyboard.TargetName="SelectionBackground" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.240" />
-                                                </Storyboard>
-                                            </VisualState>
-                                            <VisualStateGroup.Transitions>
-                                                <VisualTransition To="Normal" GeneratedDuration="0:0:0.240" />
-                                            </VisualStateGroup.Transitions>
-                                        </VisualStateGroup>
-                                        <VisualStateGroup x:Name="DragStates">
-                                            <VisualState x:Name="NotDragging" />
-                                            <VisualState x:Name="ReorderedPlaceholder">
-                                                <Storyboard>
-                                                    <FadeOutThemeAnimation TargetName="Root" />
-                                                </Storyboard>
-                                            </VisualState>
-                                        </VisualStateGroup>
-                                    </VisualStateManager.VisualStateGroups>
-                                    <ContentPresenter />
-                                    <Rectangle 
-                                        x:Name="SelectionBackground"
-                                        IsHitTestVisible="False"
-                                        Fill="#22ffffff"
-                                        Opacity="0"
-                                    />
-                                    <Border
-                                        x:Name="Selection"
-                                        IsHitTestVisible="False"
-                                        BorderThickness="2"
-                                        CornerRadius="8"
-                                        BorderBrush="{ThemeResource AccentFillColorDefaultBrush}"
-                                        Opacity="0"
-                                    />
-                                </Grid>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </ListView.ItemContainerStyle>
-            <ListView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="16,0,0,0" />
-                </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="vm:ImageFileViewModel">
-                    <Image
-                        Opacity="1"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
-                        Source="{x:Bind Image, Mode=OneWay}"
-                        Stretch="UniformToFill"
-                        ContextFlyout="{StaticResource flyoutImage}"
-                    />
-                </DataTemplate>
-            </ListView.ItemTemplate>
-            <ListView.Footer>
-                <Button
-                    Margin="{x:Bind ViewModel.ImageFileList.Count, Converter={StaticResource HasItemsToMargin}, Mode=OneWay}"
-                    Command="{x:Bind ViewModel.AddBackgroundCommand}"
-                    CornerRadius="8"
-                    Width="192"
-                    Height="144"
+                <controls:DoomItemList
+                    MaxWidth="992"
+                    Margin="16,0"
+                    HeaderTitle="Файлы"
+                    HeaderButtonTitle="Добавить"
+                    VerticalAlignment="Top"
+                    ItemsSource="{x:Bind ViewModel.ModFileList}"
                 >
-                    <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Stretch" Spacing="4">
-                        <FontIcon FontSize="20" Glyph="&#xE710;" HorizontalAlignment="Center" />
-                        <TextBlock>Добавить изображение</TextBlock>
-                    </StackPanel>
-                </Button>
-            </ListView.Footer>
-        </ListView>
+                    <controls:DoomItemList.HeaderFlyout>
+                        <MenuFlyout
+                            Placement="Bottom"
+                            Opening="MenuFlyout_Opening"
+                        />  
+                    </controls:DoomItemList.HeaderFlyout>
+                    <controls:DoomItemList.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ModFileViewModel">
+                            <Grid ColumnDefinitions="*,Auto" ContextFlyout="{StaticResource flyoutFile}">
+                                <TextBlock
+                                    Grid.Column="0"
+                                    Text="{x:Bind Title}"
+                                    VerticalAlignment="Center"
+                                />
+                                <Button
+                                    Grid.Column="1"
+                                    Style="{ThemeResource EllipsisButton}"
+                                    Height="40"
+                                    Width="40"
+                                    Flyout="{StaticResource flyoutFile}"
+                                    Content="{ui:FontIcon FontSize=14, Glyph=&#xE712;}"
+                                />
+                            </Grid>
+                        </DataTemplate>
+                    </controls:DoomItemList.ItemTemplate>
+                </controls:DoomItemList>
+                <ListView
+                    Padding="0,0,0,16"
+                    HorizontalAlignment="Center"
+                    ItemsSource="{x:Bind ViewModel.ImageFileList}"
+                    SelectedIndex="{x:Bind ViewModel.Entry.SelectedImageIndex, Mode=OneWay}"
+                    ScrollViewer.HorizontalScrollMode="Enabled"
+                    ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                    ScrollViewer.VerticalScrollMode="Disabled"
+                    SelectionMode="Single"
+                    CanReorderItems="True"
+                    AllowDrop="True"
+                    IsItemClickEnabled="True"
+                    ItemClick="ListView_ItemClick"        
+                >
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Template" Value="{StaticResource PictureListViewItem}"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="8" Margin="16,0,0,0" />
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ImageFileViewModel">
+                            <Image
+                                Opacity="1"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center"
+                                Source="{x:Bind Image, Mode=OneWay}"
+                                Stretch="UniformToFill"
+                                ContextFlyout="{StaticResource flyoutImage}"
+                            />
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.Footer>
+                        <Button
+                            Margin="{x:Bind ViewModel.ImageFileList.Count, Converter={StaticResource HasItemsToMargin}, Mode=OneWay}"
+                            Command="{x:Bind ViewModel.AddBackgroundCommand}"
+                            CornerRadius="8"
+                            Width="192"
+                            Height="144"
+                        >
+                            <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Stretch" Spacing="4">
+                                <FontIcon FontSize="20" Glyph="&#xE710;" HorizontalAlignment="Center" />
+                                <TextBlock>Добавить изображение</TextBlock>
+                            </StackPanel>
+                        </Button>
+                    </ListView.Footer>
+                </ListView>
+            </StackPanel>
+        </ScrollView>
         <StackPanel
-            Grid.Row="2"
+            Grid.Row="1"
             Orientation="Horizontal"
             HorizontalAlignment="Right"
         >
