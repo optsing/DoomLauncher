@@ -388,7 +388,7 @@ public sealed partial class RootPage : Page
         WinRT.Interop.InitializeWithWindow.Initialize(picker, WinApi.HWND);
 
         // Now we can use the picker object as normal
-        picker.FileTypeChoices.Add("Ярлык", new List<string>() { ".url" });
+        picker.FileTypeChoices.Add("Ярлык", [".url"]);
         picker.SuggestedFileName = entry.Name;
         picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Desktop;
         picker.CommitButtonText = "Создать ярлык";
@@ -417,7 +417,7 @@ public sealed partial class RootPage : Page
         WinRT.Interop.InitializeWithWindow.Initialize(picker, WinApi.HWND);
 
         // Now we can use the picker object as normal
-        picker.FileTypeChoices.Add("Сборка GZDoomLauncher", new List<string>() { ".gzdl" });
+        picker.FileTypeChoices.Add("Сборка GZDoomLauncher", [".gzdl"]);
         picker.SuggestedFileName = entry.Name;
         picker.CommitButtonText = "Экспортировать";
 
