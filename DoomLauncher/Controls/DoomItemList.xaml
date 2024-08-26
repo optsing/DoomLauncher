@@ -12,7 +12,9 @@
         Orientation="Vertical"
         CornerRadius="8"
         HorizontalAlignment="Stretch"
-        Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+        BorderThickness="1"
         Padding="16"
         Spacing="4"
     >

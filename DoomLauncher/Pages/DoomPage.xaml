@@ -158,7 +158,9 @@
                         Grid.Column="0"
                         CornerRadius="8"
                         Padding="16,20"
-                        Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
                     >
                         <tk:WrapPanel
                             Orientation="Horizontal"
@@ -256,7 +258,9 @@
                     MaxHeight="192"
                     MaxWidth="992"
                     Margin="16,0"
-                    Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
                     CornerRadius="8"
                     HorizontalAlignment="Stretch"
                     Visibility="{x:Bind local:XamlHelper.HasText(ViewModel.Entry.LongDescription), Mode=OneWay}"

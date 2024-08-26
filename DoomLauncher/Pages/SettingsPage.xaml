@@ -217,7 +217,9 @@
                 ColumnDefinitions="*,Auto"
                 CornerRadius="8"
                 HorizontalAlignment="Stretch"
-                Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
                 Padding="16"
             >
                 <TextBlock
@@ -244,7 +246,9 @@
                 ColumnDefinitions="*,Auto"
                 CornerRadius="8"
                 HorizontalAlignment="Stretch"
-                Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
                 Padding="16"
             >
                 <TextBlock
@@ -267,7 +271,9 @@
                 Orientation="Vertical"
                 CornerRadius="8"
                 HorizontalAlignment="Stretch"
-                Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
                 Padding="16"
                 Spacing="4"
             >
