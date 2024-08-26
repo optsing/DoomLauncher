@@ -131,7 +131,7 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
     [RelayCommand]
     private async Task RemoveModFile(ModFileViewModel modFile)
     {
-        if (await DialogHelper.ShowAskAsync("Удаление ссылки на файл", $"Вы уверены, что хотите удалить ссылку на файл '{modFile.Title}'?", "Удалить", "Отмена"))
+        if (await DialogHelper.ShowAskAsync(Strings.Resources.DialogRemoveLinkTitle, Strings.Resources.DialogRemoveLinkText(modFile.Title), Strings.Resources.DialogRemoveAction, Strings.Resources.DialogCancelAction))
         {
             ModFileList.Remove(modFile);
         }
@@ -141,7 +141,7 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
     {
         foreach (var file in files)
         {
-            EventBus.Progress(this, $"Копирование: {file.Name}");
+            EventBus.Progress(this, Strings.Resources.ProgressCopy(file.Name));
             await FileHelper.CopyFileWithConfirmation(file, FileHelper.ModsFolderPath);
             if (!ModFileList.Any(modFile => modFile.Path == file.Name))
             {
@@ -177,7 +177,7 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
         bool hasAddedImages = false;
         foreach (var file in files)
         {
-            EventBus.Progress(this, $"Копирование: {file.Name}");
+            EventBus.Progress(this, Strings.Resources.ProgressCopy(file.Name));
             await FileHelper.CopyFileWithConfirmation(file, FileHelper.ImagesFolderPath);
             if (!ImageFileList.Any(imageFile => imageFile.Path == file.Name))
             {
@@ -224,7 +224,7 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
     private async Task RemoveImageFile(ImageFileViewModel imageFile)
     {
         IsSlideshowEnabled = false;
-        if (await DialogHelper.ShowAskAsync("Удаление фона", $"Вы уверены, что хотите удалить выбранный фон?", "Удалить", "Отмена"))
+        if (await DialogHelper.ShowAskAsync(Strings.Resources.DialogRemoveLinkTitle, Strings.Resources.DialogRemoveImageLinkText, Strings.Resources.DialogRemoveAction, Strings.Resources.DialogCancelAction))
         {
             var selectedImageIndex = Entry.SelectedImageIndex;
             ImageFileList.Remove(imageFile);

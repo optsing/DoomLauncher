@@ -174,7 +174,7 @@ public sealed partial class RootPage : Page
         {
             return;
         }
-        if (await DialogHelper.ShowAskAsync("Удаление сборки", $"Вы уверены, что хотите удалить сборку '{entry.Name}'?", "Удалить", "Отмена"))
+        if (await DialogHelper.ShowAskAsync(Strings.Resources.DialogEntryRemoveTitle, Strings.Resources.DialogEntryRemoveText(entry.Name), Strings.Resources.DialogRemoveAction, Strings.Resources.DialogCancelAction))
         {
             if (entry == ViewModel.CurrentEntry)
             {
@@ -245,7 +245,7 @@ public sealed partial class RootPage : Page
     {
         if (entry == null)
         {
-            await DialogHelper.ShowAskAsync("Ошибка при запуске", "Не удалось найти нужную сборку", "", "Отмена");
+            await DialogHelper.ShowAskAsync(Strings.Resources.DialogLaunchErrorTitle, Strings.Resources.DialogLaunchErrorNoEntryText, "", Strings.Resources.DialogCancelAction);
             return;
         }
         SetCurrentEntry(entry);
@@ -267,29 +267,29 @@ public sealed partial class RootPage : Page
                     var error = await LaunchHelper.CurrentProcess.StandardError.ReadToEndAsync();
                     if (string.IsNullOrEmpty(error))
                     {
-                        await DialogHelper.ShowAskAsync("Ошибка при запуске", $"Игра завершилась с ошибкой, код ошибки: {LaunchHelper.CurrentProcess.ExitCode}", "", "Отмена");
+                        await DialogHelper.ShowAskAsync(Strings.Resources.DialogLaunchErrorTitle, Strings.Resources.DialogLaunchErrorCodeText(LaunchHelper.CurrentProcess.ExitCode), "", Strings.Resources.DialogCancelAction);
                     }
                     else
                     {
-                        await DialogHelper.ShowAskAsync("Ошибка при запуске", $"Игра завершилась с ошибкой, вывод:\n{error}", "", "Отмена");
+                        await DialogHelper.ShowAskAsync(Strings.Resources.DialogLaunchErrorTitle, Strings.Resources.DialogLaunchErrorText(error), "", Strings.Resources.DialogCancelAction);
                     }
                 }
             }
         }
         else if (result == LaunchResult.AlreadyLaunched && LaunchHelper.CurrentProcess != null)
         {
-            await DialogHelper.ShowAskAsync("Ошибка при запуске", "Игра уже запущена, закройте текущую игру", "", "Отмена");
+            await DialogHelper.ShowAskAsync(Strings.Resources.DialogLaunchErrorTitle, Strings.Resources.DialogLaunchErrorAlreadyLaunchedText, "", Strings.Resources.DialogCancelAction);
         }
         else if (result == LaunchResult.PathNotValid)
         {
-            if (await DialogHelper.ShowAskAsync("Ошибка при запуске", "Не выбрана версия GZDoom, выберите нужную версию в настройках сборки", "Перейти в настройки", "Отмена"))
+            if (await DialogHelper.ShowAskAsync(Strings.Resources.DialogLaunchErrorTitle, Strings.Resources.DialogLaunchErrorGZDoomPathNotValidText, Strings.Resources.DialogEditAction, Strings.Resources.DialogCancelAction))
             {
                 await EditEntry(entry);
             }
         }
         else
         {
-            await DialogHelper.ShowAskAsync("Ошибка при запуске", "Не удалось запустить игру", "", "Отмена");
+            await DialogHelper.ShowAskAsync(Strings.Resources.DialogLaunchErrorTitle, Strings.Resources.DialogLaunchErrorUnknownText, "", Strings.Resources.DialogCancelAction);
         }
     }
 
@@ -388,10 +388,10 @@ public sealed partial class RootPage : Page
         WinRT.Interop.InitializeWithWindow.Initialize(picker, WinApi.HWND);
 
         // Now we can use the picker object as normal
-        picker.FileTypeChoices.Add("Ярлык", [".url"]);
+        picker.FileTypeChoices.Add(Strings.Resources.Shortcut, [".url"]);
         picker.SuggestedFileName = entry.Name;
         picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Desktop;
-        picker.CommitButtonText = "Создать ярлык";
+        picker.CommitButtonText = Strings.Resources.CreateShortcut;
 
         var file = await picker.PickSaveFileAsync();
         if (file == null)
@@ -399,7 +399,7 @@ public sealed partial class RootPage : Page
             return;
         }
 
-        SetProgress("Создание ярлыка");
+        SetProgress(Strings.Resources.ProgressCreatingShortcut);
         await FileHelper.CreateEntryShortcut(entry, file);
         SetProgress(null);
     }
@@ -417,9 +417,9 @@ public sealed partial class RootPage : Page
         WinRT.Interop.InitializeWithWindow.Initialize(picker, WinApi.HWND);
 
         // Now we can use the picker object as normal
-        picker.FileTypeChoices.Add("Сборка GZDoomLauncher", [".gzdl"]);
+        picker.FileTypeChoices.Add(Strings.Resources.ChooseGZDLFile, [".gzdl"]);
         picker.SuggestedFileName = entry.Name;
-        picker.CommitButtonText = "Экспортировать";
+        picker.CommitButtonText = Strings.Resources.Export;
 
         var file = await picker.PickSaveFileAsync();
         if (file != null)
@@ -444,7 +444,7 @@ public sealed partial class RootPage : Page
 
     public async Task ImportEntryFromDoomWorldId(string wadId, bool withConfirm)
     {
-        SetProgress($"Получение информации...");
+        SetProgress(Strings.Resources.ProgressGettingInformation);
         var wadInfo = await WebAPI.Current.GetDoomWorldWADInfo(wadId);
         if (wadInfo != null)
         {

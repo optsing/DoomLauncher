@@ -7,24 +7,24 @@ namespace DoomLauncher.ViewModels;
 public class EditEntryDialogViewModel(EditDialogMode mode)
 {
     private static readonly DoomPackageViewModel DefaultDoomPackage = new() { Path = "", Arch = AssetArch.notSelected };
-    private static readonly KeyValue DefaultIWadFile = new("", "По умолчанию");
-    private static readonly KeyValue DefaultSteamGame = new("", "По умолчанию");
+    private static readonly KeyValue DefaultIWadFile = new("", Strings.Resources.DefaultValue);
+    private static readonly KeyValue DefaultSteamGame = new("", Strings.Resources.DefaultValue);
 
     private readonly EditDialogMode mode = mode;
     public string Title => mode switch
     {
-        EditDialogMode.Create => "Создание сборки",
-        EditDialogMode.Edit => "Настройка сборки",
-        EditDialogMode.Import => "Импорт сборки",
-        EditDialogMode.Copy => "Дублирование сборки",
+        EditDialogMode.Create => Strings.Resources.EditDialogModeCreateTitle,
+        EditDialogMode.Edit => Strings.Resources.EditDialogModeEditTitle,
+        EditDialogMode.Import => Strings.Resources.EditDialogModeImportTitle,
+        EditDialogMode.Copy => Strings.Resources.EditDialogModeCopyTitle,
         _ => throw new NotImplementedException(),
     };
     public string PrimaryButtonText => mode switch
     {
-        EditDialogMode.Create => "Создать",
-        EditDialogMode.Edit => "Сохранить",
-        EditDialogMode.Import => "Импортировать",
-        EditDialogMode.Copy => "Дублировать",
+        EditDialogMode.Create => Strings.Resources.EditDialogModeCreateAction,
+        EditDialogMode.Edit => Strings.Resources.EditDialogModeEditAction,
+        EditDialogMode.Import => Strings.Resources.EditDialogModeImportAction,
+        EditDialogMode.Copy => Strings.Resources.EditDialogModeCopyAction,
         _ => throw new NotImplementedException(),
     };
 

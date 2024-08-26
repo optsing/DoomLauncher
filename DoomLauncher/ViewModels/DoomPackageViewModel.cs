@@ -37,7 +37,7 @@ public partial class DoomPackageViewModel : ObservableObject
         {
             if (Arch == AssetArch.notSelected)
             {
-                return "По умолчанию";
+                return Strings.Resources.DefaultValue;
             }
             return (Version?.ToString() ?? "unknown") + Arch switch
             {

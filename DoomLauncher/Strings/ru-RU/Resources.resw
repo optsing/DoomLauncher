@@ -207,7 +207,7 @@
   <data name="EditEntryDialogFiles.Text" xml:space="preserve">
     <value>Файлы</value>
   </data>
-  <data name="EditEntryDialogImages" xml:space="preserve">
+  <data name="EditEntryDialogImages.Text" xml:space="preserve">
     <value>Изображения</value>
   </data>
   <data name="SettingsPageAbout.Text" xml:space="preserve">
@@ -311,5 +311,180 @@
   </data>
   <data name="RootPageRightDropHelper.Text" xml:space="preserve">
     <value>Отпустите файлы, чтобы добавить их в сборку</value>
+  </data>
+  <data name="JumpListLastLaunchedGroupName" xml:space="preserve">
+    <value>Последние запущенные</value>
+  </data>
+  <data name="ProgressCopy" xml:space="preserve">
+    <value>Копирование: {0}</value>
+    <comment>#Format[String]</comment>
+  </data>
+  <data name="ProgressExport" xml:space="preserve">
+    <value>Экспорт: {0}</value>
+    <comment>#Format[String]</comment>
+  </data>
+  <data name="ProgressExtract" xml:space="preserve">
+    <value>Извлечение: {0}</value>
+    <comment>#Format[String]</comment>
+  </data>
+  <data name="ProgressReadFile" xml:space="preserve">
+    <value>Чтение файла: {0}</value>
+    <comment>#Format[String]</comment>
+  </data>
+  <data name="ProgressDownloadAndExtractArchive" xml:space="preserve">
+    <value>Загрузка и извлечение архива</value>
+  </data>
+  <data name="ProgressGettingListOfVersions" xml:space="preserve">
+    <value>Получение списка версий</value>
+  </data>
+  <data name="ProgressCreatingShortcut" xml:space="preserve">
+    <value>Создание ярлыка</value>
+  </data>
+  <data name="ProgressGettingInformation" xml:space="preserve">
+    <value>Получение информации</value>
+  </data>
+  <data name="NewEntry" xml:space="preserve">
+    <value>Новая сборка</value>
+  </data>
+  <data name="DefaultValue" xml:space="preserve">
+    <value>По умолчанию</value>
+  </data>
+  <data name="EditDialogModeCreateTitle" xml:space="preserve">
+    <value>Создание сборки</value>
+  </data>
+  <data name="EditDialogModeEditTitle" xml:space="preserve">
+    <value>Настройка сборки</value>
+  </data>
+  <data name="EditDialogModeEditAction" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="EditDialogModeImportTitle" xml:space="preserve">
+    <value>Импорт сборки</value>
+  </data>
+  <data name="EditDialogModeImportAction" xml:space="preserve">
+    <value>Импортировать </value>
+  </data>
+  <data name="EditDialogModeCopyTitle" xml:space="preserve">
+    <value>Дублировать</value>
+  </data>
+  <data name="EditDialogModeCopyAction" xml:space="preserve">
+    <value>Дублирование сборки</value>
+  </data>
+  <data name="EditDialogModeCreateAction" xml:space="preserve">
+    <value>Создать</value>
+  </data>
+  <data name="NotSelected" xml:space="preserve">
+    <value>Не выбрано</value>
+  </data>
+  <data name="UnknownApp" xml:space="preserve">
+    <value>Неизвестное приложение</value>
+  </data>
+  <data name="UnknownVersion" xml:space="preserve">
+    <value>Неизвестная версия</value>
+  </data>
+  <data name="ChooseIWAD" xml:space="preserve">
+    <value>Выбрать IWAD</value>
+  </data>
+  <data name="ChooseGZDoom" xml:space="preserve">
+    <value>Выбрать GZDoom</value>
+  </data>
+  <data name="ChooseLocal" xml:space="preserve">
+    <value>Выбрать на устройстве</value>
+  </data>
+  <data name="Favorites" xml:space="preserve">
+    <value>Избранное</value>
+  </data>
+  <data name="Empty" xml:space="preserve">
+    <value>(пусто)</value>
+  </data>
+  <data name="CreateShortcut" xml:space="preserve">
+    <value>Создать ярлык</value>
+  </data>
+  <data name="Shortcut" xml:space="preserve">
+    <value>Ярлык</value>
+  </data>
+  <data name="DialogRemoveAction" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="DialogCancelAction" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="DialogDownloadAction" xml:space="preserve">
+    <value>Скачать</value>
+  </data>
+  <data name="DialogRemoveLinkTitle" xml:space="preserve">
+    <value>Удалить ссылку</value>
+  </data>
+  <data name="Export" xml:space="preserve">
+    <value>Экспортировать</value>
+  </data>
+  <data name="ChooseGZDLFile" xml:space="preserve">
+    <value>Выбрать сборку GZDL</value>
+  </data>
+  <data name="DialogRemoveLinkText" xml:space="preserve">
+    <value>Вы уверены, что хотите удалить ссылку на '{0}'?</value>
+    <comment>#Format[String]</comment>
+  </data>
+  <data name="DialogRemoveImageLinkText" xml:space="preserve">
+    <value>Вы уверены, что хотите удалить выбранное изображение?</value>
+  </data>
+  <data name="DialogDownloadFreedoomTitle" xml:space="preserve">
+    <value>Скачать Freedoom</value>
+  </data>
+  <data name="DialogDownloadFreedoomText" xml:space="preserve">
+    <value>Вы уверены, что хотите скачать Freedoom версии {0}?</value>
+    <comment>#Format[String]</comment>
+  </data>
+  <data name="DialogLaunchErrorTitle" xml:space="preserve">
+    <value>Ошибка при запуске</value>
+  </data>
+  <data name="DialogLaunchErrorUnknownText" xml:space="preserve">
+    <value>Не удалось запустить игру</value>
+  </data>
+  <data name="DialogLaunchErrorNoEntryText" xml:space="preserve">
+    <value>Не удалось найти нужную сборку</value>
+  </data>
+  <data name="DialogLaunchErrorCodeText" xml:space="preserve">
+    <value>Игра завершилась с ошибкой, код ошибки: {0}</value>
+    <comment>#Format[Int32]</comment>
+  </data>
+  <data name="DialogLaunchErrorText" xml:space="preserve">
+    <value>Игра завершилась с ошибкой, вывод:\n{0}</value>
+    <comment>#Format[String]</comment>
+  </data>
+  <data name="DialogLaunchErrorAlreadyLaunchedText" xml:space="preserve">
+    <value>Игра уже запущена, закройте текущую игру</value>
+  </data>
+  <data name="DialogLaunchErrorGZDoomPathNotValidText" xml:space="preserve">
+    <value>Не выбрана версия GZDoom, выберите нужную версию в настройках сборки</value>
+  </data>
+  <data name="DialogEditAction" xml:space="preserve">
+    <value>Изменить</value>
+  </data>
+  <data name="DialogEntryRemoveText" xml:space="preserve">
+    <value>Вы уверены, что хотите удалить сборку '{0}'?</value>
+    <comment>#Format[String]</comment>
+  </data>
+  <data name="DialogEntryRemoveTitle" xml:space="preserve">
+    <value>Удалить сборку</value>
+  </data>
+  <data name="DialogFileReplaceText" xml:space="preserve">
+    <value>Файл '{0}' уже существует в папке лаунчера.\nЗаменить?</value>
+    <comment>#Format[String]</comment>
+  </data>
+  <data name="DialogFileReplaceTitle" xml:space="preserve">
+    <value>Заменить файл</value>
+  </data>
+  <data name="DialogFileReplaceCancelAction" xml:space="preserve">
+    <value>Не заменять</value>
+  </data>
+  <data name="DialogFileReplaceOKAction" xml:space="preserve">
+    <value>Заменить</value>
+  </data>
+  <data name="SteamAppIdOff" xml:space="preserve">
+    <value>Отключено</value>
+  </data>
+  <data name="SteamAppIdAsIWAD" xml:space="preserve">
+    <value>Согласно IWAD</value>
   </data>
 </root>

@@ -22,7 +22,7 @@ internal class JumpListHelper
         foreach (var entry in entries)
         {
             JumpListItem item = JumpListItem.CreateWithArguments($"launch --id {entry.Id}", entry.Name);
-            item.GroupName = "Последние запущенные";
+            item.GroupName = Strings.Resources.JumpListLastLaunchedGroupName;
             item.Logo = new Uri("ms-appx:///Assets/app.ico");
             jumpList.Items.Add(item);
         }

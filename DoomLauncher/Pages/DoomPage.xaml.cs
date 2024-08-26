@@ -75,7 +75,7 @@ public sealed partial class DoomPage : Page
             menu.Items.Clear();
             var browseItem = new MenuFlyoutItem()
             {
-                Text = "Выбрать на устройстве",
+                Text = Strings.Resources.ChooseLocal,
                 Icon = new FontIcon()
                 {
                     Glyph = "\uEC50",
@@ -87,7 +87,7 @@ public sealed partial class DoomPage : Page
             menu.Items.Add(new MenuFlyoutSeparator());
             menu.Items.Add(new MenuFlyoutItem()
             {
-                Text = "Избранное",
+                Text = Strings.Resources.Favorites,
                 IsEnabled = false,
                 Icon = new FontIcon()
                 {
@@ -119,7 +119,7 @@ public sealed partial class DoomPage : Page
             {
                 menu.Items.Add(new MenuFlyoutItem()
                 {
-                    Text = "(пусто)",
+                    Text = Strings.Resources.Empty,
                     IsEnabled = false,
                 });
             }

@@ -39,7 +39,7 @@ static class XamlHelper
 
     public static string IsDefaultText(object value1, object value2)
     {
-        return Equals(value1, value2) ? " по умолчанию" : "";
+        return Equals(value1, value2) ? Strings.Resources.DefaultValue : "";
     }
 
     public static string EntryTooltip(string firstLine, string secondLine)

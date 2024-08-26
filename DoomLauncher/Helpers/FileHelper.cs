@@ -44,10 +44,10 @@ internal static partial class FileHelper
                 Directory.CreateDirectory(targetFolder);
             }
             if (!File.Exists(targetPath) || await DialogHelper.ShowAskAsync(
-                "Добавление с заменой",
-                $"Файл '{file.Name}' уже существует в папке лаунчера.\nЗаменить?",
-                "Заменить",
-                "Не заменять"
+                Strings.Resources.DialogFileReplaceTitle,
+                Strings.Resources.DialogFileReplaceText(file.Name),
+                Strings.Resources.DialogFileReplaceOKAction,
+                Strings.Resources.DialogFileReplaceCancelAction
             ))
             {
                 using var sourceStream = await file.OpenStreamForReadAsync();
@@ -65,10 +65,10 @@ internal static partial class FileHelper
             Directory.CreateDirectory(targetFolder);
         }
         if (!File.Exists(targetPath) || await DialogHelper.ShowAskAsync(
-            "Добавление с заменой",
-            $"Файл '{fileName}' уже существует в папке лаунчера.\nЗаменить?",
-            "Заменить",
-            "Не заменять"
+            Strings.Resources.DialogFileReplaceTitle,
+            Strings.Resources.DialogFileReplaceText(fileName),
+            Strings.Resources.DialogFileReplaceOKAction,
+            Strings.Resources.DialogFileReplaceCancelAction
         ))
         {
             using var destinationStream = new FileStream(targetPath, FileMode.Create, FileAccess.Write);
@@ -104,8 +104,8 @@ internal static partial class FileHelper
 
     public static Dictionary<string, TitleAppId> SteamAppIds = new()
     {
-        { "off", new("Отключено", 0) },
-        { "iwad", new("Согласно IWAD", 0) },
+        { "off", new(Strings.Resources.SteamAppIdOff, 0) },
+        { "iwad", new(Strings.Resources.SteamAppIdAsIWAD, 0) },
         { "doom", new("Ultimate Doom", 2280) },
         { "doom2", new("Doom II", 2300) },
         { "doom64", new("Doom 64", 1148590) },
@@ -171,7 +171,7 @@ internal static partial class FileHelper
         var resolvedIWadFile = ResolveIWadFile(iWadFile, defaultIWadFile);
         if (string.IsNullOrEmpty(resolvedIWadFile))
         {
-            return "Не выбрано";
+            return Strings.Resources.NotSelected;
         }
         return IWadFileToTitle(resolvedIWadFile);
     }
@@ -181,7 +181,7 @@ internal static partial class FileHelper
         var package = ResolveGZDoomPath(gZDoomPath, defaultGZDoomPath);
         if (package == null)
         {
-            return "Не выбрано";
+            return Strings.Resources.NotSelected;
         }
         return package.Title;
     }

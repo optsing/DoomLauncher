@@ -26,8 +26,8 @@ public partial class SettingsPageViewModel : ObservableObject
     public SettingsPageViewModel()
     {
 #if IS_NON_PACKAGED
-    var appName = "Неизвестное приложение";
-    var appVersion = "Неизвестная версия";
+    var appName = Strings.Resources.UnknownApp;
+    var appVersion = Strings.Resources.UnknownVersion;
     if (Assembly.GetEntryAssembly() is Assembly assembly)
     {
         if (assembly.GetCustomAttribute<AssemblyTitleAttribute>() is AssemblyTitleAttribute assemblyTitle) {
@@ -60,7 +60,7 @@ public partial class SettingsPageViewModel : ObservableObject
     [RelayCommand]
     private async Task AddRemoteDoomPackage()
     {
-        EventBus.Progress(this, "Получение списка версий");
+        EventBus.Progress(this, Strings.Resources.ProgressGettingListOfVersions);
         var entries = await WebAPI.Current.GetGZDoomGitHubReleases();
         var onlinePackages = new List<DoomPackageViewModel>();
         var nox86Version = new Version(4, 8, 0);
@@ -112,7 +112,7 @@ public partial class SettingsPageViewModel : ObservableObject
     {
         if (!string.IsNullOrEmpty(package.Path))
         {
-            EventBus.Progress(this, "Загрузка и извлечение архива");
+            EventBus.Progress(this, Strings.Resources.ProgressDownloadAndExtractArchive);
             try
             {
                 using var stream = await WebAPI.Current.DownloadUrl(package.Path);
@@ -147,7 +147,7 @@ public partial class SettingsPageViewModel : ObservableObject
 
         // Now we can use the picker object as normal
         picker.FileTypeFilter.Add(".exe");
-        picker.CommitButtonText = "Выбрать GZDoom";
+        picker.CommitButtonText = Strings.Resources.ChooseGZDoom;
         var file = await picker.PickSingleFileAsync();
         if (file != null && FileHelper.ValidateGZDoomPath(file.Path))
         {
@@ -179,12 +179,12 @@ public partial class SettingsPageViewModel : ObservableObject
 
         // Now we can use the picker object as normal
         picker.FileTypeFilter.Add(".wad");
-        picker.CommitButtonText = "Выбрать IWad";
+        picker.CommitButtonText = Strings.Resources.ChooseIWAD;
         var files = await picker.PickMultipleFilesAsync();
 
         foreach (var file in files)
         {
-            EventBus.Progress(this, $"Копирование: {file.Name}");
+            EventBus.Progress(this, Strings.Resources.ProgressCopy(file.Name));
             await FileHelper.CopyFileWithConfirmation(file, FileHelper.IWadFolderPath);
             if (!SettingsViewModel.Current.IWadFiles.Contains(file.Name))
             {
@@ -197,9 +197,9 @@ public partial class SettingsPageViewModel : ObservableObject
     [RelayCommand]
     private async Task AddFreedoomIWadFromGitHub()
     {
-        if (await DialogHelper.ShowAskAsync("Скачать Freedoom", $"Вы уверены, что хотите скачать Freedoom версии {FreedoomVersion}?", "Скачать", "Отмена"))
+        if (await DialogHelper.ShowAskAsync(Strings.Resources.DialogDownloadFreedoomTitle, Strings.Resources.DialogDownloadFreedoomText(FreedoomVersion), Strings.Resources.DialogDownloadAction, Strings.Resources.DialogCancelAction))
         {
-            EventBus.Progress(this, "Загрузка и извлечение архива");
+            EventBus.Progress(this, Strings.Resources.ProgressDownloadAndExtractArchive);
             try
             {
                 using var stream = await WebAPI.Current.DownloadUrl(FreedoomDownloadUrl);
@@ -212,7 +212,7 @@ public partial class SettingsPageViewModel : ObservableObject
                 }
                 foreach (var zipEntry in zipEntries)
                 {
-                    EventBus.Progress(this, $"Извлечение: {zipEntry.Name}");
+                    EventBus.Progress(this, Strings.Resources.ProgressExtract(zipEntry.Name));
                     using var fileStream = zipEntry.Open();
                     await FileHelper.CopyFileWithConfirmation(fileStream, zipEntry.Name, FileHelper.IWadFolderPath);
                     if (!SettingsViewModel.Current.IWadFiles.Contains(zipEntry.Name))
@@ -256,7 +256,7 @@ public partial class SettingsPageViewModel : ObservableObject
         {
             return;
         }
-        if (await DialogHelper.ShowAskAsync("Удаление ссылки", $"Вы уверены, что хотите удалить ссылку на '{package.Title}'?", "Удалить", "Отмена"))
+        if (await DialogHelper.ShowAskAsync(Strings.Resources.DialogRemoveLinkTitle, Strings.Resources.DialogRemoveLinkText(package.Title), Strings.Resources.DialogRemoveAction, Strings.Resources.DialogCancelAction))
         {
             SettingsViewModel.Current.GZDoomInstalls.Remove(package);
         }
@@ -290,7 +290,7 @@ public partial class SettingsPageViewModel : ObservableObject
             return;
         }
         var title = FileHelper.IWadFileToTitle(iWadFile);
-        if (await DialogHelper.ShowAskAsync("Удаление ссылки", $"Вы уверены, что хотите удалить ссылку на '{title}'?", "Удалить", "Отмена"))
+        if (await DialogHelper.ShowAskAsync(Strings.Resources.DialogRemoveLinkTitle, Strings.Resources.DialogRemoveLinkText(title), Strings.Resources.DialogRemoveAction, Strings.Resources.DialogCancelAction))
         {
             SettingsViewModel.Current.IWadFiles.Remove(iWadFile);
         }
@@ -314,7 +314,7 @@ public partial class SettingsPageViewModel : ObservableObject
 
         foreach (var file in files)
         {
-            EventBus.Progress(this, $"Копирование: {file.Name}");
+            EventBus.Progress(this, Strings.Resources.ProgressCopy(file.Name));
             await FileHelper.CopyFileWithConfirmation(file, FileHelper.ModsFolderPath);
             if (!SettingsViewModel.Current.FavoriteFiles.Contains(file.Name))
             {
@@ -342,7 +342,7 @@ public partial class SettingsPageViewModel : ObservableObject
             return;
         }
         var title = FileHelper.GetFileTitle(filePath);
-        if (await DialogHelper.ShowAskAsync("Удаление ссылки", $"Вы уверены, что хотите удалить ссылку на '{title}'?", "Удалить", "Отмена"))
+        if (await DialogHelper.ShowAskAsync(Strings.Resources.DialogRemoveLinkTitle, Strings.Resources.DialogRemoveLinkText(title), Strings.Resources.DialogRemoveAction, Strings.Resources.DialogCancelAction))
         {
             SettingsViewModel.Current.FavoriteFiles.Remove(filePath);
         }

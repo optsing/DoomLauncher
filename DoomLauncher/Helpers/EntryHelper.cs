@@ -17,13 +17,13 @@ internal static partial class EntryHelper
     {
         try
         {
-            SetProgress($"Чтение файла: {file.Name}");
+            SetProgress(Strings.Resources.ProgressReadFile(file.Name));
             using var zipToRead = await file.OpenStreamForReadAsync();
             using var archive = new ZipArchive(zipToRead, ZipArchiveMode.Read);
             DoomEntryViewModel? newEntry = null;
             if (archive.Entries.FirstOrDefault(entry => entry.FullName == "entry.json") is ZipArchiveEntry zipConfigEntry)
             {
-                SetProgress($"Извлечение: {zipConfigEntry.Name}");
+                SetProgress(Strings.Resources.ProgressExtract(zipConfigEntry.Name));
                 using var configStream = zipConfigEntry.Open();
                 newEntry = await JsonSerializer.DeserializeAsync(configStream, JsonSettingsContext.Default.DoomEntryViewModel);
             }
@@ -67,14 +67,14 @@ internal static partial class EntryHelper
                     var ext = Path.GetExtension(zipFileEntry.Name).ToLowerInvariant();
                     if (FileHelper.SupportedModExtensions.Contains(ext) && (!withConfirm || modFiles.Contains(zipFileEntry.Name)))
                     {
-                        SetProgress($"Извлечение: {zipFileEntry.Name}");
+                        SetProgress(Strings.Resources.ProgressExtract(zipFileEntry.Name));
                         using var fileStream = zipFileEntry.Open();
                         await FileHelper.CopyFileWithConfirmation(fileStream, zipFileEntry.Name, FileHelper.ModsFolderPath);
                         modsCopied.Add(zipFileEntry.Name);
                     }
                     else if (FileHelper.SupportedImageExtensions.Contains(ext) && (!withConfirm || imageFiles.Contains(zipFileEntry.Name)))
                     {
-                        SetProgress($"Извлечение: {zipFileEntry.Name}");
+                        SetProgress(Strings.Resources.ProgressExtract(zipFileEntry.Name));
                         using var fileStream = zipFileEntry.Open();
                         await FileHelper.CopyFileWithConfirmation(fileStream, zipFileEntry.Name, FileHelper.ImagesFolderPath);
                         imagesCopied.Add(zipFileEntry.Name);
@@ -110,7 +110,7 @@ internal static partial class EntryHelper
     {
         try
         {
-            SetProgress($"Чтение файла: {wadInfo.Filename}");
+            SetProgress(Strings.Resources.ProgressReadFile(wadInfo.Filename));
             using var zipToRead = await WebAPI.Current.DownloadDoomWorldWadArchive(wadInfo);
             using var archive = new ZipArchive(zipToRead, ZipArchiveMode.Read);
 
@@ -155,14 +155,14 @@ internal static partial class EntryHelper
                     var ext = Path.GetExtension(zipFileEntry.Name).ToLowerInvariant();
                     if (FileHelper.SupportedModExtensions.Contains(ext) && (!withConfirm || modFiles.Contains(zipFileEntry.Name)))
                     {
-                        SetProgress($"Извлечение: {zipFileEntry.Name}");
+                        SetProgress(Strings.Resources.ProgressExtract(zipFileEntry.Name));
                         using var fileStream = zipFileEntry.Open();
                         await FileHelper.CopyFileWithConfirmation(fileStream, zipFileEntry.Name, FileHelper.ModsFolderPath);
                         modsCopied.Add(zipFileEntry.Name);
                     }
                     else if (FileHelper.SupportedImageExtensions.Contains(ext) && (!withConfirm || imageFiles.Contains(zipFileEntry.Name)))
                     {
-                        SetProgress($"Извлечение: {zipFileEntry.Name}");
+                        SetProgress(Strings.Resources.ProgressExtract(zipFileEntry.Name));
                         using var fileStream = zipFileEntry.Open();
                         await FileHelper.CopyFileWithConfirmation(fileStream, zipFileEntry.Name, FileHelper.ImagesFolderPath);
                         imagesCopied.Add(zipFileEntry.Name);
@@ -194,7 +194,7 @@ internal static partial class EntryHelper
         {
             var mods = files.Where(file => FileHelper.SupportedModExtensions.Contains(Path.GetExtension(file.Name))).ToList();
             var images = files.Where(file => FileHelper.SupportedImageExtensions.Contains(Path.GetExtension(file.Name))).ToList();
-            string title = "Новая сборка";
+            string title = Strings.Resources.NewEntry;
             if (mods.Count > 0)
             {
                 title = Path.GetFileNameWithoutExtension(mods.First().Name);
@@ -239,7 +239,7 @@ internal static partial class EntryHelper
                 {
                     if (!withConfirm || modFiles.Contains(mod.Name))
                     {
-                        SetProgress($"Копирование: {mod.Name}");
+                        SetProgress(Strings.Resources.ProgressCopy(mod.Name));
                         await FileHelper.CopyFileWithConfirmation(mod, FileHelper.ModsFolderPath);
                         modsCopied.Add(mod.Name);
                     }
@@ -248,7 +248,7 @@ internal static partial class EntryHelper
                 {
                     if (!withConfirm || imageFiles.Contains(image.Name))
                     {
-                        SetProgress($"Копирование: {image.Name}");
+                        SetProgress(Strings.Resources.ProgressCopy(image.Name));
                         await FileHelper.CopyFileWithConfirmation(image, FileHelper.ImagesFolderPath);
                         imagesCopied.Add(image.Name);
                     }
@@ -272,7 +272,7 @@ internal static partial class EntryHelper
 
     public static async Task ExportToGZDLFile(DoomEntryViewModel entry, StorageFile file, Action<string?> SetProgress)
     {
-        SetProgress($"Экспорт: {file.Name}");
+        SetProgress(Strings.Resources.ProgressExport(file.Name));
         using var zipToWrite = await file.OpenStreamForWriteAsync();
         using var archive = new ZipArchive(zipToWrite, ZipArchiveMode.Create);
 
@@ -280,7 +280,7 @@ internal static partial class EntryHelper
         using (var configStream = zipConfigEntry.Open())
         {
             var fileName = "entry.json";
-            SetProgress($"Экспорт: {fileName}");
+            SetProgress(Strings.Resources.ProgressExport(fileName));
             var newEntry = new DoomEntryViewModel()
             {
                 Id = entry.Id,
@@ -304,7 +304,7 @@ internal static partial class EntryHelper
         {
             var fullPath = Path.GetFullPath(filePath, FileHelper.ModsFolderPath);
             var fileName = Path.GetFileName(filePath);
-            SetProgress($"Экспорт: {fileName}");
+            SetProgress(Strings.Resources.ProgressExport(fileName));
             var zipFileEntry = archive.CreateEntry(Path.Combine("mods", fileName));
             using var fileStream = zipFileEntry.Open();
             await File.OpenRead(fullPath).CopyToAsync(fileStream);
@@ -313,7 +313,7 @@ internal static partial class EntryHelper
         {
             var fullPath = Path.GetFullPath(filePath, FileHelper.ImagesFolderPath);
             var fileName = Path.GetFileName(filePath);
-            SetProgress($"Экспорт: {fileName}");
+            SetProgress(Strings.Resources.ProgressExport(fileName));
             var zipFileEntry = archive.CreateEntry(Path.Combine("images", fileName));
             using var fileStream = zipFileEntry.Open();
             await File.OpenRead(fullPath).CopyToAsync(fileStream);
