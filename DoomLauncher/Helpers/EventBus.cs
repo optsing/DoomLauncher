@@ -1,7 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using System;
 
-namespace DoomLauncher;
+namespace DoomLauncher.Helpers;
 
 static class EventBus
 {
@@ -17,7 +17,7 @@ static class EventBus
     public static event DragEventHandler? OnRightDragEnter;
     public static void RightDragEnter(object sender, DragEventArgs e) => OnRightDragEnter?.Invoke(sender, e);
     public static event DragEventHandler? OnRightDragOver;
-    public static void RightDragOver(object sender, DragEventArgs e) => OnRightDragOver?.Invoke(sender,  e);
+    public static void RightDragOver(object sender, DragEventArgs e) => OnRightDragOver?.Invoke(sender, e);
     public static event DragEventHandler? OnRightDrop;
     public static void RightDrop(object sender, DragEventArgs e) => OnRightDrop?.Invoke(sender, e);
 }

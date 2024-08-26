@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 
-namespace DoomLauncher;
+namespace DoomLauncher.Helpers;
 
 public enum LaunchResult
 {

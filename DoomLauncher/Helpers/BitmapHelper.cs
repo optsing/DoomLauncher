@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.Storage;
 
-namespace DoomLauncher;
+namespace DoomLauncher.Helpers;
 
 internal static class BitmapHelper
 {

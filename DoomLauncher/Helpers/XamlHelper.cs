@@ -1,9 +1,8 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Humanizer;
+using Microsoft.UI.Xaml;
 using System;
-using System.Collections.ObjectModel;
-using Humanizer;
 
-namespace DoomLauncher;
+namespace DoomLauncher.Helpers;
 
 static class XamlHelper
 {

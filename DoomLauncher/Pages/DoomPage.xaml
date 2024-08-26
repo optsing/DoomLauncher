@@ -5,11 +5,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="using:CommunityToolkit.WinUI"
-    xmlns:local="using:DoomLauncher"
-    xmlns:vm="using:DoomLauncher.ViewModels"
-    xmlns:converters="using:CommunityToolkit.WinUI.Converters"
-    xmlns:controls="using:DoomLauncher.Controls"
     xmlns:tk="using:CommunityToolkit.WinUI.Controls"
+    xmlns:converters="using:CommunityToolkit.WinUI.Converters"
+    xmlns:local="using:DoomLauncher"
+    xmlns:controls="using:DoomLauncher.Controls"
+    xmlns:helpers="using:DoomLauncher.Helpers"
+    xmlns:vm="using:DoomLauncher.ViewModels"
     d:DataContext="{d:DesignInstance Type=vm:DoomPageViewModel}"
     mc:Ignorable="d"
     Background="Transparent"
@@ -197,7 +198,7 @@
                                     Style="{StaticResource BaseTextBlockStyle}"
                                 />
                                 <TextBlock
-                                    Text="{x:Bind local:XamlHelper.DateToText(ViewModel.Entry.LastLaunch), Mode=OneWay}"
+                                    Text="{x:Bind helpers:XamlHelper.DateToText(ViewModel.Entry.LastLaunch), Mode=OneWay}"
                                 />
                             </StackPanel>
                             <StackPanel Orientation="Vertical">
@@ -207,7 +208,7 @@
                                     Style="{StaticResource BaseTextBlockStyle}"
                                 />
                                 <TextBlock
-                                    Text="{x:Bind local:XamlHelper.TimeSpanToText(ViewModel.Entry.PlayTime), Mode=OneWay}"
+                                    Text="{x:Bind helpers:XamlHelper.TimeSpanToText(ViewModel.Entry.PlayTime), Mode=OneWay}"
                                 />
                             </StackPanel>
                         </tk:WrapPanel>
@@ -255,12 +256,12 @@
                     BorderThickness="1"
                     CornerRadius="8"
                     HorizontalAlignment="Stretch"
-                    Visibility="{x:Bind local:XamlHelper.HasText(ViewModel.Entry.LongDescription), Mode=OneWay}"
+                    Visibility="{x:Bind helpers:XamlHelper.HasText(ViewModel.Entry.LongDescription), Mode=OneWay}"
                 >
                     <TextBlock
                         Margin="16"
                         Text="{x:Bind ViewModel.Entry.LongDescription, Mode=OneWay}"
-                        Visibility="{x:Bind local:XamlHelper.HasText(ViewModel.Entry.LongDescription), Mode=OneWay}"
+                        Visibility="{x:Bind helpers:XamlHelper.HasText(ViewModel.Entry.LongDescription), Mode=OneWay}"
                         TextWrapping="WrapWholeWords"
                     />
                 </ScrollView>
@@ -338,7 +339,7 @@
                                 CornerRadius="8"
                                 Width="192"
                                 Height="144"
-                                IsEnabled="{x:Bind local:XamlHelper.HasMoreItems(ViewModel.ImageFileList.Count, 1), Mode=OneWay}"
+                                IsEnabled="{x:Bind helpers:XamlHelper.HasMoreItems(ViewModel.ImageFileList.Count, 1), Mode=OneWay}"
                             >
                                 <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Stretch" Spacing="4">
                                     <Grid>

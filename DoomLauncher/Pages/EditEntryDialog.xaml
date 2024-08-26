@@ -5,6 +5,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="using:DoomLauncher"
+    xmlns:helpers="using:DoomLauncher.Helpers"
+    xmlns:vm="using:DoomLauncher.ViewModels"
     mc:Ignorable="d"
     x:Uid="EditEntryDialog"
     DefaultButton="Primary"
@@ -53,7 +55,7 @@
                 ItemsSource="{x:Bind ViewModel.DoomPackages}"
             >
                 <ComboBox.ItemTemplate>
-                    <DataTemplate x:DataType="local:DoomPackageViewModel">
+                    <DataTemplate x:DataType="vm:DoomPackageViewModel">
                         <TextBlock Text="{x:Bind Title}" />
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
@@ -94,12 +96,12 @@
             />
             <TextBlock
                 x:Uid="EditEntryDialogFiles"
-                Visibility="{x:Bind local:XamlHelper.HasItems(ViewModel.ModFiles.Count)}"
+                Visibility="{x:Bind helpers:XamlHelper.HasItems(ViewModel.ModFiles.Count)}"
             />
             <ListView
                 ItemsSource="{x:Bind ViewModel.ModFiles}"
                 SelectionMode="None"
-                Visibility="{x:Bind local:XamlHelper.HasItems(ViewModel.ModFiles.Count)}"
+                Visibility="{x:Bind helpers:XamlHelper.HasItems(ViewModel.ModFiles.Count)}"
             >
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
@@ -118,12 +120,12 @@
             </ListView>
             <TextBlock
                 x:Uid="EditEntryDialogImages"
-                Visibility="{x:Bind local:XamlHelper.HasItems(ViewModel.ImageFiles.Count)}"
+                Visibility="{x:Bind helpers:XamlHelper.HasItems(ViewModel.ImageFiles.Count)}"
             />
             <ListView
                 ItemsSource="{x:Bind ViewModel.ImageFiles}"
                 SelectionMode="None"
-                Visibility="{x:Bind local:XamlHelper.HasItems(ViewModel.ImageFiles.Count)}"
+                Visibility="{x:Bind helpers:XamlHelper.HasItems(ViewModel.ImageFiles.Count)}"
             >
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">

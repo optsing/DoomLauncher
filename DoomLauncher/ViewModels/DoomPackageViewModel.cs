@@ -3,7 +3,7 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace DoomLauncher;
+namespace DoomLauncher.ViewModels;
 
 public class AssetArchJsonConverter : JsonConverter<AssetArch>
 {

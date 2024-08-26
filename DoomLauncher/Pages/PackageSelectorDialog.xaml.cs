@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using DoomLauncher.ViewModels;
+using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
 using System.Linq;
 

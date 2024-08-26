@@ -6,8 +6,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:local="using:DoomLauncher"
-    xmlns:vm="using:DoomLauncher.ViewModels"
     xmlns:controls="using:DoomLauncher.Controls"
+    xmlns:helpers="using:DoomLauncher.Helpers"
+    xmlns:vm="using:DoomLauncher.ViewModels"
     mc:Ignorable="d"
 >
     <Page.Resources>
@@ -95,7 +96,7 @@
                     </MenuFlyout>
                 </controls:DoomItemList.HeaderFlyout>
                 <controls:DoomItemList.ItemTemplate>
-                    <DataTemplate x:DataType="local:DoomPackageViewModel">
+                    <DataTemplate x:DataType="vm:DoomPackageViewModel">
                         <Grid ColumnDefinitions="*,Auto" ContextFlyout="{StaticResource flyoutPackage}">
                             <TextBlock
                                 Grid.Column="0"
@@ -104,7 +105,7 @@
                                 <Run Text="{x:Bind Title, Mode=OneWay}" />
                                 <Run
                                     Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                    Text="{x:Bind local:XamlHelper.IsDefaultText(vm:SettingsViewModel.Current.DefaultGZDoomPath, Path), Mode=OneWay}"
+                                    Text="{x:Bind helpers:XamlHelper.IsDefaultText(vm:SettingsViewModel.Current.DefaultGZDoomPath, Path), Mode=OneWay}"
                                 />
                             </TextBlock>
                             <Button
@@ -152,7 +153,7 @@
                                 <Run Text="{x:Bind local:FileHelper.IWadFileToTitle((x:String))}" />
                                 <Run
                                     Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                    Text="{x:Bind local:XamlHelper.IsDefaultText(vm:SettingsViewModel.Current.DefaultIWadFile, (x:String)), Mode=OneWay}"
+                                    Text="{x:Bind helpers:XamlHelper.IsDefaultText(vm:SettingsViewModel.Current.DefaultIWadFile, (x:String)), Mode=OneWay}"
                                 />
                             </TextBlock>
                             <Button
@@ -195,7 +196,7 @@
                                 <Run Text="{x:Bind local:FileHelper.GetFileTitle((x:String))}" />
                                 <Run
                                     Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                    Text="{x:Bind local:XamlHelper.IsDefaultText(vm:SettingsViewModel.Current.DefaultIWadFile, (x:String)), Mode=OneWay}"
+                                    Text="{x:Bind helpers:XamlHelper.IsDefaultText(vm:SettingsViewModel.Current.DefaultIWadFile, (x:String)), Mode=OneWay}"
                                 />
                             </TextBlock>
                             <Button

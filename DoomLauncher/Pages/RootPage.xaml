@@ -7,7 +7,7 @@
     xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:animations="using:CommunityToolkit.WinUI.Animations"
     xmlns:converters="using:CommunityToolkit.WinUI.Converters"
-    xmlns:local="using:DoomLauncher"
+    xmlns:helpers="using:DoomLauncher.Helpers"
     xmlns:vm="using:DoomLauncher.ViewModels"
     xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
     mc:Ignorable="d"
@@ -188,7 +188,7 @@
                                     Orientation="Vertical"
                                     Padding="0,8"
                                     ContextFlyout="{StaticResource flyoutEntry}"
-                                    ToolTipService.ToolTip="{x:Bind local:XamlHelper.EntryTooltip(Name, Description), Mode=OneWay}"
+                                    ToolTipService.ToolTip="{x:Bind helpers:XamlHelper.EntryTooltip(Name, Description), Mode=OneWay}"
                                 >
                                     <TextBlock
                                         Text="{x:Bind Name, Mode=OneWay}"
@@ -197,7 +197,7 @@
                                     />
                                     <TextBlock
                                         Text="{x:Bind Description, Mode=OneWay}"
-                                        Visibility="{x:Bind local:XamlHelper.HasText(Description), Mode=OneWay}"
+                                        Visibility="{x:Bind helpers:XamlHelper.HasText(Description), Mode=OneWay}"
                                         FontSize="12"
                                         TextTrimming="CharacterEllipsis"
                                     />
