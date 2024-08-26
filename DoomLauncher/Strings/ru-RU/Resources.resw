@@ -1,0 +1,315 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="NotSelectedPageText.Text" xml:space="preserve">
+    <value>Создайте или выберите сборку</value>
+  </data>
+  <data name="PackageSelectorDialog.Title" xml:space="preserve">
+    <value>Выберите версию</value>
+  </data>
+  <data name="PackageSelectorDialog.CloseButtonText" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="PackageSelectorDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Установить</value>
+  </data>
+  <data name="SlideshowTextConverter.TrueValue" xml:space="preserve">
+    <value>Остановить слайд-шоу</value>
+  </data>
+  <data name="SlideshowTextConverter.FalseValue" xml:space="preserve">
+    <value>Запустить слайд-шоу</value>
+  </data>
+  <data name="IsInFavoritesTextConverter.TrueValue" xml:space="preserve">
+    <value>Убрать из избранного</value>
+  </data>
+  <data name="IsInFavoritesTextConverter.FalseValue" xml:space="preserve">
+    <value>Добавить в избранное</value>
+  </data>
+  <data name="FlyoutFileOpenFolder.Text" xml:space="preserve">
+    <value>Открыть расположение</value>
+  </data>
+  <data name="FlyoutImageOpenFolder.Text" xml:space="preserve">
+    <value>Открыть расположение</value>
+  </data>
+  <data name="FlyoutFileRemove.Text" xml:space="preserve">
+    <value>Удалить ссылку на файл</value>
+  </data>
+  <data name="FlyoutImageRemove.Text" xml:space="preserve">
+    <value>Удалить ссылку на изображение</value>
+  </data>
+  <data name="DoomPageInfoSteamIntegration.Text" xml:space="preserve">
+    <value>Интеграция Steam</value>
+  </data>
+  <data name="DoomPageInfoLastLaunch.Text" xml:space="preserve">
+    <value>Последний запуск</value>
+  </data>
+  <data name="DoomPageInfoPlayTime.Text" xml:space="preserve">
+    <value>Вы играли</value>
+  </data>
+  <data name="DoomPageFiles.HeaderButtonTitle" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
+  <data name="DoomPageAddImage.Text" xml:space="preserve">
+    <value>Добавить изображение</value>
+  </data>
+  <data name="DoomPageFiles.HeaderTitle" xml:space="preserve">
+    <value>Файлы</value>
+  </data>
+  <data name="EditEntryDialog.CloseButtonText" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="EditEntryDialogName.Text" xml:space="preserve">
+    <value>Название</value>
+  </data>
+  <data name="EditEntryDialogNameTextBox.PlaceholderText" xml:space="preserve">
+    <value>Введите название</value>
+  </data>
+  <data name="EditEntryDialogShortDescription.Text" xml:space="preserve">
+    <value>Краткое описание</value>
+  </data>
+  <data name="EditEntryDialogLongDescription.Text" xml:space="preserve">
+    <value>Подробное описание</value>
+  </data>
+  <data name="EditEntryDialogShortDescriptionTextBox.PlaceholderText" xml:space="preserve">
+    <value>Введите краткое описание</value>
+  </data>
+  <data name="EditEntryDialogLongDescriptionTextBox.PlaceholderText" xml:space="preserve">
+    <value>Введите подробное описание</value>
+  </data>
+  <data name="EditEntryDialogGZDoomVersion.Text" xml:space="preserve">
+    <value>Версия GZDoom</value>
+  </data>
+  <data name="EditEntryDialogSteamIntegration.Text" xml:space="preserve">
+    <value>Интеграция Steam</value>
+  </data>
+  <data name="EditEntryDialogUniqueConfig.Content" xml:space="preserve">
+    <value>Использовать уникальный файл настроек</value>
+  </data>
+  <data name="EditEntryDialogUniqueSavesFolder.Content" xml:space="preserve">
+    <value>Использовать уникальную папку сохранений</value>
+  </data>
+  <data name="EditEntryDialogFiles.Text" xml:space="preserve">
+    <value>Файлы</value>
+  </data>
+  <data name="EditEntryDialogImages" xml:space="preserve">
+    <value>Изображения</value>
+  </data>
+  <data name="SettingsPageAbout.Text" xml:space="preserve">
+    <value>О приложении</value>
+  </data>
+  <data name="SettingsPageCloseOnLaunch.Text" xml:space="preserve">
+    <value>Закрывать лаунчер при запуске сборки</value>
+  </data>
+  <data name="SettingsPageSteamIntegration.Text" xml:space="preserve">
+    <value>Интеграция Steam</value>
+  </data>
+  <data name="SettingsPageAddLocalFavFile.Text" xml:space="preserve">
+    <value>Выбрать на устройстве</value>
+  </data>
+  <data name="SettingsPageFavFiles.HeaderTitle" xml:space="preserve">
+    <value>Избранные файлы</value>
+  </data>
+  <data name="SettingsPageFavFiles.HeaderButtonTitle" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
+  <data name="SettingsPageIWAD.HeaderTitle" xml:space="preserve">
+    <value>Установленные IWAD</value>
+  </data>
+  <data name="SettingsPageIWAD.HeaderButtonTitle" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
+  <data name="SettingsPageIWADAddLocal.Text" xml:space="preserve">
+    <value>Выбрать на устройстве</value>
+  </data>
+  <data name="SettingsPageIWADAddFreedoom.Text" xml:space="preserve">
+    <value>Скачать Freedoom</value>
+  </data>
+  <data name="SettingsPageGZDoom.HeaderTitle" xml:space="preserve">
+    <value>Установленные GZDoom</value>
+  </data>
+  <data name="SettingsPageGZDoom.HeaderButtonTitle" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
+  <data name="SettingsPageGZDoomAddLocal.Text" xml:space="preserve">
+    <value>Выбрать на устройстве</value>
+  </data>
+  <data name="SettingsPageGZDoomAddRemote.Text" xml:space="preserve">
+    <value>Скачать с GitHub</value>
+  </data>
+  <data name="FlyoutFavFileOpenFolder.Text" xml:space="preserve">
+    <value>Открыть расположение</value>
+  </data>
+  <data name="FlyoutFavFileRemove.Text" xml:space="preserve">
+    <value>Удалить ссылку на файл</value>
+  </data>
+  <data name="FlyoutIWADToggleDefault.Text" xml:space="preserve">
+    <value>Назначить по умолчанию</value>
+  </data>
+  <data name="FlyoutIWADOpenFolder.Text" xml:space="preserve">
+    <value>Открыть расположение</value>
+  </data>
+  <data name="FlyoutIWADRemove.Text" xml:space="preserve">
+    <value>Удалить ссылку на файл</value>
+  </data>
+  <data name="FlyoutPackageToggleDefault.Text" xml:space="preserve">
+    <value>Назначить по умолчанию</value>
+  </data>
+  <data name="FlyoutPackageOpenFolder.Text" xml:space="preserve">
+    <value>Открыть расположение</value>
+  </data>
+  <data name="FlyoutPackageRemove.Text" xml:space="preserve">
+    <value>Удалить ссылку на файл</value>
+  </data>
+  <data name="FlyoutEntryCopy.Text" xml:space="preserve">
+    <value>Дублировать</value>
+  </data>
+  <data name="FlyoutEntryRemove.Text" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="FlyoutEntryExport.Text" xml:space="preserve">
+    <value>Экспортировать</value>
+  </data>
+  <data name="FlyoutEntryCreateShortcut.Text" xml:space="preserve">
+    <value>Создать ярлык</value>
+  </data>
+  <data name="FlyoutEntryEdit.Text" xml:space="preserve">
+    <value>Настроить</value>
+  </data>
+  <data name="RootPageCreateEntry.Text" xml:space="preserve">
+    <value>Создать сборку</value>
+  </data>
+  <data name="RootPageCreateEntryFromFiles.Text" xml:space="preserve">
+    <value>Создать сборку из файлов</value>
+  </data>
+  <data name="RootPageCreateEntryImport.Text" xml:space="preserve">
+    <value>Импортировать из файла</value>
+  </data>
+  <data name="RootPageSettings.Text" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="RootPageLaunch.Text" xml:space="preserve">
+    <value>Играть</value>
+  </data>
+  <data name="RootPageLeftDropHelper.Text" xml:space="preserve">
+    <value>Отпустите файлы, чтобы создать или импортировать сборку</value>
+  </data>
+  <data name="RootPageRightDropHelper.Text" xml:space="preserve">
+    <value>Отпустите файлы, чтобы добавить их в сборку</value>
+  </data>
+</root>

@@ -17,18 +17,11 @@
     Unloaded="Page_Unloaded"
 >
     <Page.Resources>
-        <converters:BoolToObjectConverter x:Key="SlideshowTextConverter" TrueValue="Остановить слайд-шоу" FalseValue="Запустить слайд-шоу" />
+        <converters:BoolToObjectConverter x:Key="SlideshowTextConverter" x:Uid="SlideshowTextConverter"  />
         <converters:BoolToObjectConverter x:Key="SlideshowGlyphConverter" TrueValue="&#xE769;" FalseValue="&#xE768;" />
-        <converters:BoolToObjectConverter x:Key="IsInFavoritesTextConverter" TrueValue="Убрать из избранного" FalseValue="Добавить в избранное" />
+        <converters:BoolToObjectConverter x:Key="IsInFavoritesTextConverter" x:Uid="IsInFavoritesTextConverter" />
         <converters:BoolToObjectConverter x:Key="IsInFavoritesGlyphConverter" TrueValue="&#xE734;" FalseValue="&#xE735;" />
-        <converters:DoubleToObjectConverter x:Key="HasItemsToMargin" GreaterThan="0">
-            <converters:DoubleToObjectConverter.TrueValue>
-                <Thickness>8,0,16,0</Thickness>
-            </converters:DoubleToObjectConverter.TrueValue>
-            <converters:DoubleToObjectConverter.FalseValue>
-                <Thickness>0,0,16,0</Thickness>
-            </converters:DoubleToObjectConverter.FalseValue>
-        </converters:DoubleToObjectConverter>
+        <converters:DoubleToObjectConverter x:Key="HasItemsToMargin" GreaterThan="0" TrueValue="8,0,16,0" FalseValue="0,0,16,0" />
         <MenuFlyout x:Key="flyoutFile" Placement="Bottom">
             <MenuFlyoutItem
                 Command="{x:Bind ViewModel.ToggleFavoriteFileCommand}"
@@ -43,29 +36,29 @@
                 </MenuFlyoutItem.Icon>
             </MenuFlyoutItem>
             <MenuFlyoutItem
+                x:Uid="FlyoutFileOpenFolder"
                 Command="{x:Bind ViewModel.OpenContainingFolderCommand}"
                 CommandParameter="{Binding}"
-                Text="Открыть расположение"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE838;}"
             />
             <MenuFlyoutItem
+                x:Uid="FlyoutFileRemove"
                 Command="{x:Bind ViewModel.RemoveModFileCommand}"
                 CommandParameter="{Binding}"
-                Text="Удалить ссылку на файл"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
             />
         </MenuFlyout>
         <MenuFlyout x:Key="flyoutImage" Placement="Bottom">
             <MenuFlyoutItem
+                x:Uid="FlyoutImageOpenFolder"
                 Command="{x:Bind ViewModel.OpenImageContainingFolderCommand}"
                 CommandParameter="{Binding}"
-                Text="Открыть расположение"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE838;}"
             />
             <MenuFlyoutItem
+                x:Uid="FlyoutImageRemove"
                 Command="{x:Bind ViewModel.RemoveImageFileCommand}"
                 CommandParameter="{Binding}"
-                Text="Удалить ссылку на изображение"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
             />
         </MenuFlyout>
@@ -189,7 +182,7 @@
                             </StackPanel>
                             <StackPanel Orientation="Vertical">
                                 <TextBlock
-                                    Text="Интеграция Steam"
+                                    x:Uid="DoomPageInfoSteamIntegration"
                                     FontSize="16"
                                     Style="{StaticResource BaseTextBlockStyle}"
                                 />
@@ -199,7 +192,7 @@
                             </StackPanel>
                             <StackPanel Orientation="Vertical">
                                 <TextBlock
-                                    Text="Последний запуск"
+                                    x:Uid="DoomPageInfoLastLaunch"
                                     FontSize="16"
                                     Style="{StaticResource BaseTextBlockStyle}"
                                 />
@@ -209,7 +202,7 @@
                             </StackPanel>
                             <StackPanel Orientation="Vertical">
                                 <TextBlock
-                                    Text="Вы играли"
+                                    x:Uid="DoomPageInfoPlayTime"
                                     FontSize="16"
                                     Style="{StaticResource BaseTextBlockStyle}"
                                 />
@@ -221,8 +214,7 @@
                     </Border>
                     <controls:DoomItemList
                         Grid.Column="1"
-                        HeaderTitle="Файлы"
-                        HeaderButtonTitle="Добавить"
+                        x:Uid="DoomPageFiles"
                         VerticalAlignment="Stretch"
                         ItemsSource="{x:Bind ViewModel.ModFileList}"
                     >
@@ -338,7 +330,7 @@
                                         Glyph="&#xE710;"
                                         HorizontalAlignment="Center"
                                     />
-                                    <TextBlock>Добавить изображение</TextBlock>
+                                    <TextBlock x:Uid="DoomPageAddImage" />
                                 </StackPanel>
                             </Button>
                             <Button

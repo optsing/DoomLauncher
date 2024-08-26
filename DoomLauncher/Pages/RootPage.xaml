@@ -17,33 +17,33 @@
         <converters:EmptyObjectToObjectConverter x:Key="NullVisibilityConverter" NotEmptyValue="Visible" EmptyValue="Collapsed" />
         <MenuFlyout x:Key="flyoutEntry" Placement="Bottom">
             <MenuFlyoutItem
+                x:Uid="FlyoutEntryEdit"
                 Command="{x:Bind EditEntryCommand}"
                 CommandParameter="{Binding}"
-                Text="Настроить"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE70F;}"
             />
             <MenuFlyoutItem
+                x:Uid="FlyoutEntryCopy"
                 Command="{x:Bind CopyEntryCommand}"
                 CommandParameter="{Binding}"
-                Text="Дублировать"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE8C8;}"
             />
             <MenuFlyoutItem
+                x:Uid="FlyoutEntryCreateShortcut"
                 Command="{x:Bind CreateShortcutEntryCommand}"
                 CommandParameter="{Binding}"
-                Text="Создать ярлык"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE71B;}"
             />
             <MenuFlyoutItem
+                x:Uid="FlyoutEntryExport"
                 Command="{x:Bind ExportEntryCommand}"
                 CommandParameter="{Binding}"
-                Text="Экспортировать"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE896;}"
             />
             <MenuFlyoutItem
+                x:Uid="FlyoutEntryRemove"
                 Command="{x:Bind RemoveEntryCommand}"
                 CommandParameter="{Binding}"
-                Text="Удалить"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
             />
         </MenuFlyout>
@@ -154,22 +154,22 @@
                         <SplitButton.Flyout>
                             <MenuFlyout>
                                 <MenuFlyoutItem
+                                    x:Uid="RootPageCreateEntryFromFiles"
                                     Command="{x:Bind CreateEntryFromFilesCommand}"
                                     HorizontalAlignment="Stretch"
-                                    Text="Создать сборку из файлов"
                                     Icon="{ui:FontIcon FontSize=14, Glyph=&#xEC50;}"
                                 />
                                 <MenuFlyoutItem
+                                    x:Uid="RootPageCreateEntryImport"
                                     Command="{x:Bind ImportEntriesCommand}"
                                     HorizontalAlignment="Stretch"
-                                    Text="Импортировать из файла"
                                     Icon="{ui:FontIcon FontSize=14, Glyph=&#xE898;}"
                                 />
                             </MenuFlyout>
                         </SplitButton.Flyout>
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <FontIcon FontSize="14" Glyph="&#xE710;" />
-                            <TextBlock>Создать сборку</TextBlock>
+                            <TextBlock x:Uid="RootPageCreateEntry" />
                         </StackPanel>
                     </SplitButton>
                     <ListView
@@ -221,7 +221,7 @@
                                     <SymbolIconSource Symbol="Setting"/>
                                 </AnimatedIcon.FallbackIconSource>
                             </AnimatedIcon>
-                            <TextBlock>Настройки</TextBlock>
+                            <TextBlock x:Uid="RootPageSettings" />
                         </StackPanel>
                     </Button>
                     <Border
@@ -241,9 +241,9 @@
                             <animations:OpacityAnimation Duration="0:0:0.3" From="1.0" To="0"/>
                         </animations:Implicit.HideAnimations>
                         <TextBlock
+                            x:Uid="RootPageLeftDropHelper"
                             FontSize="24"
                             Margin="8"
-                            Text="Отпустите файлы, чтобы создать или импортировать сборку"
                             TextWrapping="WrapWholeWords"
                             HorizontalAlignment="Stretch"
                             TextAlignment="Center"
@@ -322,7 +322,7 @@
                         >
                             <StackPanel Orientation="Horizontal" Spacing="4">
                                 <FontIcon FontSize="14" Glyph="&#xE768;" />
-                                <TextBlock>Играть</TextBlock>
+                                <TextBlock x:Uid="RootPageLaunch" />
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -348,9 +348,9 @@
                         <animations:OpacityAnimation Duration="0:0:0.3" From="1.0" To="0"/>
                     </animations:Implicit.HideAnimations>
                     <TextBlock
+                        x:Uid="RootPageRightDropHelper"
                         FontSize="24"
                         Margin="8"
-                        Text="Отпустите файлы, чтобы добавить их в сборку"
                         TextWrapping="WrapWholeWords"
                         HorizontalAlignment="Stretch"
                         TextAlignment="Center"

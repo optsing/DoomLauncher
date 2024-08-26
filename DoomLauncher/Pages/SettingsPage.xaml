@@ -13,55 +13,55 @@
     <Page.Resources>
         <MenuFlyout x:Key="flyoutPackage" Placement="Bottom">
             <MenuFlyoutItem
+                x:Uid="FlyoutPackageToggleDefault"
                 Command="{x:Bind ViewModel.ToggleDefaultDoomPackageCommand}"
                 CommandParameter="{Binding}"
-                Text="Назначить по умолчанию"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE73E;}"
             />
             <MenuFlyoutItem
+                x:Uid="FlyoutPackageOpenFolder"
                 Command="{x:Bind ViewModel.OpenFolderDoomPackageCommand}"
                 CommandParameter="{Binding}"
-                Text="Открыть расположение"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE838;}"
             />
             <MenuFlyoutItem
+                x:Uid="FlyoutPackageRemove"
                 Command="{x:Bind ViewModel.RemoveDoomPackageCommand}"
                 CommandParameter="{Binding}"
-                Text="Удалить ссылку на файл"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
             />
         </MenuFlyout>
         <MenuFlyout x:Key="flyoutIWad" Placement="Bottom" >
             <MenuFlyoutItem
+                x:Uid="FlyoutIWADToggleDefault"
                 Command="{x:Bind ViewModel.ToggleDefaultIWadCommand}"
                 CommandParameter="{Binding}"
-                Text="Назначить по умолчанию"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE73E;}"
             />
             <MenuFlyoutItem
+                x:Uid="FlyoutIWADOpenFolder"
                 Command="{x:Bind ViewModel.OpenFolderIWadCommand}"
                 CommandParameter="{Binding}"
-                Text="Открыть расположение"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE838;}"
             />
             <MenuFlyoutItem
+                x:Uid="FlyoutIWADRemove"
                 Command="{x:Bind ViewModel.RemoveIWadCommand}"
                 CommandParameter="{Binding}"
-                Text="Удалить ссылку на файл"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
             />
         </MenuFlyout>
         <MenuFlyout x:Key="flyoutFavFile" Placement="Bottom">
             <MenuFlyoutItem
+                x:Uid="FlyoutFavFileOpenFolder"
                 Command="{x:Bind ViewModel.OpenFolderFavFileCommand}"
                 CommandParameter="{Binding}"
-                Text="Открыть расположение"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE838;}"
             />
             <MenuFlyoutItem
+                x:Uid="FlyoutFavFileRemove"
                 Command="{x:Bind ViewModel.RemoveFavFileCommand}"
                 CommandParameter="{Binding}"
-                Text="Удалить ссылку на файл"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
             />
         </MenuFlyout>
@@ -75,8 +75,7 @@
             Spacing="8"
         >
             <controls:DoomItemList
-                HeaderTitle="Установленные GZDoom"
-                HeaderButtonTitle="Добавить"
+                x:Uid="SettingsPageGZDoom"
                 ItemsSource="{x:Bind vm:SettingsViewModel.Current.GZDoomInstalls}"
             >
                 <controls:DoomItemList.HeaderFlyout>
@@ -84,13 +83,13 @@
                         Placement="Bottom"
                     >
                       <MenuFlyoutItem
+                            x:Uid="SettingsPageGZDoomAddLocal"
                             Command="{x:Bind ViewModel.AddLocalDoomPackageCommand}"
-                            Text="Выбрать на устройстве"
                             Icon="{ui:FontIcon FontSize=14, Glyph=&#xEC50;}"
                        />
                         <MenuFlyoutItem
+                            x:Uid="SettingsPageGZDoomAddRemote"
                             Command="{x:Bind ViewModel.AddRemoteDoomPackageCommand}"
-                            Text="Скачать с GitHub"
                             Icon="{ui:FontIcon FontSize=14, Glyph=&#xE896;}"
                        />
                     </MenuFlyout>
@@ -121,8 +120,7 @@
                 </controls:DoomItemList.ItemTemplate>
             </controls:DoomItemList>
             <controls:DoomItemList
-                HeaderTitle="Установленные IWAD"
-                HeaderButtonTitle="Добавить"
+                x:Uid="SettingsPageIWAD"
                 ItemsSource="{x:Bind vm:SettingsViewModel.Current.IWadFiles}"
             >
                 <controls:DoomItemList.HeaderFlyout>
@@ -130,13 +128,13 @@
                         Placement="Bottom"
                     >
                         <MenuFlyoutItem 
+                            x:Uid="SettingsPageIWADAddLocal"
                             Command="{x:Bind ViewModel.AddLocalIWadCommand}"
-                            Text="Выбрать на устройстве"
                             Icon="{ui:FontIcon FontSize=14, Glyph=&#xEC50;}"
                         />
-                        <MenuFlyoutItem 
+                        <MenuFlyoutItem
+                            x:Uid="SettingsPageIWADAddFreedoom"
                             Command="{x:Bind ViewModel.AddFreedoomIWadFromGitHubCommand}"
-                            Text="Скачать Freedoom"
                             Icon="{ui:FontIcon FontSize=14, Glyph=&#xE896;}"
                         />
                     </MenuFlyout>
@@ -170,8 +168,7 @@
                 </controls:DoomItemList.ItemTemplate>
             </controls:DoomItemList>
             <controls:DoomItemList
-                HeaderTitle="Избранные файлы"
-                HeaderButtonTitle="Добавить"
+                x:Uid="SettingsPageFavFiles"
                 ItemsSource="{x:Bind vm:SettingsViewModel.Current.FavoriteFiles}"
             >   
                 <controls:DoomItemList.HeaderFlyout>
@@ -179,8 +176,8 @@
                         Placement="Bottom"
                     >
                         <MenuFlyoutItem 
+                            x:Uid="SettingsPageAddLocalFavFile"
                             Command="{x:Bind ViewModel.AddLocalFavFileCommand}"
-                            Text="Выбрать на устройстве"
                             Icon="{ui:FontIcon FontSize=14, Glyph=&#xEC50;}"
                         />
                     </MenuFlyout>
@@ -224,7 +221,7 @@
             >
                 <TextBlock
                     Grid.Column="0"
-                    Text="Интеграция Steam"
+                    x:Uid="SettingsPageSteamIntegration"
                     Style="{ThemeResource BaseTextBlockStyle}"
                     FontSize="16"
                     VerticalAlignment="Center"
@@ -253,7 +250,7 @@
             >
                 <TextBlock
                     Grid.Column="0"
-                    Text="Закрывать лаунчер при запуске сборки"
+                    x:Uid="SettingsPageCloseOnLaunch"
                     Style="{ThemeResource BaseTextBlockStyle}"
                     FontSize="16"
                     VerticalAlignment="Center"
@@ -278,7 +275,7 @@
                 Spacing="4"
             >
                 <TextBlock
-                    Text="О приложении"
+                    x:Uid="SettingsPageAbout"
                     Style="{ThemeResource BaseTextBlockStyle}"
                     FontSize="16"
                 />

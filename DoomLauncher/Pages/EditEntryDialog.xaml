@@ -6,8 +6,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="using:DoomLauncher"
     mc:Ignorable="d"
+    x:Uid="EditEntryDialog"
     DefaultButton="Primary"
-    CloseButtonText="Отмена"
     Style="{ThemeResource DefaultContentDialogStyle}"
     Title="{x:Bind ViewModel.Title}"
     PrimaryButtonText="{x:Bind ViewModel.PrimaryButtonText}"
@@ -20,32 +20,32 @@
         VerticalScrollMode="Enabled"
     >
         <StackPanel>
-            <TextBlock>Название</TextBlock>
+            <TextBlock x:Uid="EditEntryDialogName" />
             <TextBox
+                x:Uid="EditEntryDialogNameTextBox"
                 x:Name="tbModName"
                 HorizontalAlignment="Stretch"
                 Margin="0,8,0,8"
                 Text="{x:Bind ViewModel.Name, Mode=TwoWay}"
-                PlaceholderText="Введите название"
             />
-            <TextBlock>Описание</TextBlock>
+            <TextBlock x:Uid="EditEntryDialogShortDescription" />
             <TextBox
+                x:Uid="EditEntryDialogShortDescriptionTextBox" 
                 HorizontalAlignment="Stretch"
                 Margin="0,8,0,8"
                 Text="{x:Bind ViewModel.Description, Mode=TwoWay}"
-                PlaceholderText="Введите краткое описание"
             />
-            <TextBlock>Подробное описание</TextBlock>
+            <TextBlock x:Uid="EditEntryDialogLongDescription" />
             <TextBox
+                x:Uid="EditEntryDialogLongDescriptionTextBox"
                 Height="64"
                 AcceptsReturn="True"
                 TextWrapping="Wrap" 
                 HorizontalAlignment="Stretch"
                 Margin="0,8,0,8"
                 Text="{x:Bind ViewModel.LongDescription, Mode=TwoWay}"
-                PlaceholderText="Введите подробное описание"
             />
-            <TextBlock>Версия GZDoom</TextBlock>
+            <TextBlock x:Uid="EditEntryDialogGZDoomVersion" />
             <ComboBox
                 HorizontalAlignment="Stretch"
                 Margin="0,8,0,8"
@@ -71,7 +71,7 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <TextBlock>Интеграция Steam</TextBlock>
+            <TextBlock x:Uid="EditEntryDialogSteamIntegration" />
             <ComboBox
                 HorizontalAlignment="Stretch"
                 Margin="0,8,0,8"
@@ -85,14 +85,17 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
             <CheckBox
-                Content="Использовать уникальный файл настроек"
+                x:Uid="EditEntryDialogUniqueConfig"
                 IsChecked="{x:Bind ViewModel.UniqueConfig, Mode=TwoWay}"
             />
             <CheckBox
-                Content="Использовать уникальную папку сохранений"
+                x:Uid="EditEntryDialogUniqueSavesFolder"
                 IsChecked="{x:Bind ViewModel.UniqueSavesFolder, Mode=TwoWay}"
             />
-            <TextBlock Visibility="{x:Bind local:XamlHelper.HasItems(ViewModel.ModFiles.Count)}">Файлы</TextBlock>
+            <TextBlock
+                x:Uid="EditEntryDialogFiles"
+                Visibility="{x:Bind local:XamlHelper.HasItems(ViewModel.ModFiles.Count)}"
+            />
             <ListView
                 ItemsSource="{x:Bind ViewModel.ModFiles}"
                 SelectionMode="None"
@@ -113,7 +116,10 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <TextBlock Visibility="{x:Bind local:XamlHelper.HasItems(ViewModel.ImageFiles.Count)}">Изображения</TextBlock>
+            <TextBlock
+                x:Uid="EditEntryDialogImages"
+                Visibility="{x:Bind local:XamlHelper.HasItems(ViewModel.ImageFiles.Count)}"
+            />
             <ListView
                 ItemsSource="{x:Bind ViewModel.ImageFiles}"
                 SelectionMode="None"

@@ -20,7 +20,7 @@
             VerticalAlignment="Center"
         />
         <TextBlock
-            Text="Создайте или выберите сборку"
+            x:Uid="NotSelectedPageText"
             FontSize="24"
             VerticalAlignment="Center"
         />

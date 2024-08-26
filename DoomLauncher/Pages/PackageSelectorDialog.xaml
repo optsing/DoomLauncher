@@ -7,12 +7,9 @@
     xmlns:local="using:DoomLauncher"
     mc:Ignorable="d"
     DefaultButton="Primary"
-    Title="Выберите версию"
-    PrimaryButtonText="Установить"
-    CloseButtonText="Отмена"
+    x:Uid="PackageSelectorDialog"
     Style="{ThemeResource DefaultContentDialogStyle}"
 >
-
     <ListView SelectedItem="{x:Bind SelectedPackage, Mode=TwoWay}" ItemsSource="{x:Bind OnlinePackage}">
         <ListView.ItemTemplate>
             <DataTemplate x:DataType="local:DoomPackageViewModel">
