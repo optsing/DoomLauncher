@@ -188,7 +188,7 @@
                                     Style="{StaticResource BaseTextBlockStyle}"
                                 />
                             <TextBlock
-                                Text="{x:Bind local:FileHelper.SteamGameTitle(ViewModel.Entry.SteamGame, ViewModel.DefaultSteamGame, ViewModel.Entry.IWadFile, ViewModel.DefaultIWadFile), Mode=OneWay}"
+                                Text="{x:Bind local:FileHelper.SteamGameTitle(ViewModel.Entry.SteamGame, ViewModel.DefaultSteamGame), Mode=OneWay}"
                             />
                             </StackPanel>
                             <StackPanel Orientation="Vertical">

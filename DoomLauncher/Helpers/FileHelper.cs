@@ -81,23 +81,12 @@ internal static partial class FileHelper
         await FileIO.WriteTextAsync(file, $"[InternetShortcut]\nURL=gzdoomlauncher://launch/?id={entry.Id}\n");
     }
 
-    public static TitleAppId ResolveSteamGame(string steamGame, string defaultSteamGame, string iWadFile, string defaultIWadFile)
+    public static TitleAppId ResolveSteamGame(string steamGame, string defaultSteamGame)
     {
         var resolvedSteamGame = string.IsNullOrEmpty(steamGame) ? defaultSteamGame : steamGame;
-        if (!string.IsNullOrEmpty(resolvedSteamGame))
+        if (SteamAppIds.TryGetValue(resolvedSteamGame, out TitleAppId value))
         {
-            if (resolvedSteamGame == "iwad")
-            {
-                var resolvedIWad = ResolveIWadFile(iWadFile, defaultIWadFile).ToLower();
-                if (!string.IsNullOrEmpty(resolvedIWad) && IWads.TryGetValue(resolvedIWad, out TitleAppId value) && value.appId != 0)
-                {
-                    return value;
-                }
-            }
-            else if (SteamAppIds.TryGetValue(resolvedSteamGame, out TitleAppId value))
-            {
-                return value;
-            }
+            return value;
         }
         return SteamAppIds["off"];
     }
@@ -105,8 +94,7 @@ internal static partial class FileHelper
     public static Dictionary<string, TitleAppId> SteamAppIds = new()
     {
         { "off", new(Strings.Resources.SteamAppIdOff, 0) },
-        { "iwad", new(Strings.Resources.SteamAppIdAsIWAD, 0) },
-        { "doom", new("Ultimate Doom", 2280) },
+        { "doom", new("DOOM + DOOM II", 2280) },
         { "doom2", new("Doom II", 2300) },
         { "doom64", new("Doom 64", 1148590) },
         { "heretic", new("Heretic", 2390) },
@@ -114,24 +102,24 @@ internal static partial class FileHelper
         { "strife", new("Strife", 317040) },
     };
 
-    private static readonly Dictionary<string, TitleAppId> IWads = new()
+    private static readonly Dictionary<string, string> IWads = new()
     {
-        { "doom1.wad", new("Doom (Shareware)", 2280) },
-        { "doom.wad", new("Ultimate Doom", 2280) },
-        { "doom2.wad", new("Doom II", 2300) },
-        { "doom2f.wad", new("Doom II (French)", 2300) },
-        { "doom64.wad", new("Doom 64", 1148590)},
-        { "tnt.wad", new("TNT: Evilution", 0) },
-        { "plutonia.wad", new("The Plutonia Experiment", 0) },
-        { "heretic1.wad", new("Heretic (Shareware)", 2390) },
-        { "heretic.wad", new("Heretic", 2390) },
-        { "hexen.wad", new("Hexen", 2360) },
-        { "strife1.wad", new("Strife", 317040) },
-        { "chex.wad", new("Chex Quest", 0) },
-        { "freedoom1.wad", new("Freedoom: Phase 1", 0) },
-        { "freedoom2.wad", new("Freedoom: Phase 2", 0) },
-        { "freedm.wad", new("FreeDM", 0) },
-        { "sigil.wad", new TitleAppId("SIGIL", 0) },
+        { "doom1.wad", "Doom (Shareware)" },
+        { "doom.wad", "Ultimate Doom" },
+        { "doom2.wad", "Doom II" },
+        { "doom2f.wad", "Doom II (French)" },
+        { "doom64.wad", "Doom 64" },
+        { "tnt.wad", "TNT: Evilution" },
+        { "plutonia.wad", "The Plutonia Experiment" },
+        { "heretic1.wad", "Heretic (Shareware)" },
+        { "heretic.wad", "Heretic" },
+        { "hexen.wad", "Hexen" },
+        { "strife1.wad", "Strife" },
+        { "chex.wad", "Chex Quest" },
+        { "freedoom1.wad", "Freedoom: Phase 1" },
+        { "freedoom2.wad", "Freedoom: Phase 2" },
+        { "freedm.wad", "FreeDM" },
+        { "sigil.wad", "SIGIL" },
     };
 
     public static string ResolveIWadFile(string iWadFile, string defaultIWadFile)
@@ -162,8 +150,8 @@ internal static partial class FileHelper
         return SettingsViewModel.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == defaultGZDoomPath);
     }
 
-    public static string SteamGameTitle(string steamGame, string defaultSteamGame, string iWadFile, string defaultIWadFile) =>
-        ResolveSteamGame(steamGame, defaultSteamGame, iWadFile, defaultIWadFile).title;
+    public static string SteamGameTitle(string steamGame, string defaultSteamGame) =>
+        ResolveSteamGame(steamGame, defaultSteamGame).title;
 
 
     public static string GetIWadFileTitle(string iWadFile, string defaultIWadFile)
@@ -212,10 +200,9 @@ internal static partial class FileHelper
 
     public static string IWadFileToTitle(string iWadFile)
     {
-        var key = iWadFile.ToLower();
-        if (IWads.TryGetValue(key, out TitleAppId value))
+        if (IWads.TryGetValue(iWadFile.ToLower(), out var title))
         {
-            return value.title;
+            return title;
         }
         return iWadFile;
     }

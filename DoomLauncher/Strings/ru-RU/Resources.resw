@@ -216,8 +216,8 @@
   <data name="SettingsPageCloseOnLaunch.Text" xml:space="preserve">
     <value>Закрывать лаунчер при запуске сборки</value>
   </data>
-  <data name="SettingsPageSteamIntegration.Text" xml:space="preserve">
-    <value>Интеграция Steam</value>
+  <data name="SettingsPageSteamIntegrationDefault.Text" xml:space="preserve">
+    <value>Интеграция Steam по умолчанию</value>
   </data>
   <data name="SettingsPageAddLocalFavFile.Text" xml:space="preserve">
     <value>Выбрать на устройстве</value>

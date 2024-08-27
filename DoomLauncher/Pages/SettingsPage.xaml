@@ -222,7 +222,7 @@
             >
                 <TextBlock
                     Grid.Column="0"
-                    x:Uid="SettingsPageSteamIntegration"
+                    x:Uid="SettingsPageSteamIntegrationDefault"
                     Style="{ThemeResource BaseTextBlockStyle}"
                     FontSize="16"
                     VerticalAlignment="Center"
