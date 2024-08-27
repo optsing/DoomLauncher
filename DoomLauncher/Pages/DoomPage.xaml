@@ -155,6 +155,7 @@
                         Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         BorderThickness="1"
+                        Margin="-1"
                     >
                         <tk:WrapPanel
                             Orientation="Horizontal"
@@ -250,7 +251,7 @@
                     Grid.Column="0"
                     MaxHeight="192"
                     MaxWidth="992"
-                    Margin="16,0"
+                    Margin="15,-1"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                     BorderThickness="1"

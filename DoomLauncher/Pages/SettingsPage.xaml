@@ -218,6 +218,7 @@
                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                 BorderThickness="1"
+                Margin="-1"
                 Padding="16"
             >
                 <TextBlock
@@ -247,6 +248,7 @@
                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                 BorderThickness="1"
+                Margin="-1"
                 Padding="16"
             >
                 <TextBlock
@@ -272,6 +274,7 @@
                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                 BorderThickness="1"
+                Margin="-1"
                 Padding="16"
                 Spacing="4"
             >
