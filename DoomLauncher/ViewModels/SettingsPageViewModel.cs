@@ -24,6 +24,10 @@ public partial class SettingsPageViewModel : ObservableObject
     private const string FreedoomSubfolder = $"freedoom-{FreedoomVersion}/";
     private readonly string[] FreedoomIWads = ["freedoom1.wad", "freedoom2.wad"];
 
+    private const string ProjectBrutalityVersion = "0.1.0A";
+    private const string ProjectBrutalityUrl = $"https://github.com/pa1nki113r/Project_Brutality/archive/refs/tags/{ProjectBrutalityVersion}.zip";
+    private const string ProjectBrutalityFileName = $"ProjectBrutality{ProjectBrutalityVersion}.pk3";
+
     public SettingsPageViewModel()
     {
 #if IS_NON_PACKAGED
@@ -323,6 +327,29 @@ public partial class SettingsPageViewModel : ObservableObject
             }
         }
         EventBus.Progress(this, null);
+    }
+
+    [RelayCommand]
+    private async Task AddProjectBrutalityFromGitHub()
+    {
+        if (await DialogHelper.ShowAskAsync(Strings.Resources.DialogDownloadProjectBrutalityTitle, Strings.Resources.DialogDownloadProjectBrutalityText(ProjectBrutalityVersion), Strings.Resources.DialogDownloadAction, Strings.Resources.DialogCancelAction))
+        {
+            EventBus.Progress(this, Strings.Resources.ProgressLongDownload);
+            try
+            {
+                using var stream = await WebAPI.Current.DownloadUrl(ProjectBrutalityUrl);
+                await FileHelper.CopyFileWithConfirmation(stream, ProjectBrutalityFileName, FileHelper.ModsFolderPath);
+                if (!SettingsViewModel.Current.FavoriteFiles.Contains(ProjectBrutalityFileName))
+                {
+                    SettingsViewModel.Current.FavoriteFiles.Add(ProjectBrutalityFileName);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex);
+            }
+            EventBus.Progress(this, null);
+        }
     }
 
     [RelayCommand]
