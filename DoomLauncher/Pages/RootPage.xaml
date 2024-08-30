@@ -9,6 +9,7 @@
     xmlns:converters="using:CommunityToolkit.WinUI.Converters"
     xmlns:helpers="using:DoomLauncher.Helpers"
     xmlns:vm="using:DoomLauncher.ViewModels"
+    xmlns:local="using:DoomLauncher"
     xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
     mc:Ignorable="d"
     XYFocusKeyboardNavigation="Enabled"
@@ -140,94 +141,116 @@
                 >
                     <Grid.RowDefinitions>
                         <RowDefinition Height="{x:Bind TitleBarHeight}" />
-                        <RowDefinition Height="48" />
                         <RowDefinition Height="*" />
-                        <RowDefinition Height="48" />
                     </Grid.RowDefinitions>
-                    <SplitButton
+                    <Grid
                         Grid.Row="1"
-                        Command="{x:Bind CreateEntryEmptyCommand}"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Center"
-                        Margin="8,0"
+                        RowDefinitions="Auto,Auto,*,Auto"
+                        RowSpacing="8"
+                        Padding="8"
                     >
-                        <SplitButton.Flyout>
-                            <MenuFlyout>
-                                <MenuFlyoutItem
-                                    x:Uid="RootPageCreateEntryFromFiles"
-                                    Command="{x:Bind CreateEntryFromFilesCommand}"
-                                    HorizontalAlignment="Stretch"
-                                    Icon="{ui:FontIcon FontSize=14, Glyph=&#xEC50;}"
-                                />
-                                <MenuFlyoutItem
-                                    x:Uid="RootPageCreateEntryImport"
-                                    Command="{x:Bind ImportEntriesCommand}"
-                                    HorizontalAlignment="Stretch"
-                                    Icon="{ui:FontIcon FontSize=14, Glyph=&#xE898;}"
-                                />
-                            </MenuFlyout>
-                        </SplitButton.Flyout>
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <FontIcon FontSize="14" Glyph="&#xE710;" />
-                            <TextBlock x:Uid="RootPageCreateEntry" />
-                        </StackPanel>
-                    </SplitButton>
-                    <ListView
-                        SelectionMode="Single"
-                        Grid.Row="2"
-                        VerticalAlignment="Stretch"
-                        ItemsSource="{x:Bind vm:SettingsViewModel.Current.Entries}"
-                        SelectedItem="{x:Bind ViewModel.CurrentEntry, Mode=OneWay}"
-                        CanReorderItems="True"
-                        AllowDrop="True"
-                        SelectionChanged="ListView_SelectionChanged"
-                    >
-                        <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="vm:DoomEntryViewModel">
-                                <StackPanel
-                                    Orientation="Vertical"
-                                    Padding="0,8"
-                                    ContextFlyout="{StaticResource flyoutEntry}"
-                                    ToolTipService.ToolTip="{x:Bind helpers:XamlHelper.EntryTooltip(Name, Description), Mode=OneWay}"
-                                >
-                                    <TextBlock
-                                        Text="{x:Bind Name, Mode=OneWay}"
-                                        FontSize="16"
-                                        TextTrimming="CharacterEllipsis"
+                        <SplitButton
+                            Grid.Row="0"
+                            Command="{x:Bind CreateEntryEmptyCommand}"
+                            HorizontalAlignment="Stretch"
+                        >
+                            <SplitButton.Flyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem
+                                        x:Uid="RootPageCreateEntryFromFiles"
+                                        Command="{x:Bind CreateEntryFromFilesCommand}"
+                                        HorizontalAlignment="Stretch"
+                                        Icon="{ui:FontIcon FontSize=14, Glyph=&#xEC50;}"
                                     />
-                                    <TextBlock
-                                        Text="{x:Bind Description, Mode=OneWay}"
-                                        Visibility="{x:Bind helpers:XamlHelper.HasText(Description), Mode=OneWay}"
-                                        FontSize="12"
-                                        TextTrimming="CharacterEllipsis"
-                                    />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                    <Button
-                        Grid.Row="3"
-                        Command="{x:Bind NavigateToSettingsPageCommand}"
-                        Margin="8,0"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Center"
-                    >
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <AnimatedIcon Height="18">
-                                <AnimatedIcon.Source>
-                                    <animatedvisuals:AnimatedSettingsVisualSource />
-                                </AnimatedIcon.Source>
-                                <AnimatedIcon.FallbackIconSource>
-                                    <SymbolIconSource Symbol="Setting"/>
-                                </AnimatedIcon.FallbackIconSource>
-                            </AnimatedIcon>
-                            <TextBlock x:Uid="RootPageSettings" />
-                        </StackPanel>
-                    </Button>
+                                    <MenuFlyoutItem
+                                        x:Uid="RootPageCreateEntryImport"
+                                        Command="{x:Bind ImportEntriesCommand}"
+                                        HorizontalAlignment="Stretch"
+                                        Icon="{ui:FontIcon FontSize=14, Glyph=&#xE898;}"
+                                    />  
+                                </MenuFlyout>
+                            </SplitButton.Flyout>
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <FontIcon FontSize="14" Glyph="&#xE710;" />
+                                <TextBlock x:Uid="RootPageCreateEntry" />
+                            </StackPanel>
+                        </SplitButton>
+                        <Grid
+                            Grid.Row="1"
+                            ColumnDefinitions="*, Auto"
+                            ColumnSpacing="8"
+                        >
+                            <TextBox
+                                x:Uid="RootPageSearchTextBox"
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="{x:Bind ViewModel.SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            />
+                            <DropDownButton
+                                Grid.Column="1"
+                                Content="{ui:FontIcon FontSize=14, Glyph=&#xE8CB;}"
+                                VerticalAlignment="Stretch"
+                                Height="32"
+                            >
+                                <DropDownButton.Flyout>
+                                    <MenuFlyout x:Name="filterMenuFlyout" Placement="Bottom" />
+                                </DropDownButton.Flyout>
+                            </DropDownButton>
+                        </Grid>
+                        <ListView
+                            SelectionMode="Single"
+                            Grid.Row="2"
+                            VerticalAlignment="Stretch"
+                            Margin="-8,0"
+                            ItemsSource="{x:Bind ViewModel.Entries}"
+                            SelectedItem="{x:Bind ViewModel.CurrentEntry, Mode=OneWay}"
+                            ItemClick="ListView_ItemClick"
+                            IsItemClickEnabled="True"
+                        >   
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="vm:DoomEntryViewModel">
+                                    <StackPanel
+                                        Orientation="Vertical"
+                                        Padding="0,8"
+                                        ContextFlyout="{StaticResource flyoutEntry}"
+                                        ToolTipService.ToolTip="{x:Bind helpers:XamlHelper.EntryTooltip(Name, Description), Mode=OneWay}"
+                                    >
+                                        <TextBlock
+                                            Text="{x:Bind Name, Mode=OneWay}"
+                                            FontSize="16"
+                                            TextTrimming="CharacterEllipsis"
+                                        />
+                                        <TextBlock
+                                            Text="{x:Bind Description, Mode=OneWay}"
+                                            Visibility="{x:Bind helpers:XamlHelper.HasText(Description), Mode=OneWay}"
+                                            FontSize="12"
+                                            TextTrimming="CharacterEllipsis"
+                                        />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                        <Button
+                            Grid.Row="3"
+                            Command="{x:Bind NavigateToSettingsPageCommand}"
+                            HorizontalAlignment="Stretch"
+                        >
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <AnimatedIcon Height="18">
+                                    <AnimatedIcon.Source>
+                                        <animatedvisuals:AnimatedSettingsVisualSource />
+                                    </AnimatedIcon.Source>
+                                    <AnimatedIcon.FallbackIconSource>
+                                        <SymbolIconSource Symbol="Setting"/>
+                                    </AnimatedIcon.FallbackIconSource>
+                                </AnimatedIcon>
+                                <TextBlock x:Uid="RootPageSettings" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
                     <Border
                         Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
                         Grid.Row="1"
-                        Grid.RowSpan="3"
                         CornerRadius="8"
                         AllowDrop="True"
                         DragOver="LeftDropHelper_DragOver"

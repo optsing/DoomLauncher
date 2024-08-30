@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<AssemblyName>GZDoomLauncher</AssemblyName>
 		<AssemblyTitle>GZDoom Launcher</AssemblyTitle>
-		<AssemblyVersion>1.2.0.0</AssemblyVersion>
+		<AssemblyVersion>1.2.1.0</AssemblyVersion>
 		<ApplicationIcon>Assets\app.ico</ApplicationIcon>
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
@@ -43,6 +43,7 @@
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.0" />
 		<PackageReference Include="CommunityToolkit.WinUI.Animations" Version="8.0.240109" />
+		<PackageReference Include="CommunityToolkit.WinUI.Collections" Version="8.0.240109" />
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" Version="8.0.240109" />
 		<PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.0.240109" />
 		<PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.0.240109" />

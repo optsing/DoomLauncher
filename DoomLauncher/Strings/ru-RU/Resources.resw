@@ -502,4 +502,19 @@
   <data name="SettingsPageFavFilesAddProjectBrutality.Text" xml:space="preserve">
     <value>Скачать Project Brutality</value>
   </data>
+  <data name="SortOrderByName" xml:space="preserve">
+    <value>По имени</value>
+  </data>
+  <data name="SortOrderByLaunch" xml:space="preserve">
+    <value>По дате запуска</value>
+  </data>
+  <data name="SortOrderByPlayTime" xml:space="preserve">
+    <value>По времени в игре</value>
+  </data>
+  <data name="SortOrderByCreated" xml:space="preserve">
+    <value>По дате создания</value>
+  </data>
+  <data name="RootPageSearchTextBox.PlaceholderText" xml:space="preserve">
+    <value>Поиск по названию</value>
+  </data>
 </root>

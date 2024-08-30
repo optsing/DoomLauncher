@@ -70,7 +70,25 @@ public sealed partial class RootPage : Page
         {
             CurrentEntry = SettingsViewModel.Current.Entries.ElementAtOrDefault(SettingsViewModel.Current.SelectedModIndex),
         };
+        InitializeFilterMenu();
         NavigateToEntry(ViewModel.CurrentEntry);
+    }
+
+    private void InitializeFilterMenu()
+    {
+        if (ViewModel is RootPageViewModel vm)
+        {
+            foreach (var order in vm.SortOrders)
+            {
+                var item = new RadioMenuFlyoutItem
+                {
+                    Text = order.Value,
+                    IsChecked = vm.SortOrder.Key == order.Key,
+                };
+                item.Click += (sender, e) => vm.SortOrder = order;
+                filterMenuFlyout.Items.Add(item);
+            }
+        }
     }
 
     private void EventBus_OnDropHelper(object? sender, bool e)
@@ -599,18 +617,11 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void ListView_ItemClick(object sender, ItemClickEventArgs e)
     {
-        if (sender is ListView listView)
+        if (e.ClickedItem is DoomEntryViewModel entry)
         {
-            if (listView.SelectedItem is DoomEntryViewModel entry)
-            {
-                SetCurrentEntry(entry);
-            }
-            else
-            {
-                SetCurrentEntry(null);
-            }
+            SetCurrentEntry(entry);
         }
     }
 }

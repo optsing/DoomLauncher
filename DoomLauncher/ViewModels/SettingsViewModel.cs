@@ -33,6 +33,8 @@ public partial class SettingsViewModel : ObservableObject
     public string SteamGame { get => steamGame; set => SetProperty(ref steamGame, value); }
     private string steamGame = "off";
 
+    public string SortOrder { get; set; } = "";
+
     public int SelectedModIndex { get; set; } = 0;
     public ObservableCollection<DoomEntryViewModel> Entries { get; set; } = [];
 
