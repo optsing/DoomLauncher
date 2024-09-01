@@ -205,28 +205,20 @@ public sealed partial class RootPage : Page
     }
 
     [RelayCommand]
-    private static async Task EditEntry(DoomEntryViewModel? entry)
+    private async Task EditEntry(DoomEntryViewModel? entry)
     {
         if (entry == null)
         {
             return;
         }
-        if (await DialogHelper.ShowEditEntryAsync(entry, EditDialogMode.Edit) is EditEntryDialogViewModel result)
+        var result = await DialogHelper.ShowEditEntryAsync(entry, EditDialogMode.Edit);
+        if (result.Result == ContentDialogResult.Primary)
         {
-            result.UpdateEntry(entry);
+            result.ViewModel.UpdateEntry(entry);
             SettingsViewModel.Current.Save();
             await JumpListHelper.Update();
         }
-    }
-
-    [RelayCommand]
-    private async Task CopyEntry(DoomEntryViewModel? entry)
-    {
-        if (entry == null)
-        {
-            return;
-        }
-        if (await DialogHelper.ShowEditEntryAsync(entry, EditDialogMode.Copy) is EditEntryDialogViewModel result)
+        else if (result.Result == ContentDialogResult.Secondary)
         {
             var newEntry = new DoomEntryViewModel()
             {
@@ -236,7 +228,7 @@ public sealed partial class RootPage : Page
                 ModFiles = new(entry.ModFiles),
                 ImageFiles = new(entry.ImageFiles),
             };
-            result.UpdateEntry(newEntry);
+            result.ViewModel.UpdateEntry(newEntry);
             AddEntries([newEntry]);
         }
     }
@@ -360,7 +352,7 @@ public sealed partial class RootPage : Page
     [RelayCommand]
     private async Task CreateEntryEmpty()
     {
-        if (await DialogHelper.ShowEditEntryAsync(EditDialogMode.Create) is EditEntryDialogViewModel result)
+        if (await DialogHelper.ShowEditEntryAsync(EditDialogMode.Create) is var result && result.Result == ContentDialogResult.Primary)
         {
             var newEntry = new DoomEntryViewModel()
             {
@@ -368,7 +360,7 @@ public sealed partial class RootPage : Page
                 Created = DateTime.Now,
                 SelectedImageIndex = 0,
             };
-            result.UpdateEntry(newEntry);
+            result.ViewModel.UpdateEntry(newEntry);
             AddEntries([newEntry]);
         }
     }
@@ -406,7 +398,7 @@ public sealed partial class RootPage : Page
         WinRT.Interop.InitializeWithWindow.Initialize(picker, WinApi.HWND);
 
         // Now we can use the picker object as normal
-        picker.FileTypeChoices.Add(Strings.Resources.Shortcut, [".url"]);
+        picker.FileTypeChoices.Add(Strings.Resources.FileTypeShortcutTitle, [".url"]);
         picker.SuggestedFileName = entry.Name;
         picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Desktop;
         picker.CommitButtonText = Strings.Resources.CreateShortcut;
@@ -435,7 +427,7 @@ public sealed partial class RootPage : Page
         WinRT.Interop.InitializeWithWindow.Initialize(picker, WinApi.HWND);
 
         // Now we can use the picker object as normal
-        picker.FileTypeChoices.Add(Strings.Resources.ChooseGZDLFile, [".gzdl"]);
+        picker.FileTypeChoices.Add(Strings.Resources.FileTypeGZDLTitle, [".gzdl"]);
         picker.SuggestedFileName = entry.Name;
         picker.CommitButtonText = Strings.Resources.Export;
 

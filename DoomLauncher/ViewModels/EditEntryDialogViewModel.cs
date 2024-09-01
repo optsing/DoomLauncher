@@ -16,7 +16,6 @@ public class EditEntryDialogViewModel(EditDialogMode mode)
         EditDialogMode.Create => Strings.Resources.EditDialogModeCreateTitle,
         EditDialogMode.Edit => Strings.Resources.EditDialogModeEditTitle,
         EditDialogMode.Import => Strings.Resources.EditDialogModeImportTitle,
-        EditDialogMode.Copy => Strings.Resources.EditDialogModeCopyTitle,
         _ => throw new NotImplementedException(),
     };
     public string PrimaryButtonText => mode switch
@@ -24,7 +23,14 @@ public class EditEntryDialogViewModel(EditDialogMode mode)
         EditDialogMode.Create => Strings.Resources.EditDialogModeCreateAction,
         EditDialogMode.Edit => Strings.Resources.EditDialogModeEditAction,
         EditDialogMode.Import => Strings.Resources.EditDialogModeImportAction,
-        EditDialogMode.Copy => Strings.Resources.EditDialogModeCopyAction,
+        _ => throw new NotImplementedException(),
+    };
+
+    public string SecondaryButtonText => mode switch
+    {
+        EditDialogMode.Create => "",
+        EditDialogMode.Edit => Strings.Resources.EditDialogModeCopyAction,
+        EditDialogMode.Import => "",
         _ => throw new NotImplementedException(),
     };
 

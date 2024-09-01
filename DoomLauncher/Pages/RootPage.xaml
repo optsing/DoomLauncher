@@ -23,11 +23,12 @@
                 CommandParameter="{Binding}"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE70F;}"
             />
+            <MenuFlyoutSeparator />
             <MenuFlyoutItem
-                x:Uid="FlyoutEntryCopy"
-                Command="{x:Bind CopyEntryCommand}"
+                x:Uid="FlyoutEntryExport"
+                Command="{x:Bind ExportEntryCommand}"
                 CommandParameter="{Binding}"
-                Icon="{ui:FontIcon FontSize=14, Glyph=&#xE8C8;}"
+                Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74E;}"
             />
             <MenuFlyoutItem
                 x:Uid="FlyoutEntryCreateShortcut"
@@ -36,10 +37,24 @@
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE71B;}"
             />
             <MenuFlyoutItem
+                x:Uid="FlyoutEntryRemove"
+                Command="{x:Bind RemoveEntryCommand}"
+                CommandParameter="{Binding}"
+                Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
+            />
+        </MenuFlyout>
+        <MenuFlyout x:Key="flyoutEntryShort" Placement="Bottom">
+            <MenuFlyoutItem
                 x:Uid="FlyoutEntryExport"
                 Command="{x:Bind ExportEntryCommand}"
                 CommandParameter="{Binding}"
-                Icon="{ui:FontIcon FontSize=14, Glyph=&#xE896;}"
+                Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74E;}"
+            />
+            <MenuFlyoutItem
+                x:Uid="FlyoutEntryCreateShortcut"
+                Command="{x:Bind CreateShortcutEntryCommand}"
+                CommandParameter="{Binding}"
+                Icon="{ui:FontIcon FontSize=14, Glyph=&#xE71B;}"
             />
             <MenuFlyoutItem
                 x:Uid="FlyoutEntryRemove"
@@ -332,10 +347,20 @@
                         <DropDownButton
                             DataContext="{x:Bind ViewModel.CurrentEntry, Mode=OneWay}"
                             VerticalAlignment="Center"
-                            Flyout="{StaticResource flyoutEntry}"
+                            Flyout="{StaticResource flyoutEntryShort}"
                             Content="{ui:FontIcon FontSize=14, Glyph=&#xE712;}"
                             Height="32"
                         />
+                        <Button 
+                            Command="{x:Bind EditEntryCommand}"
+                            CommandParameter="{x:Bind ViewModel.CurrentEntry, Mode=OneWay}"
+                            VerticalAlignment="Center"
+                        >
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <FontIcon FontSize="14" Glyph="&#xE70F;" />
+                                <TextBlock x:Uid="FlyoutEntryEdit" />
+                            </StackPanel>
+                        </Button>
                         <Button 
                             Command="{x:Bind LaunchEntryCommand}"
                             CommandParameter="{x:Bind ViewModel.CurrentEntry, Mode=OneWay}"

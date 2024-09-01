@@ -1,4 +1,6 @@
-﻿using DoomLauncher.ViewModels;
+﻿using DoomLauncher.Helpers;
+using DoomLauncher.ViewModels;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -47,11 +49,11 @@ internal static partial class EntryHelper
                         imageFiles.Add(zipFileEntry.Name);
                     }
                 }
-                if (await DialogHelper.ShowEditEntryAsync(newEntry, EditDialogMode.Import, modFiles, imageFiles) is EditEntryDialogViewModel result)
+                if (await DialogHelper.ShowEditEntryAsync(newEntry, EditDialogMode.Import, modFiles, imageFiles) is var result && result.Result == ContentDialogResult.Primary)
                 {
-                    result.UpdateEntry(newEntry);
-                    modFiles = result.GetModFiles();
-                    imageFiles = result.GetImageFiles();
+                    result.ViewModel.UpdateEntry(newEntry);
+                    modFiles = result.ViewModel.GetModFiles();
+                    imageFiles = result.ViewModel.GetImageFiles();
                 }
                 else
                 {
@@ -135,11 +137,11 @@ internal static partial class EntryHelper
                         imageFiles.Add(zipFileEntry.Name);
                     }
                 }
-                if (await DialogHelper.ShowEditEntryAsync(newEntry, EditDialogMode.Import, modFiles, imageFiles) is EditEntryDialogViewModel result)
+                if (await DialogHelper.ShowEditEntryAsync(newEntry, EditDialogMode.Import, modFiles, imageFiles) is var result && result.Result == ContentDialogResult.Primary)
                 {
-                    result.UpdateEntry(newEntry);
-                    modFiles = result.GetModFiles();
-                    imageFiles = result.GetImageFiles();
+                    result.ViewModel.UpdateEntry(newEntry);
+                    modFiles = result.ViewModel.GetModFiles();
+                    imageFiles = result.ViewModel.GetImageFiles();
                 }
                 else
                 {
@@ -220,11 +222,11 @@ internal static partial class EntryHelper
                 {
                     imageFiles.Add(image.Name);
                 }
-                if (await DialogHelper.ShowEditEntryAsync(newEntry, EditDialogMode.Create, modFiles, imageFiles) is EditEntryDialogViewModel result)
+                if (await DialogHelper.ShowEditEntryAsync(newEntry, EditDialogMode.Create, modFiles, imageFiles) is var result && result.Result == ContentDialogResult.Primary)
                 {
-                    result.UpdateEntry(newEntry);
-                    modFiles = result.GetModFiles();
-                    imageFiles = result.GetImageFiles();
+                    result.ViewModel.UpdateEntry(newEntry);
+                    modFiles = result.ViewModel.GetModFiles();
+                    imageFiles = result.ViewModel.GetImageFiles();
                 }
                 else
                 {

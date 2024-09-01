@@ -13,7 +13,9 @@
     Style="{ThemeResource DefaultContentDialogStyle}"
     Title="{x:Bind ViewModel.Title}"
     PrimaryButtonText="{x:Bind ViewModel.PrimaryButtonText}"
-    PrimaryButtonClick="EditEntryDialog_PrimaryButtonClick"
+    SecondaryButtonText="{x:Bind ViewModel.SecondaryButtonText}"
+    PrimaryButtonClick="EditEntryDialog_PrimaryOrSecondaryButtonClick"
+    SecondaryButtonClick="EditEntryDialog_PrimaryOrSecondaryButtonClick"
 >
     <ScrollView
         VerticalAlignment="Center"

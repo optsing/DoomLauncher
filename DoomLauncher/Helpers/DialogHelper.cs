@@ -5,7 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DoomLauncher;
+namespace DoomLauncher.Helpers;
+
+public class EditEntryDialogResult
+{
+    public required ContentDialogResult Result { get; init; }
+    public required EditEntryDialogViewModel ViewModel { get; init; }
+}
+
 
 internal static class DialogHelper
 {
@@ -32,40 +39,31 @@ internal static class DialogHelper
         }
     }
 
-    public static async Task<EditEntryDialogViewModel?> ShowEditEntryAsync(DoomEntryViewModel entry, EditDialogMode mode, List<string>? modFiles = null, List<string>? imageFiles = null)
+    public static async Task<EditEntryDialogResult> ShowEditEntryAsync(DoomEntryViewModel entry, EditDialogMode mode, List<string>? modFiles = null, List<string>? imageFiles = null)
     {
-        if (XamlRoot == null)
-        {
-            return null;
-        }
         var viewModel = EditEntryDialogViewModel.FromEntry(entry, mode, modFiles, imageFiles);
         var dialog = new EditEntryDialog(viewModel)
         {
             XamlRoot = XamlRoot,
         };
-        if (ContentDialogResult.Primary == await dialog.ShowAsync())
-        {
-            return viewModel;
-        }
-        return null;
+        return new EditEntryDialogResult {
+            Result = await dialog.ShowAsync(),
+            ViewModel = viewModel,
+        };
     }
 
-    public static async Task<EditEntryDialogViewModel?> ShowEditEntryAsync(EditDialogMode mode)
+    public static async Task<EditEntryDialogResult> ShowEditEntryAsync(EditDialogMode mode)
     {
-        if (XamlRoot == null)
-        {
-            return null;
-        }
         var viewModel = new EditEntryDialogViewModel(mode);
         var dialog = new EditEntryDialog(viewModel)
         {
             XamlRoot = XamlRoot,
         };
-        if (ContentDialogResult.Primary == await dialog.ShowAsync())
+        return new EditEntryDialogResult
         {
-            return viewModel;
-        }
-        return null;
+            Result = await dialog.ShowAsync(),
+            ViewModel = viewModel,
+        };
     }
 
     public static async Task<DoomPackageViewModel?> ShowPackageSelectorAsync(List<DoomPackageViewModel> packages)

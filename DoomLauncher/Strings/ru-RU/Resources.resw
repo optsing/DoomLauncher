@@ -276,14 +276,11 @@
   <data name="FlyoutPackageRemove.Text" xml:space="preserve">
     <value>Удалить ссылку на файл</value>
   </data>
-  <data name="FlyoutEntryCopy.Text" xml:space="preserve">
-    <value>Дублировать</value>
-  </data>
   <data name="FlyoutEntryRemove.Text" xml:space="preserve">
     <value>Удалить</value>
   </data>
   <data name="FlyoutEntryExport.Text" xml:space="preserve">
-    <value>Экспортировать</value>
+    <value>Сохранить</value>
   </data>
   <data name="FlyoutEntryCreateShortcut.Text" xml:space="preserve">
     <value>Создать ярлык</value>
@@ -367,11 +364,8 @@
   <data name="EditDialogModeImportAction" xml:space="preserve">
     <value>Импортировать </value>
   </data>
-  <data name="EditDialogModeCopyTitle" xml:space="preserve">
-    <value>Дублировать</value>
-  </data>
   <data name="EditDialogModeCopyAction" xml:space="preserve">
-    <value>Дублирование сборки</value>
+    <value>Сохранить как</value>
   </data>
   <data name="EditDialogModeCreateAction" xml:space="preserve">
     <value>Создать</value>
@@ -403,9 +397,6 @@
   <data name="CreateShortcut" xml:space="preserve">
     <value>Создать ярлык</value>
   </data>
-  <data name="Shortcut" xml:space="preserve">
-    <value>Ярлык</value>
-  </data>
   <data name="DialogRemoveAction" xml:space="preserve">
     <value>Удалить</value>
   </data>
@@ -420,9 +411,6 @@
   </data>
   <data name="Export" xml:space="preserve">
     <value>Экспортировать</value>
-  </data>
-  <data name="ChooseGZDLFile" xml:space="preserve">
-    <value>Выбрать сборку GZDL</value>
   </data>
   <data name="DialogRemoveLinkText" xml:space="preserve">
     <value>Вы уверены, что хотите удалить ссылку на '{0}'?</value>
@@ -516,5 +504,11 @@
   </data>
   <data name="RootPageSearchTextBox.PlaceholderText" xml:space="preserve">
     <value>Поиск по названию</value>
+  </data>
+  <data name="FileTypeShortcutTitle" xml:space="preserve">
+    <value>Ярлык</value>
+  </data>
+  <data name="FileTypeGZDLTitle" xml:space="preserve">
+    <value>Сборка GZDL</value>
   </data>
 </root>

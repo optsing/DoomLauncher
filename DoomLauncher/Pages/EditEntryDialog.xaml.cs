@@ -20,7 +20,7 @@ public sealed partial class EditEntryDialog : ContentDialog
         ViewModel = viewModel;
     }
 
-    private void EditEntryDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+    private void EditEntryDialog_PrimaryOrSecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
         if (string.IsNullOrWhiteSpace(ViewModel.Name))
         {
@@ -32,7 +32,7 @@ public sealed partial class EditEntryDialog : ContentDialog
 
 public enum EditDialogMode
 {
-    Create, Edit, Import, Copy
+    Create, Edit, Import 
 }
 
 public class TitleChecked(string title)

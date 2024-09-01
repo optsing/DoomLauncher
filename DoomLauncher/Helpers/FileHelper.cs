@@ -1,4 +1,5 @@
-﻿using DoomLauncher.ViewModels;
+﻿using DoomLauncher.Helpers;
+using DoomLauncher.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
