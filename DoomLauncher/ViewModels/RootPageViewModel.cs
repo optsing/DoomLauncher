@@ -63,6 +63,7 @@ public partial class RootPageViewModel : ObservableObject
                 Entries.SortDescriptions.Add(new SortDescription("PlayTime", SortDirection.Descending));
             }
             Entries.SortDescriptions.Add(new SortDescription("Name", SortDirection.Ascending));
+            Entries.SortDescriptions.Add(new SortDescription("Created", SortDirection.Ascending));
         }
     }
 

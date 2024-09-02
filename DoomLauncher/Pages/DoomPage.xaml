@@ -167,7 +167,7 @@
                                     Text="GZDoom"
                                     FontSize="16"
                                     Style="{StaticResource BaseTextBlockStyle}"
-                                />
+                                  />
                                 <TextBlock
                                     Text="{x:Bind local:FileHelper.GZDoomPathToTitle(ViewModel.Entry.GZDoomPath, ViewModel.DefaultGZDoomPath), Mode=OneWay}"
                                 />
@@ -185,12 +185,22 @@
                             <StackPanel Orientation="Vertical">
                                 <TextBlock
                                     x:Uid="DoomPageInfoSteamIntegration"
+                                FontSize="16"
+                                Style="{StaticResource BaseTextBlockStyle}"
+                            />
+                                <TextBlock
+                                Text="{x:Bind local:FileHelper.SteamGameTitle(ViewModel.Entry.SteamGame, ViewModel.DefaultSteamGame), Mode=OneWay}"
+                                />
+                            </StackPanel>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock
+                                    x:Uid="DoomPageInfoCreated"
                                     FontSize="16"
                                     Style="{StaticResource BaseTextBlockStyle}"
                                 />
-                            <TextBlock
-                                Text="{x:Bind local:FileHelper.SteamGameTitle(ViewModel.Entry.SteamGame, ViewModel.DefaultSteamGame), Mode=OneWay}"
-                            />
+                                <TextBlock
+                                    Text="{x:Bind helpers:XamlHelper.DateToText(ViewModel.Entry.Created), Mode=OneWay}"
+                                />
                             </StackPanel>
                             <StackPanel Orientation="Vertical">
                                 <TextBlock
@@ -206,7 +216,7 @@
                                 <TextBlock
                                     x:Uid="DoomPageInfoPlayTime"
                                     FontSize="16"
-                                    Style="{StaticResource BaseTextBlockStyle}"
+Style="{StaticResource BaseTextBlockStyle}"
                                 />
                                 <TextBlock
                                     Text="{x:Bind helpers:XamlHelper.TimeSpanToText(ViewModel.Entry.PlayTime), Mode=OneWay}"

@@ -511,4 +511,7 @@
   <data name="FileTypeGZDLTitle" xml:space="preserve">
     <value>Сборка GZDL</value>
   </data>
+  <data name="DoomPageInfoCreated.Text" xml:space="preserve">
+    <value>Создано</value>
+  </data>
 </root>

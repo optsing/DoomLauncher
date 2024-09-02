@@ -24,8 +24,10 @@ public partial class DoomEntryViewModel : ObservableObject
     public string SteamGame { get => steamGame; set => SetProperty(ref steamGame, value); }
     private string steamGame = "";
 
-    public bool UniqueConfig { get; set; } = false;
-    public bool UniqueSavesFolder { get; set; } = false;
+    public bool UniqueConfig { get => uniqueConfig; set => SetProperty(ref uniqueConfig, value); }
+    private bool uniqueConfig = false;
+    public bool UniqueSavesFolder { get => uniqueSavesFolder; set => SetProperty(ref uniqueSavesFolder, value); }
+    private bool uniqueSavesFolder = false;
 
     public string Id { get; set; } = "";
 

@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<AssemblyName>GZDoomLauncher</AssemblyName>
 		<AssemblyTitle>GZDoom Launcher</AssemblyTitle>
-		<AssemblyVersion>1.2.1.0</AssemblyVersion>
+		<AssemblyVersion>1.2.2.0</AssemblyVersion>
 		<ApplicationIcon>Assets\app.ico</ApplicationIcon>
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
@@ -18,7 +18,7 @@
 		<PublishReadyToRun>true</PublishReadyToRun>
 		<PublishTrimmed>true</PublishTrimmed>
 		<TrimMode>partial</TrimMode>
-		<DefaultLanguage>ru-RU</DefaultLanguage>
+		<DefaultLanguage>ru</DefaultLanguage>
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Platforms>x64;ARM64</Platforms>
