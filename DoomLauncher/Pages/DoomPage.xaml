@@ -185,9 +185,9 @@
                             <StackPanel Orientation="Vertical">
                                 <TextBlock
                                     x:Uid="DoomPageInfoSteamIntegration"
-                                FontSize="16"
-                                Style="{StaticResource BaseTextBlockStyle}"
-                            />
+                                    FontSize="16"
+                                    Style="{StaticResource BaseTextBlockStyle}"
+                                />
                                 <TextBlock
                                 Text="{x:Bind local:FileHelper.SteamGameTitle(ViewModel.Entry.SteamGame, ViewModel.DefaultSteamGame), Mode=OneWay}"
                                 />
@@ -216,7 +216,7 @@
                                 <TextBlock
                                     x:Uid="DoomPageInfoPlayTime"
                                     FontSize="16"
-Style="{StaticResource BaseTextBlockStyle}"
+                                    Style="{StaticResource BaseTextBlockStyle}"
                                 />
                                 <TextBlock
                                     Text="{x:Bind helpers:XamlHelper.TimeSpanToText(ViewModel.Entry.PlayTime), Mode=OneWay}"
@@ -251,7 +251,7 @@ Style="{StaticResource BaseTextBlockStyle}"
                                         Width="40"
                                         Flyout="{StaticResource flyoutFile}"
                                         Content="{ui:FontIcon FontSize=14, Glyph=&#xE712;}"
-                                    />  
+                                    />
                                 </Grid>
                             </DataTemplate>
                         </controls:DoomItemList.ItemTemplate>
