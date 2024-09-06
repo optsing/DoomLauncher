@@ -46,10 +46,7 @@ internal static class LaunchHelper
         if (entry.UniqueConfig)
         {
             var entryFolderPath = Path.Combine(FileHelper.EntriesFolderPath, entry.Id);
-            if (!Directory.Exists(entryFolderPath))
-            {
-                Directory.CreateDirectory(entryFolderPath);
-            }
+            Directory.CreateDirectory(entryFolderPath);
             var configPath = Path.Combine(entryFolderPath, "config.ini");
             processInfo.ArgumentList.Add("-config");
             processInfo.ArgumentList.Add(configPath);
@@ -57,10 +54,7 @@ internal static class LaunchHelper
         if (entry.UniqueSavesFolder)
         {
             var entrySavesFolderPath = Path.Combine(FileHelper.EntriesFolderPath, entry.Id, "saves");
-            if (!Directory.Exists(entrySavesFolderPath))
-            {
-                Directory.CreateDirectory(entrySavesFolderPath);
-            }
+            Directory.CreateDirectory(entrySavesFolderPath);
             processInfo.ArgumentList.Add("-savedir");
             processInfo.ArgumentList.Add(entrySavesFolderPath);
         }

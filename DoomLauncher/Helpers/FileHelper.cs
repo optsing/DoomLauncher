@@ -40,10 +40,7 @@ internal static partial class FileHelper
         var targetPath = Path.Combine(targetFolder, file.Name);
         if (targetPath != file.Path)
         {
-            if (!Directory.Exists(targetFolder))
-            {
-                Directory.CreateDirectory(targetFolder);
-            }
+            Directory.CreateDirectory(targetFolder);
             if (!File.Exists(targetPath) || await DialogHelper.ShowAskAsync(
                 Strings.Resources.DialogFileReplaceTitle,
                 Strings.Resources.DialogFileReplaceText(file.Name),
@@ -61,10 +58,7 @@ internal static partial class FileHelper
     public static async Task CopyFileWithConfirmation(Stream sourceStream, string fileName, string targetFolder)
     {
         var targetPath = Path.Combine(targetFolder, fileName);
-        if (!Directory.Exists(targetFolder))
-        {
-            Directory.CreateDirectory(targetFolder);
-        }
+        Directory.CreateDirectory(targetFolder);
         if (!File.Exists(targetPath) || await DialogHelper.ShowAskAsync(
             Strings.Resources.DialogFileReplaceTitle,
             Strings.Resources.DialogFileReplaceText(fileName),

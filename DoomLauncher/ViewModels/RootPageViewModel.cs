@@ -52,18 +52,18 @@ public partial class RootPageViewModel : ObservableObject
             Entries.SortDescriptions.Clear();
             if (order == "launch")
             {
-                Entries.SortDescriptions.Add(new SortDescription("LastLaunch", SortDirection.Descending));
+                Entries.SortDescriptions.Add(new SortDescription(nameof(DoomEntryViewModel.LongDescription), SortDirection.Descending));
             }
             else if (order == "created")
             {
-                Entries.SortDescriptions.Add(new SortDescription("Created", SortDirection.Descending));
+                Entries.SortDescriptions.Add(new SortDescription(nameof(DoomEntryViewModel.Created), SortDirection.Descending));
             }
             else if (order == "playtime")
             {
-                Entries.SortDescriptions.Add(new SortDescription("PlayTime", SortDirection.Descending));
+                Entries.SortDescriptions.Add(new SortDescription(nameof(DoomEntryViewModel.PlayTime), SortDirection.Descending));
             }
-            Entries.SortDescriptions.Add(new SortDescription("Name", SortDirection.Ascending));
-            Entries.SortDescriptions.Add(new SortDescription("Created", SortDirection.Ascending));
+            Entries.SortDescriptions.Add(new SortDescription(nameof(DoomEntryViewModel.Name), SortDirection.Ascending));
+            Entries.SortDescriptions.Add(new SortDescription(nameof(DoomEntryViewModel.Created), SortDirection.Ascending));
         }
     }
 
