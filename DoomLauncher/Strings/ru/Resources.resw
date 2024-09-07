@@ -280,7 +280,7 @@
     <value>Удалить</value>
   </data>
   <data name="FlyoutEntryExport.Text" xml:space="preserve">
-    <value>Сохранить</value>
+    <value>Сохранить в файл</value>
   </data>
   <data name="FlyoutEntryCreateShortcut.Text" xml:space="preserve">
     <value>Создать ярлык</value>
@@ -410,7 +410,7 @@
     <value>Удалить ссылку</value>
   </data>
   <data name="Export" xml:space="preserve">
-    <value>Экспортировать</value>
+    <value>Сохранить</value>
   </data>
   <data name="DialogRemoveLinkText" xml:space="preserve">
     <value>Вы уверены, что хотите удалить ссылку на '{0}'?</value>
