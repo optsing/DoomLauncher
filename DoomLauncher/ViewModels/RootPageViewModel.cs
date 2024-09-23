@@ -1,7 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.WinUI.Collections;
+using DoomLauncher.Helpers;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace DoomLauncher.ViewModels;
@@ -39,32 +40,33 @@ public partial class RootPageViewModel : ObservableObject
         }
         set
         {
-            SettingsViewModel.Current.SortOrder = value.Key;
-            RefreshSort();
+            if (SettingsViewModel.Current.SortOrder != value.Key)
+            {
+                SettingsViewModel.Current.SortOrder = value.Key;
+                RefreshSort();
+                SyncCollection.SyncImmediate();
+            }
         }
     }
 
     private void RefreshSort()
     {
-        using (Entries.DeferRefresh())
+        var order = SortOrder.Key;
+        SyncCollection.ClearSort();
+        if (order == "launch")
         {
-            var order = SortOrder.Key;
-            Entries.SortDescriptions.Clear();
-            if (order == "launch")
-            {
-                Entries.SortDescriptions.Add(new SortDescription(nameof(DoomEntryViewModel.LongDescription), SortDirection.Descending));
-            }
-            else if (order == "created")
-            {
-                Entries.SortDescriptions.Add(new SortDescription(nameof(DoomEntryViewModel.Created), SortDirection.Descending));
-            }
-            else if (order == "playtime")
-            {
-                Entries.SortDescriptions.Add(new SortDescription(nameof(DoomEntryViewModel.PlayTime), SortDirection.Descending));
-            }
-            Entries.SortDescriptions.Add(new SortDescription(nameof(DoomEntryViewModel.Name), SortDirection.Ascending));
-            Entries.SortDescriptions.Add(new SortDescription(nameof(DoomEntryViewModel.Created), SortDirection.Ascending));
+            SyncCollection.AddSort(nameof(DoomEntryViewModel.LastLaunch), x => x.LastLaunch, true);
         }
+        else if (order == "created")
+        {
+            SyncCollection.AddSort(nameof(DoomEntryViewModel.Created), x => x.Created, true);
+        }
+        else if (order == "playtime")
+        {
+            SyncCollection.AddSort(nameof(DoomEntryViewModel.PlayTime), x => x.PlayTime, true);
+        }
+        SyncCollection.AddSort(nameof(DoomEntryViewModel.Name), x => x.Name);
+        SyncCollection.AddSort(nameof(DoomEntryViewModel.Created), x => x.Created);
     }
 
     [ObservableProperty]
@@ -72,14 +74,19 @@ public partial class RootPageViewModel : ObservableObject
 
     public RootPageViewModel()
     {
-        Entries.Filter = (object vm) => string.IsNullOrEmpty(SearchQuery) || ((DoomEntryViewModel)vm).Name.Contains(SearchQuery, System.StringComparison.CurrentCultureIgnoreCase);
+        SyncCollection = new SyncCollection<DoomEntryViewModel>(SettingsViewModel.Current.Entries, Entries)
+        {
+            Filter = vm => string.IsNullOrEmpty(SearchQuery) || vm.Name.Contains(SearchQuery, System.StringComparison.CurrentCultureIgnoreCase),
+        };
         RefreshSort();
+        SyncCollection.SyncImmediate();
     }
 
-    public AdvancedCollectionView Entries = new(SettingsViewModel.Current.Entries, true);
+    public ObservableCollection<DoomEntryViewModel> Entries { get; } =[];
+    private readonly SyncCollection<DoomEntryViewModel> SyncCollection;
 
     partial void OnSearchQueryChanged(string value)
     {
-        Entries.RefreshFilter();
+        SyncCollection.SyncDebounce();
     }
 }

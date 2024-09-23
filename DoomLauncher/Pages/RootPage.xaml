@@ -16,6 +16,7 @@
 >
     <Page.Resources>
         <converters:EmptyObjectToObjectConverter x:Key="NullVisibilityConverter" NotEmptyValue="Visible" EmptyValue="Collapsed" />
+        <converters:DoubleToObjectConverter x:Key="HasItemsToVisiblity" GreaterThan="0" TrueValue="Collapsed" FalseValue="Visible" />
         <MenuFlyout x:Key="flyoutEntry" Placement="Bottom">
             <MenuFlyoutItem
                 x:Uid="FlyoutEntryEdit"
@@ -212,6 +213,16 @@
                                 </DropDownButton.Flyout>
                             </DropDownButton>
                         </Grid>
+                        <TextBlock
+                            x:Uid="RootPageEntriesNotFound"
+                            Grid.Row="2"
+                            Visibility="{x:Bind ViewModel.Entries.Count, Converter={StaticResource HasItemsToVisiblity}, Mode=OneWay}"
+                            VerticalAlignment="Top"
+                            HorizontalAlignment="Center"
+                            TextAlignment="Center"
+                            FontSize="16"
+                            Margin="16"
+                        />
                         <ListView
                             SelectionMode="Single"
                             Grid.Row="2"

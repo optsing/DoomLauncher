@@ -514,4 +514,7 @@
   <data name="DoomPageInfoCreated.Text" xml:space="preserve">
     <value>Создано</value>
   </data>
+  <data name="RootPageEntriesNotFound.Text" xml:space="preserve">
+    <value>Сборки не найдены</value>
+  </data>
 </root>
