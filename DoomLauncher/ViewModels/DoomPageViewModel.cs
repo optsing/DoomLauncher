@@ -21,6 +21,9 @@ public partial class ModFileViewModel(string filePath, bool isInFavorites) : Obs
 
     [ObservableProperty]
     private bool isInFavorites = isInFavorites;
+    public required IRelayCommand<ModFileViewModel> ToggleFavoriteFileCommand { get; init; }
+    public required IRelayCommand<ModFileViewModel> OpenContainingFolderCommand { get; init; }
+    public required IRelayCommand<ModFileViewModel> RemoveModFileCommand { get; init; }
 }
 
 public partial class ImageFileViewModel : ObservableObject
@@ -42,6 +45,9 @@ public partial class ImageFileViewModel : ObservableObject
     {
         Image = await BitmapHelper.CreateBitmapFromFile(FullPath, isPreview: true);
     }
+
+    public required IRelayCommand<ImageFileViewModel> OpenImageContainingFolderCommand { get; init; }
+    public required IRelayCommand<ImageFileViewModel> RemoveImageFileCommand { get; init; }
 }
 
 public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableObject
@@ -97,12 +103,21 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
         ModFileList.Clear();
         foreach (var filePath in entry.ModFiles)
         {
-            ModFileList.Add(new(filePath, FavoriteFiles.Contains(filePath)));
+            ModFileList.Add(new(filePath, FavoriteFiles.Contains(filePath))
+            {
+                ToggleFavoriteFileCommand = ToggleFavoriteFileCommand,
+                OpenContainingFolderCommand = OpenContainingFolderCommand,
+                RemoveModFileCommand = RemoveModFileCommand,
+            });
         }
         ImageFileList.Clear();
         foreach (var imagePath in entry.ImageFiles)
         {
-            ImageFileList.Add(new(imagePath));
+            ImageFileList.Add(new(imagePath)
+            {
+                OpenImageContainingFolderCommand = OpenImageContainingFolderCommand,
+                RemoveImageFileCommand = RemoveImageFileCommand,
+            });
         }
         SetSlideshow();
         SetSelectedImageIndex(entry.SelectedImageIndex, direction: AnimationDirection.None);
@@ -146,7 +161,12 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
             await FileHelper.CopyFileWithConfirmation(file, FileHelper.ModsFolderPath);
             if (!ModFileList.Any(modFile => modFile.Path == file.Name))
             {
-                ModFileList.Add(new(file.Name, FavoriteFiles.Contains(file.Name)));
+                ModFileList.Add(new(file.Name, FavoriteFiles.Contains(file.Name))
+                {
+                    ToggleFavoriteFileCommand = ToggleFavoriteFileCommand,
+                    OpenContainingFolderCommand = OpenContainingFolderCommand,
+                    RemoveModFileCommand = RemoveModFileCommand,
+                });
             }
         }
         EventBus.Progress(this, null);
@@ -182,7 +202,11 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
             await FileHelper.CopyFileWithConfirmation(file, FileHelper.ImagesFolderPath);
             if (!ImageFileList.Any(imageFile => imageFile.Path == file.Name))
             {
-                ImageFileList.Add(new(file.Name));
+                ImageFileList.Add(new(file.Name)
+                {
+                    OpenImageContainingFolderCommand = OpenImageContainingFolderCommand,
+                    RemoveImageFileCommand = RemoveImageFileCommand,
+                });
                 hasAddedImages = true;
             }
         }

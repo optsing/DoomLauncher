@@ -23,46 +23,6 @@
         <converters:BoolToObjectConverter x:Key="IsInFavoritesTextConverter" x:Uid="IsInFavoritesTextConverter" />
         <converters:BoolToObjectConverter x:Key="IsInFavoritesGlyphConverter" TrueValue="&#xE734;" FalseValue="&#xE735;" />
         <converters:DoubleToObjectConverter x:Key="HasItemsToMargin" GreaterThan="0" TrueValue="8,0,16,0" FalseValue="0,0,16,0" />
-        <MenuFlyout x:Key="flyoutFile" Placement="Bottom">
-            <MenuFlyoutItem
-                Command="{x:Bind ViewModel.ToggleFavoriteFileCommand}"
-                CommandParameter="{Binding}"
-                Text="{Binding IsInFavorites, Converter={StaticResource IsInFavoritesTextConverter}}"
-            >
-                <MenuFlyoutItem.Icon>
-                    <FontIcon
-                        FontSize="14"
-                        Glyph="{Binding IsInFavorites, Converter={StaticResource IsInFavoritesGlyphConverter}}" 
-                    />
-                </MenuFlyoutItem.Icon>
-            </MenuFlyoutItem>
-            <MenuFlyoutItem
-                x:Uid="FlyoutFileOpenFolder"
-                Command="{x:Bind ViewModel.OpenContainingFolderCommand}"
-                CommandParameter="{Binding}"
-                Icon="{ui:FontIcon FontSize=14, Glyph=&#xE838;}"
-            />
-            <MenuFlyoutItem
-                x:Uid="FlyoutFileRemove"
-                Command="{x:Bind ViewModel.RemoveModFileCommand}"
-                CommandParameter="{Binding}"
-                Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
-            />
-        </MenuFlyout>
-        <MenuFlyout x:Key="flyoutImage" Placement="Bottom">
-            <MenuFlyoutItem
-                x:Uid="FlyoutImageOpenFolder"
-                Command="{x:Bind ViewModel.OpenImageContainingFolderCommand}"
-                CommandParameter="{Binding}"
-                Icon="{ui:FontIcon FontSize=14, Glyph=&#xE838;}"
-            />
-            <MenuFlyoutItem
-                x:Uid="FlyoutImageRemove"
-                Command="{x:Bind ViewModel.RemoveImageFileCommand}"
-                CommandParameter="{Binding}"
-                Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
-            />
-        </MenuFlyout>
         <ControlTemplate x:Key="PictureListViewItem" TargetType="ListViewItem">
             <Grid
                 x:Name="Root"
@@ -238,21 +198,51 @@
                         </controls:DoomItemList.HeaderFlyout>
                         <controls:DoomItemList.ItemTemplate>
                             <DataTemplate x:DataType="vm:ModFileViewModel">
-                                <Grid ColumnDefinitions="*,Auto" ContextFlyout="{StaticResource flyoutFile}">
-                                    <TextBlock
-                                        Grid.Column="0"
-                                        Text="{x:Bind Title}"
-                                        VerticalAlignment="Center"
-                                    />
-                                    <Button
-                                        Grid.Column="1"
-                                        Style="{ThemeResource EllipsisButton}"
-                                        Height="40"
-                                        Width="40"
-                                        Flyout="{StaticResource flyoutFile}"
-                                        Content="{ui:FontIcon FontSize=14, Glyph=&#xE712;}"
-                                    />
-                                </Grid>
+                                <Border>
+                                    <Border.Resources>
+                                        <MenuFlyout x:Key="flyoutFile" Placement="Bottom">
+                                            <MenuFlyoutItem
+                                                Command="{x:Bind ToggleFavoriteFileCommand}"
+                                                CommandParameter="{x:Bind}"
+                                                Text="{x:Bind IsInFavorites, Converter={StaticResource IsInFavoritesTextConverter}, Mode=OneWay}"
+                                            >       
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon
+                                                        FontSize="14"
+                                                        Glyph="{x:Bind IsInFavorites, Converter={StaticResource IsInFavoritesGlyphConverter}, Mode=OneWay}" 
+                                                    />  
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+                                            <MenuFlyoutItem
+                                                x:Uid="FlyoutFileOpenFolder"
+                                                Command="{x:Bind OpenContainingFolderCommand}"
+                                                CommandParameter="{x:Bind}"
+                                                Icon="{ui:FontIcon FontSize=14, Glyph=&#xE838;}"
+                                            />
+                                            <MenuFlyoutItem
+                                                x:Uid="FlyoutFileRemove"
+                                                Command="{x:Bind RemoveModFileCommand}"
+                                                CommandParameter="{x:Bind}"
+                                                Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
+                                            />
+                                        </MenuFlyout>
+                                    </Border.Resources>
+                                    <Grid ColumnDefinitions="*,Auto" ContextFlyout="{StaticResource flyoutFile}">
+                                        <TextBlock
+                                            Grid.Column="0"
+                                            Text="{x:Bind Title}"
+                                            VerticalAlignment="Center"
+                                        />
+                                        <Button
+                                            Grid.Column="1"
+                                            Style="{ThemeResource EllipsisButton}"
+                                            Height="40"
+                                            Width="40"
+                                            Flyout="{StaticResource flyoutFile}"            
+                                            Content="{ui:FontIcon FontSize=14, Glyph=&#xE712;}"
+                                        />
+                                    </Grid>
+                                </Border>                              
                             </DataTemplate>
                         </controls:DoomItemList.ItemTemplate>
                     </controls:DoomItemList>
@@ -303,6 +293,22 @@
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="vm:ImageFileViewModel">
                             <Grid>
+                                <Grid.Resources>
+                                    <MenuFlyout x:Key="flyoutImage" Placement="Bottom">
+                                        <MenuFlyoutItem
+                                            x:Uid="FlyoutImageOpenFolder"
+                                            Command="{x:Bind OpenImageContainingFolderCommand}"
+                                            CommandParameter="{x:Bind}"
+                                            Icon="{ui:FontIcon FontSize=14, Glyph=&#xE838;}"
+                                        />
+                                        <MenuFlyoutItem
+                                            x:Uid="FlyoutImageRemove"
+                                            Command="{x:Bind RemoveImageFileCommand}"
+                                            CommandParameter="{x:Bind}"
+                                            Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
+                                        />
+                                    </MenuFlyout>
+                                </Grid.Resources>
                                 <Image
                                     VerticalAlignment="Center"
                                     HorizontalAlignment="Center"
