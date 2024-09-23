@@ -7,7 +7,7 @@
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
 		<TargetPlatformMinVersion>10.0.18362.0</TargetPlatformMinVersion>
-		<WindowsSdkPackageVersion>10.0.26100.42</WindowsSdkPackageVersion>
+		<WindowsSdkPackageVersion>10.0.26100.45</WindowsSdkPackageVersion>
 		<RootNamespace>DoomLauncher</RootNamespace>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<UseWinUI>true</UseWinUI>
@@ -26,6 +26,7 @@
 		<!--<WindowsPackageType>None</WindowsPackageType>-->
 		<AppendPlatformToOutputPath>false</AppendPlatformToOutputPath>
 		<MvvmToolkitEnableINotifyPropertyChangingSupport>false</MvvmToolkitEnableINotifyPropertyChangingSupport>
+		<DisableRuntimeMarshalling>true</DisableRuntimeMarshalling>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(WindowsPackageType)' == 'None'">
@@ -42,7 +43,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.1" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
 		<PackageReference Include="CommunityToolkit.WinUI.Animations" Version="8.1.240916" />
 		<PackageReference Include="CommunityToolkit.WinUI.Collections" Version="8.1.240916" />
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" Version="8.1.240916" />
