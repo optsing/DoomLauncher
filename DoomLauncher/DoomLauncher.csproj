@@ -17,7 +17,7 @@
 		<PublishSingleFile>false</PublishSingleFile>
 		<PublishReadyToRun>true</PublishReadyToRun>
 		<PublishTrimmed>true</PublishTrimmed>
-		<TrimMode>partial</TrimMode>
+		<TrimMode>full</TrimMode>
 		<PublishAOT>false</PublishAOT>
 		<DefaultLanguage>ru</DefaultLanguage>
 		<Nullable>enable</Nullable>
