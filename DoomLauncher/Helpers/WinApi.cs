@@ -1,10 +1,13 @@
-﻿using Microsoft.UI.Windowing;
+﻿using DoomLauncher.ViewModels;
 using Microsoft.UI;
+using Microsoft.UI.Windowing;
 using System;
-using System.Runtime.InteropServices;
-using DoomLauncher.ViewModels;
+using Windows.Win32;
+using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Gdi;
+using Windows.Win32.UI.HiDpi;
 
-namespace DoomLauncher;
+namespace DoomLauncher.Helpers;
 
 public partial class WinApi
 {
@@ -17,7 +20,7 @@ public partial class WinApi
         {
             presenter.Minimize();
         }
-        SetForegroundWindow(anotherHWnd);
+        PInvoke.SetForegroundWindow(new HWND(anotherHWnd));
     }
 
     public static void RestoreAndSwitchToThisWindow()
@@ -33,53 +36,7 @@ public partial class WinApi
                 presenter.Restore();
             }
         }
-        SetForegroundWindow(HWND);
-    }
-
-    [LibraryImport("User32.dll")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool SetForegroundWindow(IntPtr handle);
-
-    [LibraryImport("shell32.dll", SetLastError = true)]
-    private static partial IntPtr CommandLineToArgvW([MarshalAs(UnmanagedType.LPWStr)] string lpCmdLine, out int pNumArgs);
-
-    public static string[] CommandLineToArgs(string commandLine)
-    {
-        var argv = CommandLineToArgvW(commandLine, out int argc);
-        if (argv == IntPtr.Zero)
-            throw new System.ComponentModel.Win32Exception();
-        try
-        {
-            var args = new string[argc];
-            for (var i = 0; i < args.Length; i++)
-            {
-                var p = Marshal.ReadIntPtr(argv, i * IntPtr.Size);
-                if (Marshal.PtrToStringUni(p) is not string arg)
-                {
-                    throw new System.ComponentModel.Win32Exception();
-                }
-                else
-                {
-                    args[i] = arg;
-                }
-            }
-            return args;
-        }
-        finally
-        {
-            Marshal.FreeHGlobal(argv);
-        }
-    }
-
-    [LibraryImport("Shcore.dll")]
-    private static partial int GetDpiForMonitor(IntPtr hmonitor, Monitor_DPI_Type dpiType, out uint dpiX, out uint dpiY);
-
-    internal enum Monitor_DPI_Type : int
-    {
-        MDT_Effective_DPI = 0,
-        MDT_Angular_DPI = 1,
-        MDT_Raw_DPI = 2,
-        MDT_Default = MDT_Effective_DPI,
+        PInvoke.SetForegroundWindow(new HWND(HWND));
     }
 
     public static double GetScaleAdjustment(IntPtr hWnd)
@@ -88,12 +45,9 @@ public partial class WinApi
         var displayArea = DisplayArea.GetFromWindowId(wndId, DisplayAreaFallback.Primary);
         var hMonitor = Win32Interop.GetMonitorFromDisplayId(displayArea.DisplayId);
 
-        // Get DPI.
-        var result = GetDpiForMonitor(hMonitor, Monitor_DPI_Type.MDT_Default, out var dpiX, out var _);
-        if (result != 0)
-        {
-            throw new Exception("Could not get DPI for monitor.");
-        }
+        PInvoke
+            .GetDpiForMonitor(new HMONITOR(hMonitor), MONITOR_DPI_TYPE.MDT_DEFAULT, out var dpiX, out var _)
+            .ThrowOnFailure();
 
         var scaleFactorPercent = (uint)(((long)dpiX * 100 + (96 >> 1)) / 96);
         return scaleFactorPercent / 100.0;
