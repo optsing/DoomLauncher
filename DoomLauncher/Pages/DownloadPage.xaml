@@ -72,7 +72,7 @@
             ItemsSource="{x:Bind GroupedEntries.View}"     
             ItemTemplate="{StaticResource DownloadEntryTemplate}"
             MaxWidth="992"
-            Margin="16,8"
+            Margin="16,8,16,16"
         >
             <ItemsControl.GroupStyle>
                 <GroupStyle>

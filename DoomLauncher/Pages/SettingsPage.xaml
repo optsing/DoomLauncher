@@ -71,7 +71,7 @@
         <StackPanel
             Orientation="Vertical"
             MaxWidth="992"
-            Margin="16,8"
+            Margin="16,8,16,16"
             ChildrenTransitions="{StaticResource PageCardsAnimations}"
             Spacing="8"
         >
