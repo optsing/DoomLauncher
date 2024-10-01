@@ -222,7 +222,14 @@
                             TextAlignment="Center"
                             FontSize="16"
                             Margin="16"
-                        />
+                        >
+                            <animations:Implicit.ShowAnimations>
+                                <animations:OpacityAnimation Duration="0:0:0.3" From="0" To="1.0"/>
+                            </animations:Implicit.ShowAnimations>
+                            <animations:Implicit.HideAnimations>
+                                <animations:OpacityAnimation Duration="0:0:0.3" From="1.0" To="0"/>
+                            </animations:Implicit.HideAnimations>
+                        </TextBlock>
                         <ListView
                             SelectionMode="Single"
                             Grid.Row="2"
@@ -256,23 +263,37 @@
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>
-                        <Button
+                        <StackPanel
                             Grid.Row="3"
-                            Command="{x:Bind NavigateToSettingsPageCommand}"
-                            HorizontalAlignment="Stretch"
+                            Orientation="Vertical"
+                            Spacing="8"
                         >
-                            <StackPanel Orientation="Horizontal" Spacing="4">
-                                <AnimatedIcon Height="18">
-                                    <AnimatedIcon.Source>
-                                        <animatedvisuals:AnimatedSettingsVisualSource />
-                                    </AnimatedIcon.Source>
-                                    <AnimatedIcon.FallbackIconSource>
-                                        <SymbolIconSource Symbol="Setting"/>
-                                    </AnimatedIcon.FallbackIconSource>
-                                </AnimatedIcon>
-                                <TextBlock x:Uid="RootPageSettings" />
-                            </StackPanel>
-                        </Button>
+                            <Button
+                                Command="{x:Bind NavigateToDownloadPageCommand}"
+                                HorizontalAlignment="Stretch"
+                            >  
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <FontIcon FontSize="14" Glyph="&#xF6FA;" />
+                                    <TextBlock x:Uid="RootPageDownloads" />
+                                </StackPanel>
+                            </Button>
+                            <Button
+                                Command="{x:Bind NavigateToSettingsPageCommand}"
+                                HorizontalAlignment="Stretch"
+                            >
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <AnimatedIcon Height="18">
+                                        <AnimatedIcon.Source>
+                                            <animatedvisuals:AnimatedSettingsVisualSource />
+                                        </AnimatedIcon.Source>
+                                        <AnimatedIcon.FallbackIconSource>
+                                            <SymbolIconSource Symbol="Setting"/>
+                                        </AnimatedIcon.FallbackIconSource>
+                                    </AnimatedIcon>
+                                    <TextBlock x:Uid="RootPageSettings" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
                     </Grid>
                     <Border
                         Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"

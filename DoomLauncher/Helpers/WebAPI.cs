@@ -6,7 +6,7 @@ using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace DoomLauncher;
+namespace DoomLauncher.Helpers;
 
 [JsonSerializable(typeof(DoomWorldGetResponse))]
 [JsonSerializable(typeof(List<GitHubReleaseEntry>))]
@@ -102,6 +102,22 @@ public class WebAPI
         {
             Console.Error.WriteLine(ex);
             return [];
+        }
+    }
+
+    public const string DownloadEntriesIndexEndpoint = "https://raw.githubusercontent.com/optsing/gzdoom-free-files/refs/heads/main/index.json";
+
+    public async Task<DownloadEntryList?> DownloadEntriesFromGitHub()
+    {
+        try
+        {
+            var jsonResponse = await httpClient.GetFromJsonAsync(DownloadEntriesIndexEndpoint, JsonDownloadEntryContext.Default.DownloadEntryList);
+            return jsonResponse;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
+            return null;
         }
     }
 }

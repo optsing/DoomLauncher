@@ -133,11 +133,6 @@
                             Command="{x:Bind ViewModel.AddLocalIWadCommand}"
                             Icon="{ui:FontIcon FontSize=14, Glyph=&#xEC50;}"
                         />
-                        <MenuFlyoutItem
-                            x:Uid="SettingsPageIWADAddFreedoom"
-                            Command="{x:Bind ViewModel.AddFreedoomIWadFromGitHubCommand}"
-                            Icon="{ui:FontIcon FontSize=14, Glyph=&#xE896;}"
-                        />
                     </MenuFlyout>
                 </controls:DoomItemList.HeaderFlyout>
                 <controls:DoomItemList.ItemTemplate>
@@ -180,11 +175,6 @@
                             x:Uid="SettingsPageFavFilesAddLocal"
                             Command="{x:Bind ViewModel.AddLocalFavFileCommand}"
                             Icon="{ui:FontIcon FontSize=14, Glyph=&#xEC50;}"
-                        />
-                        <MenuFlyoutItem 
-                            x:Uid="SettingsPageFavFilesAddProjectBrutality"
-                            Command="{x:Bind ViewModel.AddProjectBrutalityFromGitHubCommand}"
-                            Icon="{ui:FontIcon FontSize=14, Glyph=&#xE896;}"
                         />
                     </MenuFlyout>
                 </controls:DoomItemList.HeaderFlyout>

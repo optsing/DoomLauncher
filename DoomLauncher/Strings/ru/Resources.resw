@@ -300,6 +300,9 @@
   <data name="RootPageSettings.Text" xml:space="preserve">
     <value>Настройки</value>
   </data>
+  <data name="RootPageDownloads.Text" xml:space="preserve">
+    <value>Онлайн</value>
+  </data>
   <data name="RootPageLaunch.Text" xml:space="preserve">
     <value>Играть</value>
   </data>
@@ -419,19 +422,13 @@
   <data name="DialogRemoveImageLinkText" xml:space="preserve">
     <value>Вы уверены, что хотите удалить выбранное изображение?</value>
   </data>
-  <data name="DialogDownloadFreedoomTitle" xml:space="preserve">
-    <value>Скачать Freedoom</value>
-  </data>
-  <data name="DialogDownloadProjectBrutalityTitle" xml:space="preserve">
-    <value>Скачать Project Brutality</value>
-  </data>
-  <data name="DialogDownloadFreedoomText" xml:space="preserve">
-    <value>Вы уверены, что хотите скачать Freedoom версии {0}?</value>
+  <data name="DialogDownloadEntryTitle" xml:space="preserve">
+    <value>Скачать {0}</value>
     <comment>#Format[String]</comment>
   </data>
-  <data name="DialogDownloadProjectBrutalityText" xml:space="preserve">
-    <value>Вы уверены, что хотите скачать Project Brutality версии {0}?</value>
-    <comment>#Format[String]</comment>
+  <data name="DialogDownloadEntryText" xml:space="preserve">
+    <value>Вы уверены, что хотите скачать {0} версии {1}?</value>
+    <comment>#Format[String,String]</comment>
   </data>
   <data name="DialogLaunchErrorTitle" xml:space="preserve">
     <value>Ошибка при запуске</value>
@@ -516,5 +513,14 @@
   </data>
   <data name="RootPageEntriesNotFound.Text" xml:space="preserve">
     <value>Сборки не найдены</value>
+  </data>
+  <data name="DownloadPageDownload.Text" xml:space="preserve">
+    <value>Скачать</value>
+  </data>
+  <data name="DownloadPageGroupIWAD" xml:space="preserve">
+    <value>IWAD</value>
+  </data>
+  <data name="DownloadPageGroupFiles" xml:space="preserve">
+    <value>Файлы</value>
   </data>
 </root>

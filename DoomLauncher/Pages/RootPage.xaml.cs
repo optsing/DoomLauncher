@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using DoomLauncher.Helpers;
+using DoomLauncher.Pages;
 using DoomLauncher.ViewModels;
 using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
@@ -310,6 +311,16 @@ public sealed partial class RootPage : Page
     }
 
     [RelayCommand]
+    private void NavigateToDownloadPage()
+    {
+        if (frameMain.Content is not DownloadPage)
+        {
+            frameMain.Navigate(typeof(DownloadPage));
+            SetCurrentEntry(null);
+        }
+    }
+
+    [RelayCommand]
     private void NavigateToSettingsPage()
     {
         if (frameMain.Content is not SettingsPage)
@@ -599,7 +610,7 @@ public sealed partial class RootPage : Page
             SettingsViewModel.Current.SelectedModIndex = SettingsViewModel.Current.Entries.IndexOf(entry);
             frameMain.Navigate(typeof(DoomPage), entry);
         }
-        else if (frameMain.Content is not SettingsPage)
+        else if (frameMain.Content is not SettingsPage && frameMain.Content is not DownloadPage)
         {
             frameMain.Navigate(typeof(NotSelectedPage));
         }

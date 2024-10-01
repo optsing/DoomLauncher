@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="DoomLauncher.Pages.DownloadPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:DoomLauncher.Pages"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:DoomLauncher.ViewModels"
+    xmlns:converters="using:CommunityToolkit.WinUI.Converters"
+    xmlns:collections="using:CommunityToolkit.Mvvm.Collections"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <CollectionViewSource x:Name="GroupedEntries" Source="{x:Bind ViewModel.Entries}" IsSourceGrouped="True"/>
+        <converters:DoubleToObjectConverter x:Key="HasItemsToVisiblity" GreaterThan="1" TrueValue="Visible" FalseValue="Collapsed" />
+        <DataTemplate x:Key="DownloadEntryTemplate" x:DataType="vm:DownloadEntryViewModel">
+            <Grid
+                ColumnDefinitions="*,Auto,Auto"
+                ColumnSpacing="8"
+                CornerRadius="8"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                Padding="16"
+            >
+                <StackPanel
+                    Grid.Column="0"
+                    Orientation="Vertical"
+                    Spacing="8"
+                >
+                    <TextBlock
+                        Text="{x:Bind Name}"
+                        Style="{ThemeResource BaseTextBlockStyle}"
+                        FontSize="16"
+                    />
+                    <TextBlock
+                        Text="{x:Bind Description}"
+                        TextWrapping="WrapWholeWords"
+                    />
+                </StackPanel>
+                <ComboBox
+                    Grid.Column="1"
+                    SelectedItem="{x:Bind CurrentVersion, Mode=TwoWay}"
+                    ItemsSource="{x:Bind Versions}"
+                    VerticalAlignment="Center"
+                    Visibility="{x:Bind Versions.Count, Converter={StaticResource HasItemsToVisiblity}}"
+                    MinWidth="100"
+                />
+                <Button
+                    Grid.Column="2"
+                    Command="{x:Bind DownloadCommand}"
+                    CommandParameter="{x:Bind}"
+                    VerticalAlignment="Center"
+                >
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <FontIcon FontSize="14" Glyph="&#xE896;" />
+                        <TextBlock x:Uid="DownloadPageDownload" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+    <ScrollView>
+        <StackPanel
+             Orientation="Vertical"
+             MaxWidth="992"
+             Margin="16,8"
+             Spacing="8"
+        >
+            <ItemsControl
+                ItemsSource="{x:Bind GroupedEntries.View}"     
+                ItemTemplate="{StaticResource DownloadEntryTemplate}"
+            >
+                <ItemsControl.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.HeaderTemplate>
+                            <DataTemplate x:DataType="collections:IReadOnlyObservableGroup">
+                                <TextBlock
+                                    Margin="16,8"
+                                    Text="{x:Bind Key}"
+                                    Style="{ThemeResource BaseTextBlockStyle}"
+                                    FontSize="16"
+                                />
+                            </DataTemplate>
+                        </GroupStyle.HeaderTemplate>
+                        <GroupStyle.Panel>
+                            <ItemsPanelTemplate>
+                                <StackPanel
+                                    Orientation="Vertical"
+                                    Spacing="8"
+                                />
+                            </ItemsPanelTemplate>
+                        </GroupStyle.Panel>
+                    </GroupStyle>
+                </ItemsControl.GroupStyle>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollView>
+</Page>

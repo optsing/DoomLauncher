@@ -19,15 +19,6 @@ namespace DoomLauncher.ViewModels;
 
 public partial class SettingsPageViewModel : ObservableObject
 {
-    private const string FreedoomVersion = "0.13.0";
-    private const string FreedoomDownloadUrl = $"https://github.com/freedoom/freedoom/releases/download/v{FreedoomVersion}/freedoom-{FreedoomVersion}.zip";
-    private const string FreedoomSubfolder = $"freedoom-{FreedoomVersion}/";
-    private readonly string[] FreedoomIWads = ["freedoom1.wad", "freedoom2.wad"];
-
-    private const string ProjectBrutalityVersion = "0.1.0A";
-    private const string ProjectBrutalityUrl = $"https://github.com/pa1nki113r/Project_Brutality/archive/refs/tags/{ProjectBrutalityVersion}.zip";
-    private const string ProjectBrutalityFileName = $"ProjectBrutality{ProjectBrutalityVersion}.pk3";
-
     public SettingsPageViewModel()
     {
 #if IS_NON_PACKAGED
@@ -200,41 +191,6 @@ public partial class SettingsPageViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task AddFreedoomIWadFromGitHub()
-    {
-        if (await DialogHelper.ShowAskAsync(Strings.Resources.DialogDownloadFreedoomTitle, Strings.Resources.DialogDownloadFreedoomText(FreedoomVersion), Strings.Resources.DialogDownloadAction, Strings.Resources.DialogCancelAction))
-        {
-            EventBus.Progress(this, Strings.Resources.ProgressDownloadAndExtractArchive);
-            try
-            {
-                using var stream = await WebAPI.Current.DownloadUrl(FreedoomDownloadUrl);
-                using var zipArchive = new ZipArchive(stream, ZipArchiveMode.Read);
-                var zipEntries = new List<ZipArchiveEntry>();
-                foreach (var name in FreedoomIWads)
-                {
-                    var zipEntry = zipArchive.GetEntry(FreedoomSubfolder + name) ?? throw new Exception($"File '{name}' not found in archive");
-                    zipEntries.Add(zipEntry);
-                }
-                foreach (var zipEntry in zipEntries)
-                {
-                    EventBus.Progress(this, Strings.Resources.ProgressExtract(zipEntry.Name));
-                    using var fileStream = zipEntry.Open();
-                    await FileHelper.CopyFileWithConfirmation(fileStream, zipEntry.Name, FileHelper.IWadFolderPath);
-                    if (!SettingsViewModel.Current.IWadFiles.Contains(zipEntry.Name))
-                    {
-                        SettingsViewModel.Current.IWadFiles.Add(zipEntry.Name);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine(ex);
-            }
-            EventBus.Progress(this, null);
-        }
-    }
-
-    [RelayCommand]
     private static void ToggleDefaultDoomPackage(DoomPackageViewModel? package)
     {
         if (package == null)
@@ -327,29 +283,6 @@ public partial class SettingsPageViewModel : ObservableObject
             }
         }
         EventBus.Progress(this, null);
-    }
-
-    [RelayCommand]
-    private async Task AddProjectBrutalityFromGitHub()
-    {
-        if (await DialogHelper.ShowAskAsync(Strings.Resources.DialogDownloadProjectBrutalityTitle, Strings.Resources.DialogDownloadProjectBrutalityText(ProjectBrutalityVersion), Strings.Resources.DialogDownloadAction, Strings.Resources.DialogCancelAction))
-        {
-            EventBus.Progress(this, Strings.Resources.ProgressLongDownload);
-            try
-            {
-                using var stream = await WebAPI.Current.DownloadUrl(ProjectBrutalityUrl);
-                await FileHelper.CopyFileWithConfirmation(stream, ProjectBrutalityFileName, FileHelper.ModsFolderPath);
-                if (!SettingsViewModel.Current.FavoriteFiles.Contains(ProjectBrutalityFileName))
-                {
-                    SettingsViewModel.Current.FavoriteFiles.Add(ProjectBrutalityFileName);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine(ex);
-            }
-            EventBus.Progress(this, null);
-        }
     }
 
     [RelayCommand]
