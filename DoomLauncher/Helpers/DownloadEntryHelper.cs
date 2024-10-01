@@ -1,6 +1,7 @@
 ﻿using DoomLauncher.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Compression;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -26,6 +27,7 @@ internal partial class JsonDownloadEntryContext : JsonSerializerContext { }
 
 public class DownloadEntryList
 {
+    public required List<DownloadPort> Ports { get; init; }
     public required List<DownloadEntry> IWADs { get; init; }
     public required List<DownloadEntry> Files { get; init; }
 }
@@ -34,6 +36,7 @@ public class DownloadEntry
 {
     public required string Name { get; init; }
     public string? Description { get; init; }
+    public string? Homepage { get; init; } 
     public required Dictionary<string, DownloadEntryVersion> Versions { get; init; }
 }
 
@@ -43,6 +46,15 @@ public class DownloadEntryVersion
     public required DownloadEntryInstallType InstallType { get; init; }
     public string? InstallTypeAsIsFileName { get; init; }
     public Dictionary<string, string>? InstallTypeZipFileNames { get; init; }
+}
+
+public class DownloadPort
+{
+    public required string Name { get; init; }
+    public string? Description { get; init; }
+    public string? Homepage { get; init; }
+    public AssetArch Arch { get; init; }
+    public required Dictionary<string, string> Versions { get; init; }
 }
 
 public static class DownloadEntryHelper
@@ -105,7 +117,7 @@ public static class DownloadEntryHelper
                 }
                 foreach (var (name, zipEntry) in zipEntries)
                 {
-                    EventBus.Progress(null, Strings.Resources.ProgressExtract(zipEntry.Name));
+                    SetProgress(Strings.Resources.ProgressExtract(zipEntry.Name));
                     using var fileStream = zipEntry.Open();
                     await FileHelper.CopyFileWithConfirmation(fileStream, name, targetFolder);
                     if (!targetList.Contains(name))
@@ -121,6 +133,41 @@ public static class DownloadEntryHelper
             }
             SetProgress(null);
         }
+        return success;
+    }
+
+    public static async Task<bool> InstallPort(DownloadPort port, string version, Action<string?> SetProgress)
+    {
+        var success = false;
+        if (!Version.TryParse(version, out var parsedVersion))
+        {
+            throw new Exception("Version can't be parsed");
+        }
+        var targetUrl = port.Versions.GetValueOrDefault(version) ?? throw new Exception("Version not found");
+        SetProgress(Strings.Resources.ProgressDownloadAndExtractArchive);
+        try
+        {
+            using var stream = await WebAPI.Current.DownloadUrl(targetUrl);
+            using var zipArchive = new ZipArchive(stream, ZipArchiveMode.Read);
+            var folderName = FileHelper.VersionAndArchToFolderName(parsedVersion, port.Arch);
+            var targetPath = Path.Combine(FileHelper.PackagesFolderPath, folderName);
+            await Task.Run(
+                () => zipArchive.ExtractToDirectory(targetPath, overwriteFiles: true)
+            );
+            var newPackage = new DoomPackageViewModel()
+            {
+                Path = Path.Combine(folderName, "gzdoom.exe"),
+                Version = parsedVersion,
+                Arch = port.Arch,
+            };
+            SettingsViewModel.Current.GZDoomInstalls.Add(newPackage);
+            success = true;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
+        }
+        SetProgress(null);
         return success;
     }
 }

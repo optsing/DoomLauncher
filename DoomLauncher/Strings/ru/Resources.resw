@@ -520,7 +520,13 @@
   <data name="DownloadPageGroupIWAD" xml:space="preserve">
     <value>IWAD</value>
   </data>
+  <data name="DownloadPageGroupPorts" xml:space="preserve">
+    <value>Source ports</value>
+  </data>
   <data name="DownloadPageGroupFiles" xml:space="preserve">
     <value>Файлы</value>
+  </data>
+  <data name="DoomPageGZDoomCustom" xml:space="preserve">
+    <value>Пользовательский</value>
   </data>
 </root>

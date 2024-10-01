@@ -83,16 +83,11 @@
                     <MenuFlyout
                         Placement="Bottom"
                     >
-                      <MenuFlyoutItem
+                        <MenuFlyoutItem
                             x:Uid="SettingsPageGZDoomAddLocal"
                             Command="{x:Bind ViewModel.AddLocalDoomPackageCommand}"
                             Icon="{ui:FontIcon FontSize=14, Glyph=&#xEC50;}"
-                       />
-                        <MenuFlyoutItem
-                            x:Uid="SettingsPageGZDoomAddRemote"
-                            Command="{x:Bind ViewModel.AddRemoteDoomPackageCommand}"
-                            Icon="{ui:FontIcon FontSize=14, Glyph=&#xE896;}"
-                       />
+                        />
                     </MenuFlyout>
                 </controls:DoomItemList.HeaderFlyout>
                 <controls:DoomItemList.ItemTemplate>

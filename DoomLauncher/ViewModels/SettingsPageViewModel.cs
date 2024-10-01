@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -54,86 +53,6 @@ public partial class SettingsPageViewModel : ObservableObject
     public string AppVersion { get; }
 
     [RelayCommand]
-    private async Task AddRemoteDoomPackage()
-    {
-        EventBus.Progress(this, Strings.Resources.ProgressGettingListOfVersions);
-        var entries = await WebAPI.Current.GetGZDoomGitHubReleases();
-        var onlinePackages = new List<DoomPackageViewModel>();
-        var nox86Version = new Version(4, 8, 0);
-        foreach (var entry in entries)
-        {
-            foreach (var asset in entry.Assets)
-            {
-                if (asset.Name.EndsWith(".zip") && !asset.Name.Contains("macOS") && !asset.Name.Contains("macos") && !asset.Name.Contains("ci_deps") && !asset.Name.Contains("AppImage"))
-                {
-                    var isLegacy = asset.Name.Contains("legacy");
-                    var version = FileHelper.ParseVersion(asset.Name);
-                    AssetArch arch;
-                    if (asset.Name.Contains("arm64"))
-                    {
-                        arch = AssetArch.arm64;
-                    }
-                    else if (version >= nox86Version || asset.Name.Contains("64bit") || asset.Name.Contains("x64"))
-                    {
-                        arch = isLegacy ? AssetArch.x64legacy : AssetArch.x64;
-                    }
-                    else
-                    {
-                        arch = isLegacy ? AssetArch.x86legacy : AssetArch.x86;
-                    }
-                    if (!SettingsViewModel.Current.GZDoomInstalls.Any(package => package.Version == version && package.Arch == arch))
-                    {
-                        var newAsset = new DoomPackageViewModel()
-                        {
-                            Path = asset.DownloadUrl,
-                            Arch = arch,
-                            Version = version,
-                        };
-                        onlinePackages.Add(newAsset);
-                    }
-                }
-            }
-        }
-        EventBus.Progress(this, null);
-        {
-            var newAsset = await DialogHelper.ShowPackageSelectorAsync([.. onlinePackages.OrderByDescending(package => package.Version).ThenBy(package => package.Arch)]);
-            if (newAsset != null)
-            {
-                await DownloadPackage(newAsset);
-            }
-        }
-    }
-
-    private async Task DownloadPackage(DoomPackageViewModel package)
-    {
-        if (!string.IsNullOrEmpty(package.Path))
-        {
-            EventBus.Progress(this, Strings.Resources.ProgressDownloadAndExtractArchive);
-            try
-            {
-                using var stream = await WebAPI.Current.DownloadUrl(package.Path);
-                using var zipArchive = new ZipArchive(stream, ZipArchiveMode.Read);
-                var folderName = FileHelper.PackageToFolderName(package);
-                var targetPath = Path.Combine(FileHelper.PackagesFolderPath, folderName);
-                await Task.Run(
-                    () => zipArchive.ExtractToDirectory(targetPath, overwriteFiles: true)
-                );
-                var newPackage = new DoomPackageViewModel()
-                {
-                    Path = Path.Combine(folderName, "gzdoom.exe"),
-                    Version = package.Version,
-                    Arch = package.Arch,
-                };
-                SettingsViewModel.Current.GZDoomInstalls.Add(newPackage);
-            }
-            finally
-            {
-                EventBus.Progress(this, null);
-            }
-        }
-    }
-
-    [RelayCommand]
     private static async Task AddLocalDoomPackage()
     {
         var picker = new Windows.Storage.Pickers.FileOpenPicker();
@@ -147,17 +66,12 @@ public partial class SettingsPageViewModel : ObservableObject
         var file = await picker.PickSingleFileAsync();
         if (file != null && FileHelper.ValidateGZDoomPath(file.Path))
         {
-            var version = FileHelper.GetFileVersion(file.Path) is string s ? FileHelper.ParseVersion(s) : null;
-            if (SettingsViewModel.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == file.Path) is DoomPackageViewModel package)
-            {
-                package.Version = version;
-            }
-            else
+            if (!SettingsViewModel.Current.GZDoomInstalls.Any(package => package.Path == file.Path))
             {
                 var newPackage = new DoomPackageViewModel
                 {
                     Path = file.Path,
-                    Version = version,
+                    Version = null,
                     Arch = AssetArch.manual,
                 };
                 SettingsViewModel.Current.GZDoomInstalls.Add(newPackage);

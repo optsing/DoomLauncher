@@ -129,7 +129,7 @@
                                     Style="{StaticResource BaseTextBlockStyle}"
                                   />
                                 <TextBlock
-                                    Text="{x:Bind local:FileHelper.GZDoomPathToTitle(ViewModel.Entry.GZDoomPath, ViewModel.DefaultGZDoomPath), Mode=OneWay}"
+                                    Text="{x:Bind local:FileHelper.GZDoomPathToShortTitle(ViewModel.Entry.GZDoomPath, ViewModel.DefaultGZDoomPath), Mode=OneWay}"
                                 />
                             </StackPanel>
                             <StackPanel Orientation="Vertical">

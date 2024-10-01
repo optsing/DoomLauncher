@@ -2,10 +2,8 @@
 using DoomLauncher.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
 
@@ -159,17 +157,17 @@ internal static partial class FileHelper
         return IWadFileToTitle(resolvedIWadFile);
     }
 
-    public static string GZDoomPathToTitle(string gZDoomPath, string defaultGZDoomPath)
+    public static string GZDoomPathToShortTitle(string gZDoomPath, string defaultGZDoomPath)
     {
         var package = ResolveGZDoomPath(gZDoomPath, defaultGZDoomPath);
         if (package == null)
         {
             return Strings.Resources.NotSelected;
         }
-        return package.Title;
+        return package.Arch == AssetArch.manual ? Strings.Resources.DoomPageGZDoomCustom : package.Title;
     }
 
-    public static string PackageToFolderName(DoomPackageViewModel package) => (package.Version?.ToString() ?? "unknown") + "-" + ArchToString(package.Arch);
+    public static string VersionAndArchToFolderName(Version? version, AssetArch arch) => (version?.ToString() ?? "unknown") + "-" + ArchToString(arch);
 
     public static string ArchToString(AssetArch arch) => arch switch
     {
@@ -201,24 +199,6 @@ internal static partial class FileHelper
         }
         return iWadFile;
     }
-
-    public static string? GetFileVersion(string filePath)
-    {
-        return FileVersionInfo.GetVersionInfo(filePath)?.ProductVersion;
-    }
-
-    public static Version? ParseVersion(string version)
-    {
-        var match = reVersion().Match(version);
-        if (match.Success)
-        {
-            return new(int.Parse(match.Groups[1].Value), int.Parse(match.Groups[2].Value), int.Parse(match.Groups[3].Value));
-        }
-        return null;
-    }
-
-    [GeneratedRegex("(\\d+)[.-](\\d+)[.-](\\d+)")]
-    private static partial Regex reVersion();
 
     public static string GetFileTitle(string filePath)
     {

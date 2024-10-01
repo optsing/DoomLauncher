@@ -13,6 +13,7 @@
     <Page.Resources>
         <CollectionViewSource x:Name="GroupedEntries" Source="{x:Bind ViewModel.Entries}" IsSourceGrouped="True"/>
         <converters:DoubleToObjectConverter x:Key="HasItemsToVisiblity" GreaterThan="1" TrueValue="Visible" FalseValue="Collapsed" />
+        <converters:EmptyObjectToObjectConverter x:Key="HasHomePageToVisibility" NotEmptyValue="Visible" EmptyValue="Collapsed" />
         <DataTemplate x:Key="DownloadEntryTemplate" x:DataType="vm:DownloadEntryViewModel">
             <Grid
                 ColumnDefinitions="*,Auto,Auto"
@@ -26,12 +27,18 @@
                 <StackPanel
                     Grid.Column="0"
                     Orientation="Vertical"
-                    Spacing="8"
+                    Spacing="4"
                 >
                     <TextBlock
                         Text="{x:Bind Name}"
                         Style="{ThemeResource BaseTextBlockStyle}"
                         FontSize="16"
+                    />
+                    <HyperlinkButton
+                        Padding="0"
+                        Visibility="{x:Bind Homepage, Converter={StaticResource HasHomePageToVisibility}}"
+                        Content="{x:Bind Homepage}"
+                        NavigateUri="{x:Bind Homepage}"
                     />
                     <TextBlock
                         Text="{x:Bind Description}"
@@ -61,39 +68,34 @@
         </DataTemplate>
     </Page.Resources>
     <ScrollView>
-        <StackPanel
-             Orientation="Vertical"
-             MaxWidth="992"
-             Margin="16,8"
-             Spacing="8"
+        <ItemsControl
+            ItemsSource="{x:Bind GroupedEntries.View}"     
+            ItemTemplate="{StaticResource DownloadEntryTemplate}"
+            MaxWidth="992"
+            Margin="16,8"
         >
-            <ItemsControl
-                ItemsSource="{x:Bind GroupedEntries.View}"     
-                ItemTemplate="{StaticResource DownloadEntryTemplate}"
-            >
-                <ItemsControl.GroupStyle>
-                    <GroupStyle>
-                        <GroupStyle.HeaderTemplate>
-                            <DataTemplate x:DataType="collections:IReadOnlyObservableGroup">
-                                <TextBlock
-                                    Margin="16,8"
-                                    Text="{x:Bind Key}"
-                                    Style="{ThemeResource BaseTextBlockStyle}"
-                                    FontSize="16"
-                                />
-                            </DataTemplate>
-                        </GroupStyle.HeaderTemplate>
-                        <GroupStyle.Panel>
-                            <ItemsPanelTemplate>
-                                <StackPanel
-                                    Orientation="Vertical"
-                                    Spacing="8"
-                                />
-                            </ItemsPanelTemplate>
-                        </GroupStyle.Panel>
-                    </GroupStyle>
-                </ItemsControl.GroupStyle>
-            </ItemsControl>
-        </StackPanel>
+            <ItemsControl.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.HeaderTemplate>
+                        <DataTemplate x:DataType="collections:IReadOnlyObservableGroup">
+                            <TextBlock
+                                Margin="16,8"
+                                Text="{x:Bind Key}"
+                                Style="{ThemeResource BaseTextBlockStyle}"
+                                FontSize="16"
+                            />
+                        </DataTemplate>
+                    </GroupStyle.HeaderTemplate>
+                    <GroupStyle.Panel>
+                        <ItemsPanelTemplate>
+                            <StackPanel
+                                Orientation="Vertical"
+                                Spacing="8"
+                            />
+                        </ItemsPanelTemplate>
+                    </GroupStyle.Panel>
+                </GroupStyle>
+            </ItemsControl.GroupStyle>
+        </ItemsControl>
     </ScrollView>
 </Page>

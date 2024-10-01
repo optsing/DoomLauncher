@@ -31,6 +31,7 @@ public partial class DoomPackageViewModel : ObservableObject
     [JsonConverter(typeof(AssetArchJsonConverter))]
     public AssetArch Arch { get; set; } = AssetArch.unknown;
 
+    [JsonIgnore]
     public string Title
     {
         get
@@ -38,6 +39,10 @@ public partial class DoomPackageViewModel : ObservableObject
             if (Arch == AssetArch.notSelected)
             {
                 return Strings.Resources.DefaultValue;
+            }
+            if (Arch == AssetArch.manual && System.IO.Path.GetDirectoryName(Path) is string path)
+            {
+                return path;
             }
             return (Version?.ToString() ?? "unknown") + Arch switch
             {
