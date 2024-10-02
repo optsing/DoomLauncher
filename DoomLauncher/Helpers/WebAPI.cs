@@ -105,13 +105,11 @@ public class WebAPI
         }
     }
 
-    public const string DownloadEntriesIndexEndpoint = "https://raw.githubusercontent.com/optsing/gzdoom-free-files/refs/heads/main/index.json";
-
-    public async Task<DownloadEntryList?> DownloadEntriesFromGitHub()
+    public async Task<DownloadEntryList?> DownloadEntriesFromJson(string url)
     {
         try
         {
-            var jsonResponse = await httpClient.GetFromJsonAsync(DownloadEntriesIndexEndpoint, JsonDownloadEntryContext.Default.DownloadEntryList);
+            var jsonResponse = await httpClient.GetFromJsonAsync(url, JsonDownloadEntryContext.Default.DownloadEntryList);
             return jsonResponse;
         }
         catch (Exception ex)

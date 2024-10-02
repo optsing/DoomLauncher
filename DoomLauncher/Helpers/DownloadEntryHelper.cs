@@ -30,7 +30,7 @@ internal partial class JsonDownloadEntryContext : JsonSerializerContext { }
 public class DownloadEntryList
 {
     public required List<DownloadPort> Ports { get; init; }
-    public required List<DownloadEntry> IWADs { get; init; }
+    public required List<DownloadEntry> IWAD { get; init; }
     public required List<DownloadEntry> Files { get; init; }
 }
 

@@ -15,6 +15,8 @@ internal partial class JsonSettingsContext : JsonSerializerContext
 
 public partial class SettingsViewModel : ObservableObject
 {
+    public const string DefaultOnlineSource = "https://raw.githubusercontent.com/optsing/gzdoom-free-files/refs/heads/main/index.json";
+
     public static bool IsCustomTitleBar = false;
 
     public static SettingsViewModel Current { get; set; } = new();
@@ -32,6 +34,9 @@ public partial class SettingsViewModel : ObservableObject
 
     public string SteamGame { get => steamGame; set => SetProperty(ref steamGame, value); }
     private string steamGame = "off";
+
+    public string OnlineSource { get => onlineSource; set => SetProperty(ref onlineSource, value); }
+    private string onlineSource = DefaultOnlineSource;
 
     public string SortOrder { get; set; } = "";
 

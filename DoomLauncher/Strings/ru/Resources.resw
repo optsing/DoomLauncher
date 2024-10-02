@@ -216,6 +216,18 @@
   <data name="SettingsPageCloseOnLaunch.Text" xml:space="preserve">
     <value>Закрывать лаунчер при запуске сборки</value>
   </data>
+  <data name="SettingsPageOnlineSource.Text" xml:space="preserve">
+    <value>Источник онлайн каталога</value>
+  </data>
+  <data name="SettingsPageOnlineSourceApply.Text" xml:space="preserve">
+    <value>Применить</value>
+  </data>
+  <data name="SettingsPageOnlineSourceReset.Text" xml:space="preserve">
+    <value>По умолчанию</value>
+  </data>
+  <data name="SettingsPageOnlineSourceBox.PlaceholderText" xml:space="preserve">
+    <value>Введите URL-адрес онлайн каталога</value>
+  </data>
   <data name="SettingsPageSteamIntegrationDefault.Text" xml:space="preserve">
     <value>Интеграция Steam по умолчанию</value>
   </data>
@@ -406,6 +418,9 @@
   <data name="DialogCancelAction" xml:space="preserve">
     <value>Отмена</value>
   </data>
+  <data name="DialogOKAction" xml:space="preserve">
+    <value>ОК</value>
+  </data>
   <data name="DialogDownloadAction" xml:space="preserve">
     <value>Скачать</value>
   </data>
@@ -472,6 +487,12 @@
   <data name="DialogFileReplaceTitle" xml:space="preserve">
     <value>Заменить файл</value>
   </data>
+  <data name="DialogWrongOnlineEntriesUrlTitle" xml:space="preserve">
+    <value>Некорректный URL-адрес</value>
+  </data>
+  <data name="DialogWrongOnlineEntriesUrlText" xml:space="preserve">
+    <value>Ошибка при подключении к серверу или при разборе JSON</value>
+  </data>
   <data name="DialogFileReplaceCancelAction" xml:space="preserve">
     <value>Не заменять</value>
   </data>
@@ -517,6 +538,9 @@
   <data name="DownloadPageDownload.Text" xml:space="preserve">
     <value>Скачать</value>
   </data>
+  <data name="DownloadPageNoItems.Text" xml:space="preserve">
+    <value>Элементы не найдены</value>
+  </data>
   <data name="DownloadPageGroupIWAD" xml:space="preserve">
     <value>IWAD</value>
   </data>
@@ -528,5 +552,8 @@
   </data>
   <data name="DoomPageGZDoomCustom" xml:space="preserve">
     <value>Пользовательский</value>
+  </data>
+  <data name="ProgressLoadingOnlineEntries" xml:space="preserve">
+    <value>Загрузка онлайн каталога</value>
   </data>
 </root>

@@ -50,6 +50,41 @@ public partial class SettingsPageViewModel : ObservableObject
         set => SetProperty(SettingsViewModel.Current.SteamGame, value.Key, SettingsViewModel.Current, (settings, value) => settings.SteamGame = value);
     }
 
+    [ObservableProperty]
+    private string onlineSource = SettingsViewModel.Current.OnlineSource;
+
+    [RelayCommand]
+    private async Task ApplyOnlineSource()
+    {
+        if (string.IsNullOrEmpty(OnlineSource))
+        {
+            SettingsViewModel.Current.OnlineSource = "";
+        }
+        else {
+            EventBus.Progress(this, Strings.Resources.ProgressLoadingOnlineEntries);
+            if (await WebAPI.Current.DownloadEntriesFromJson(OnlineSource) != null)
+            {
+                SettingsViewModel.Current.OnlineSource = OnlineSource;
+            }
+            else
+            {
+                await DialogHelper.ShowAskAsync(
+                    Strings.Resources.DialogWrongOnlineEntriesUrlTitle,
+                    Strings.Resources.DialogWrongOnlineEntriesUrlText,
+                    "",
+                    Strings.Resources.DialogOKAction
+                );
+            }
+            EventBus.Progress(this, null);
+        }
+    }
+
+    [RelayCommand]
+    private void ResetOnlineSource()
+    {
+        SettingsViewModel.Current.OnlineSource = OnlineSource = SettingsViewModel.DefaultOnlineSource;
+    }
+
     public string AppVersion { get; }
 
     [RelayCommand]

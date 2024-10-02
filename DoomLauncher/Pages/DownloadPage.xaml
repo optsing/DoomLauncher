@@ -12,7 +12,7 @@
     mc:Ignorable="d">
     <Page.Resources>
         <CollectionViewSource x:Name="GroupedEntries" Source="{x:Bind ViewModel.Entries}" IsSourceGrouped="True"/>
-        <converters:DoubleToObjectConverter x:Key="HasItemsToVisiblity" GreaterThan="1" TrueValue="Visible" FalseValue="Collapsed" />
+        <converters:DoubleToObjectConverter x:Key="HasMoreThanOneItemsToVisiblity" GreaterThan="1" TrueValue="Visible" FalseValue="Collapsed" />
         <converters:EmptyObjectToObjectConverter x:Key="HasHomePageToVisibility" NotEmptyValue="Visible" EmptyValue="Collapsed" />
         <DataTemplate x:Key="DownloadEntryTemplate" x:DataType="vm:DownloadEntryViewModel">
             <Grid
@@ -50,7 +50,7 @@
                     SelectedItem="{x:Bind CurrentVersion, Mode=TwoWay}"
                     ItemsSource="{x:Bind Versions}"
                     VerticalAlignment="Center"
-                    Visibility="{x:Bind Versions.Count, Converter={StaticResource HasItemsToVisiblity}}"
+                    Visibility="{x:Bind Versions.Count, Converter={StaticResource HasMoreThanOneItemsToVisiblity}}"
                     MinWidth="100"
                 />
                 <Button
@@ -68,34 +68,45 @@
         </DataTemplate>
     </Page.Resources>
     <ScrollView>
-        <ItemsControl
-            ItemsSource="{x:Bind GroupedEntries.View}"     
-            ItemTemplate="{StaticResource DownloadEntryTemplate}"
-            MaxWidth="992"
-            Margin="16,8,16,16"
-        >
-            <ItemsControl.GroupStyle>
-                <GroupStyle>
-                    <GroupStyle.HeaderTemplate>
-                        <DataTemplate x:DataType="collections:IReadOnlyObservableGroup">
-                            <TextBlock
-                                Margin="16,8"
-                                Text="{x:Bind Key}"
-                                Style="{ThemeResource BaseTextBlockStyle}"
-                                FontSize="16"
-                            />
-                        </DataTemplate>
-                    </GroupStyle.HeaderTemplate>
-                    <GroupStyle.Panel>
-                        <ItemsPanelTemplate>
-                            <StackPanel
-                                Orientation="Vertical"
-                                Spacing="8"
-                            />
-                        </ItemsPanelTemplate>
-                    </GroupStyle.Panel>
-                </GroupStyle>
-            </ItemsControl.GroupStyle>
-        </ItemsControl>
+        <Grid>
+            <ItemsControl
+                ItemsSource="{x:Bind GroupedEntries.View}"     
+                ItemTemplate="{StaticResource DownloadEntryTemplate}"
+                MaxWidth="992"
+                Margin="16,8,16,16"
+            >
+                <ItemsControl.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.HeaderTemplate>
+                            <DataTemplate x:DataType="collections:IReadOnlyObservableGroup">
+                                <TextBlock
+                                    Margin="16,8"
+                                    Text="{x:Bind Key}"
+                                    Style="{ThemeResource BaseTextBlockStyle}"
+                                    FontSize="16"
+                                />
+                            </DataTemplate>
+                        </GroupStyle.HeaderTemplate>
+                        <GroupStyle.Panel>
+                            <ItemsPanelTemplate>
+                                <StackPanel
+                                    Orientation="Vertical"
+                                    Spacing="8"
+                                />
+                            </ItemsPanelTemplate>
+                        </GroupStyle.Panel>
+                    </GroupStyle>
+                </ItemsControl.GroupStyle>
+            </ItemsControl>
+            <TextBlock
+                x:Uid="DownloadPageNoItems"
+                Visibility="{x:Bind ViewModel.HasNoItems, Mode=OneWay}"
+                Margin="16"
+                FontSize="24"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                TextAlignment="Center"
+            />
+        </Grid>
     </ScrollView>
 </Page>

@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DoomLauncher.Helpers;
+using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,15 +26,21 @@ public partial class DownloadPageViewModel : ObservableObject
 {
     public ObservableGroupedCollection<string, DownloadEntryViewModel> Entries { get; } = [];
 
+    [ObservableProperty]
+    private Visibility hasNoItems = Visibility.Collapsed;
+
     public async void LoadEntries()
     {
-        var entries = await WebAPI.Current.DownloadEntriesFromGitHub();
+        HasNoItems = Visibility.Collapsed;
+        EventBus.Progress(this, Strings.Resources.ProgressLoadingOnlineEntries);
+        var entries = await WebAPI.Current.DownloadEntriesFromJson(SettingsViewModel.Current.OnlineSource);
+        Entries.Clear();
         if (entries != null)
         {
             var PortEntries = new ObservableGroup<string, DownloadEntryViewModel>(Strings.Resources.DownloadPageGroupPorts);
             var IWADEntries = new ObservableGroup<string, DownloadEntryViewModel>(Strings.Resources.DownloadPageGroupIWAD);
             var FileEntries = new ObservableGroup<string, DownloadEntryViewModel>(Strings.Resources.DownloadPageGroupFiles);
-            foreach (var file in entries.Ports)
+            foreach (var file in entries.Ports.OrderBy(p => p.Name))
             {
                 var versions = file.Versions.Keys.ToList();
                 Uri.TryCreate(file.Homepage, UriKind.Absolute, out var uri);
@@ -49,7 +56,7 @@ public partial class DownloadPageViewModel : ObservableObject
                     DownloadCommand = DownloadEntryCommand,
                 });
             }
-            foreach (var file in entries.IWADs)
+            foreach (var file in entries.IWAD.OrderBy(p => p.Name))
             {
                 var versions = file.Versions.Keys.ToList();
                 Uri.TryCreate(file.Homepage, UriKind.Absolute, out var uri);
@@ -65,7 +72,7 @@ public partial class DownloadPageViewModel : ObservableObject
                     DownloadCommand = DownloadEntryCommand,
                 });
             }
-            foreach (var file in entries.Files)
+            foreach (var file in entries.Files.OrderBy(p => p.Name))
             {
                 var versions = file.Versions.Keys.ToList();
                 Uri.TryCreate(file.Homepage, UriKind.Absolute, out var uri);
@@ -94,6 +101,11 @@ public partial class DownloadPageViewModel : ObservableObject
                 Entries.Add(FileEntries);
             }
         }
+        if (Entries.Count == 0)
+        {
+            HasNoItems = Visibility.Visible;
+        }
+        EventBus.Progress(this, null);
     }
 
     [RelayCommand]

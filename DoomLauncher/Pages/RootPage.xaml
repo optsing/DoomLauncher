@@ -17,6 +17,7 @@
     <Page.Resources>
         <converters:EmptyObjectToObjectConverter x:Key="NullVisibilityConverter" NotEmptyValue="Visible" EmptyValue="Collapsed" />
         <converters:DoubleToObjectConverter x:Key="HasItemsToVisiblity" GreaterThan="0" TrueValue="Collapsed" FalseValue="Visible" />
+        <converters:EmptyStringToObjectConverter x:Key="HasOnlineSourceToVisibility"  NotEmptyValue="Visible" EmptyValue="Collapsed" />
         <MenuFlyout x:Key="flyoutEntry" Placement="Bottom">
             <MenuFlyoutItem
                 x:Uid="FlyoutEntryEdit"
@@ -217,7 +218,7 @@
                             x:Uid="RootPageEntriesNotFound"
                             Grid.Row="2"
                             Visibility="{x:Bind ViewModel.Entries.Count, Converter={StaticResource HasItemsToVisiblity}, Mode=OneWay}"
-                            VerticalAlignment="Top"
+                            VerticalAlignment="Center"
                             HorizontalAlignment="Center"
                             TextAlignment="Center"
                             FontSize="16"
@@ -271,6 +272,7 @@
                             <Button
                                 Command="{x:Bind NavigateToDownloadPageCommand}"
                                 HorizontalAlignment="Stretch"
+                                Visibility="{x:Bind vm:SettingsViewModel.Current.OnlineSource, Converter={StaticResource HasOnlineSourceToVisibility}, Mode=OneWay}"
                             >  
                                 <StackPanel Orientation="Horizontal" Spacing="4">
                                     <FontIcon FontSize="14" Glyph="&#xF6FA;" />

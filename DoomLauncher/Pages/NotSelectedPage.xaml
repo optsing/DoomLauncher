@@ -13,6 +13,7 @@
         HorizontalAlignment="Center"
         Orientation="Horizontal"
         Spacing="8"
+        Margin="16"
     >
         <FontIcon
             Glyph="&#xF0B0;"
@@ -23,6 +24,7 @@
             x:Uid="NotSelectedPageText"
             FontSize="24"
             VerticalAlignment="Center"
+            TextAlignment="Center"
         />
     </StackPanel>
 </Page>
