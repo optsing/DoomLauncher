@@ -1,6 +1,7 @@
 ﻿using DoomLauncher.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Text.Json.Serialization;
@@ -20,6 +21,7 @@ public enum DownloadEntryInstallType
 {
     AsIs,
     Zip,
+    User
 }
 
 [JsonSerializable(typeof(DownloadEntryList))]
@@ -63,6 +65,11 @@ public static class DownloadEntryHelper
     {
         var success = false;
         var targetVersion = entry.Versions.GetValueOrDefault(version) ?? throw new Exception("Version not found");
+        if (targetVersion.InstallType == DownloadEntryInstallType.User)
+        {
+            Process.Start(new ProcessStartInfo() { FileName = targetVersion.Url, UseShellExecute = true });
+            return true;
+        }
         var targetFolder = type switch
         {
             DownloadEntryType.File => FileHelper.ModsFolderPath,
