@@ -4,10 +4,17 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Windows.Storage;
 
 namespace DoomLauncher;
+
+[JsonConverter(typeof(JsonStringEnumConverter<AssetArch>))]
+public enum AssetArch
+{
+    x64, x86, arm64, unknown, manual, notSelected
+}
 
 public readonly struct TitleAppId(string title, int appId)
 {
@@ -167,29 +174,7 @@ internal static partial class FileHelper
         return package.Arch == AssetArch.manual ? Strings.Resources.DoomPageGZDoomCustom : package.Title;
     }
 
-    public static string VersionAndArchToFolderName(Version? version, AssetArch arch) => (version?.ToString() ?? "unknown") + "-" + ArchToString(arch);
-
-    public static string ArchToString(AssetArch arch) => arch switch
-    {
-        AssetArch.x64 => "x64",
-        AssetArch.x64legacy => "x64-legacy",
-        AssetArch.x86 => "x86",
-        AssetArch.x86legacy => "x86-legacy",
-        AssetArch.arm64 => "arm64",
-        AssetArch.manual => "manual",
-        _ => "unknown",
-    };
-
-    public static AssetArch ArchFromString(string? arch) => arch switch
-    {
-        "x64" => AssetArch.x64,
-        "x64-legacy" => AssetArch.x64legacy,
-        "x86" => AssetArch.x86,
-        "x86-legacy" => AssetArch.x86legacy,
-        "arm64" => AssetArch.arm64,
-        "manual" => AssetArch.manual,
-        _ => AssetArch.unknown,
-    };
+    public static string VersionAndArchToFolderName(Version? version, AssetArch arch) => (version?.ToString() ?? "unknown") + "-" + arch.ToString();
 
     public static string IWadFileToTitle(string iWadFile)
     {

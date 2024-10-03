@@ -16,7 +16,7 @@ public enum DownloadEntryType
     IWAD,
 }
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(JsonStringEnumConverter<DownloadEntryInstallType>))]
 public enum DownloadEntryInstallType
 {
     AsIs,
