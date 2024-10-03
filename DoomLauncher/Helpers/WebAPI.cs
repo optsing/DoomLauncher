@@ -4,6 +4,7 @@ using System.IO;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace DoomLauncher.Helpers;
@@ -51,7 +52,7 @@ public class GitHubAssetEntry
     public string DownloadUrl { get; set; } = "";
 }
 
-public class WebAPI
+public partial class WebAPI
 {
     public static readonly WebAPI Current = new("GZDoom Launcher");
 
@@ -118,4 +119,17 @@ public class WebAPI
             return null;
         }
     }
+
+    public async Task<string> GetDirectUrlFromModDB(string url)
+    {
+        var html = await httpClient.GetStringAsync(url);
+        if (reModDBDirectUrl().Match(html) is var match && match.Success && match.Groups[1].Value is string directUrl)
+        {
+            return "https://www.moddb.com" + directUrl;
+        }
+        throw new Exception("ModDB url can't be parsed");
+    }
+
+    [GeneratedRegex(@"href=""(\/downloads\/mirror\/.+?)""")]
+    private static partial Regex reModDBDirectUrl();
 }

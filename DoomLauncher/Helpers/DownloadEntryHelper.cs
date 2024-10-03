@@ -1,4 +1,5 @@
 ﻿using DoomLauncher.ViewModels;
+using SharpCompress.Archives.Rar;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -21,7 +22,15 @@ public enum DownloadEntryInstallType
 {
     AsIs,
     Zip,
+    RAR,
     User
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter<DownloadEntryUrlType>))]
+public enum DownloadEntryUrlType
+{
+    Direct,
+    ModDB
 }
 
 [JsonSerializable(typeof(DownloadEntryList))]
@@ -38,16 +47,17 @@ public class DownloadEntry
 {
     public required string Name { get; init; }
     public string? Description { get; init; }
-    public string? Homepage { get; init; } 
+    public string? Homepage { get; init; }
     public required Dictionary<string, DownloadEntryVersion> Versions { get; init; }
 }
 
 public class DownloadEntryVersion
 {
     public required string Url { get; init; }
+    public DownloadEntryUrlType UrlType { get; set; } = DownloadEntryUrlType.Direct;
     public required DownloadEntryInstallType InstallType { get; init; }
     public string? InstallTypeAsIsFileName { get; init; }
-    public Dictionary<string, string>? InstallTypeZipFileNames { get; init; }
+    public Dictionary<string, string>? InstallTypeArchiveFileNames { get; init; }
 }
 
 public class DownloadPort
@@ -82,6 +92,12 @@ public static class DownloadEntryHelper
             DownloadEntryType.IWAD => SettingsViewModel.Current.IWadFiles,
             _ => throw new NotSupportedException(),
         };
+        var url = targetVersion.UrlType switch
+        {
+            DownloadEntryUrlType.Direct => targetVersion.Url,
+            DownloadEntryUrlType.ModDB => await WebAPI.Current.GetDirectUrlFromModDB(targetVersion.Url),
+            _ => throw new NotSupportedException(),
+        };
         if (targetVersion.InstallType == DownloadEntryInstallType.AsIs)
         {
             if (targetVersion.InstallTypeAsIsFileName == null)
@@ -91,7 +107,7 @@ public static class DownloadEntryHelper
             SetProgress(Strings.Resources.ProgressLongDownload);
             try
             {
-                using var stream = await WebAPI.Current.DownloadUrl(targetVersion.Url);
+                using var stream = await WebAPI.Current.DownloadUrl(url);
                 await FileHelper.CopyFileWithConfirmation(stream, targetVersion.InstallTypeAsIsFileName, targetFolder);
                 if (!targetList.Contains(targetVersion.InstallTypeAsIsFileName))
                 {
@@ -107,17 +123,17 @@ public static class DownloadEntryHelper
         }
         else if (targetVersion.InstallType == DownloadEntryInstallType.Zip)
         {
-            if (targetVersion.InstallTypeZipFileNames == null)
+            if (targetVersion.InstallTypeArchiveFileNames == null)
             {
-                throw new Exception("Extract file names required for InstallType == Zip");
+                throw new Exception("Archive file names required for InstallType == Zip");
             }
             SetProgress(Strings.Resources.ProgressDownloadAndExtractArchive);
             try
             {
-                using var stream = await WebAPI.Current.DownloadUrl(targetVersion.Url);
+                using var stream = await WebAPI.Current.DownloadUrl(url);
                 using var zipArchive = new ZipArchive(stream, ZipArchiveMode.Read);
                 List<(string name, ZipArchiveEntry entry)> zipEntries = [];
-                foreach (var (name, path) in targetVersion.InstallTypeZipFileNames)
+                foreach (var (name, path) in targetVersion.InstallTypeArchiveFileNames)
                 {
                     var zipEntry = zipArchive.GetEntry(path) ?? throw new Exception($"File '{path}' not found in archive");
                     zipEntries.Add((name, zipEntry));
@@ -126,6 +142,53 @@ public static class DownloadEntryHelper
                 {
                     SetProgress(Strings.Resources.ProgressExtract(zipEntry.Name));
                     using var fileStream = zipEntry.Open();
+                    await FileHelper.CopyFileWithConfirmation(fileStream, name, targetFolder);
+                    if (!targetList.Contains(name))
+                    {
+                        targetList.Add(name);
+                    }
+                }
+                success = true;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex);
+            }
+            SetProgress(null);
+        }
+        else if (targetVersion.InstallType == DownloadEntryInstallType.RAR)
+        {
+            if (targetVersion.InstallTypeArchiveFileNames == null)
+            {
+                throw new Exception("Archive file names required for InstallType == RAR");
+            }
+            SetProgress(Strings.Resources.ProgressDownloadAndExtractArchive);
+            try
+            {
+                using var stream = await WebAPI.Current.DownloadUrl(url);
+                using var ms = new MemoryStream();
+                await stream.CopyToAsync(ms);
+                ms.Seek(0, SeekOrigin.Begin);
+                using var rarArchive = RarArchive.Open(ms);
+                List<(string name, RarArchiveEntry entry)> rarEntries = [];
+
+                foreach (var re in rarArchive.Entries)
+                {
+                    if (!re.IsDirectory)
+                    {
+                        foreach (var (name, path) in targetVersion.InstallTypeArchiveFileNames)
+                        {
+                            if (re.Key == path)
+                            {
+                                rarEntries.Add((name, re));
+                            }
+                        }
+                    }
+                }
+                foreach (var (name, rarEntry) in rarEntries)
+                {
+                    SetProgress(Strings.Resources.ProgressExtract(rarEntry.Key));
+                    using var fileStream = rarEntry.OpenEntryStream();
                     await FileHelper.CopyFileWithConfirmation(fileStream, name, targetFolder);
                     if (!targetList.Contains(name))
                     {
