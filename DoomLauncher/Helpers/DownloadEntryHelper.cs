@@ -1,10 +1,12 @@
 ﻿using DoomLauncher.ViewModels;
+using SharpCompress.Archives;
 using SharpCompress.Archives.Rar;
+using SharpCompress.Archives.Zip;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
+using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
@@ -121,46 +123,11 @@ public static class DownloadEntryHelper
             }
             SetProgress(null);
         }
-        else if (targetVersion.InstallType == DownloadEntryInstallType.Zip)
+        else if (targetVersion.InstallType == DownloadEntryInstallType.Zip || targetVersion.InstallType == DownloadEntryInstallType.RAR)
         {
             if (targetVersion.InstallTypeArchiveFileNames == null)
             {
-                throw new Exception("Archive file names required for InstallType == Zip");
-            }
-            SetProgress(Strings.Resources.ProgressDownloadAndExtractArchive);
-            try
-            {
-                using var stream = await WebAPI.Current.DownloadUrl(url);
-                using var zipArchive = new ZipArchive(stream, ZipArchiveMode.Read);
-                List<(string name, ZipArchiveEntry entry)> zipEntries = [];
-                foreach (var (name, path) in targetVersion.InstallTypeArchiveFileNames)
-                {
-                    var zipEntry = zipArchive.GetEntry(path) ?? throw new Exception($"File '{path}' not found in archive");
-                    zipEntries.Add((name, zipEntry));
-                }
-                foreach (var (name, zipEntry) in zipEntries)
-                {
-                    SetProgress(Strings.Resources.ProgressExtract(zipEntry.Name));
-                    using var fileStream = zipEntry.Open();
-                    await FileHelper.CopyFileWithConfirmation(fileStream, name, targetFolder);
-                    if (!targetList.Contains(name))
-                    {
-                        targetList.Add(name);
-                    }
-                }
-                success = true;
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine(ex);
-            }
-            SetProgress(null);
-        }
-        else if (targetVersion.InstallType == DownloadEntryInstallType.RAR)
-        {
-            if (targetVersion.InstallTypeArchiveFileNames == null)
-            {
-                throw new Exception("Archive file names required for InstallType == RAR");
+                throw new Exception("Archive file names required for InstallType Zip or RAR");
             }
             SetProgress(Strings.Resources.ProgressDownloadAndExtractArchive);
             try
@@ -169,26 +136,19 @@ public static class DownloadEntryHelper
                 using var ms = new MemoryStream();
                 await stream.CopyToAsync(ms);
                 ms.Seek(0, SeekOrigin.Begin);
-                using var rarArchive = RarArchive.Open(ms);
-                List<(string name, RarArchiveEntry entry)> rarEntries = [];
-
-                foreach (var re in rarArchive.Entries)
+                using IArchive archive = targetVersion.InstallType == DownloadEntryInstallType.RAR
+                    ? RarArchive.Open(ms)
+                    : ZipArchive.Open(ms);
+                List<(string name, IArchiveEntry entry)> archiveEntries = [];
+                foreach (var (name, path) in targetVersion.InstallTypeArchiveFileNames)
                 {
-                    if (!re.IsDirectory)
-                    {
-                        foreach (var (name, path) in targetVersion.InstallTypeArchiveFileNames)
-                        {
-                            if (re.Key == path)
-                            {
-                                rarEntries.Add((name, re));
-                            }
-                        }
-                    }
+                    var archiveEntry = archive.Entries.FirstOrDefault(ae => ae.Key == path) ?? throw new Exception($"File '{path}' not found in archive");
+                    archiveEntries.Add((name, archiveEntry) );
                 }
-                foreach (var (name, rarEntry) in rarEntries)
+                foreach (var (name, archiveEntry) in archiveEntries)
                 {
-                    SetProgress(Strings.Resources.ProgressExtract(rarEntry.Key));
-                    using var fileStream = rarEntry.OpenEntryStream();
+                    SetProgress(Strings.Resources.ProgressExtract(archiveEntry.Key!));
+                    using var fileStream = archiveEntry.OpenEntryStream();
                     await FileHelper.CopyFileWithConfirmation(fileStream, name, targetFolder);
                     if (!targetList.Contains(name))
                     {
@@ -214,15 +174,24 @@ public static class DownloadEntryHelper
             throw new Exception("Version can't be parsed");
         }
         var targetUrl = port.Versions.GetValueOrDefault(version) ?? throw new Exception("Version not found");
-        SetProgress(Strings.Resources.ProgressDownloadAndExtractArchive);
+        SetProgress(Strings.Resources.ProgressDownload);
         try
         {
             using var stream = await WebAPI.Current.DownloadUrl(targetUrl);
-            using var zipArchive = new ZipArchive(stream, ZipArchiveMode.Read);
+            using var ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+            ms.Seek(0, SeekOrigin.Begin);
+            using var zipArchive = ZipArchive.Open(ms);
             var folderName = FileHelper.VersionAndArchToFolderName(parsedVersion, port.Arch);
             var targetPath = Path.Combine(FileHelper.PackagesFolderPath, folderName);
+            var dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
             await Task.Run(
-                () => zipArchive.ExtractToDirectory(targetPath, overwriteFiles: true)
+                () => {
+                    zipArchive.ExtractToDirectory(
+                        targetPath, 
+                        perc => dispatcherQueue.TryEnqueue(() => SetProgress(Strings.Resources.ProgressExtractPercents((int)Math.Ceiling(perc * 100))))
+                    );
+                }
             );
             var newPackage = new DoomPackageViewModel()
             {
@@ -230,7 +199,10 @@ public static class DownloadEntryHelper
                 Version = parsedVersion,
                 Arch = port.Arch,
             };
-            SettingsViewModel.Current.GZDoomInstalls.Add(newPackage);
+            if (!SettingsViewModel.Current.GZDoomInstalls.Any(p => p.Path == newPackage.Path))
+            {
+                SettingsViewModel.Current.GZDoomInstalls.Add(newPackage);
+            }
             success = true;
         }
         catch (Exception ex)

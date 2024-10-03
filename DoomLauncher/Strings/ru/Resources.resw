@@ -339,12 +339,19 @@
     <value>Извлечение: {0}</value>
     <comment>#Format[String]</comment>
   </data>
+  <data name="ProgressExtractPercents" xml:space="preserve">
+    <value>Извлечение: {0}%</value>
+    <comment>#Format[Int]</comment>
+  </data>
   <data name="ProgressReadFile" xml:space="preserve">
     <value>Чтение файла: {0}</value>
     <comment>#Format[String]</comment>
   </data>
   <data name="ProgressDownloadAndExtractArchive" xml:space="preserve">
     <value>Загрузка и извлечение архива</value>
+  </data>
+  <data name="ProgressDownload" xml:space="preserve">
+    <value>Загрузка файла</value>
   </data>
   <data name="ProgressLongDownload" xml:space="preserve">
     <value>Загрузка большого файла</value>
