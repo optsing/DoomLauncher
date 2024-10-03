@@ -121,7 +121,6 @@ public static class DownloadEntryHelper
             {
                 Console.Error.WriteLine(ex);
             }
-            SetProgress(null);
         }
         else if (targetVersion.InstallType == DownloadEntryInstallType.Zip || targetVersion.InstallType == DownloadEntryInstallType.RAR)
         {
@@ -161,8 +160,8 @@ public static class DownloadEntryHelper
             {
                 Console.Error.WriteLine(ex);
             }
-            SetProgress(null);
         }
+        SetProgress(null);
         return success;
     }
 

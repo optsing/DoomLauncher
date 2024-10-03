@@ -35,7 +35,8 @@
                         FontSize="16"
                     />
                     <HyperlinkButton
-                        Padding="0"
+                        Padding="4,0"
+                        Margin="-4,0"
                         Visibility="{x:Bind Homepage, Converter={StaticResource HasHomePageToVisibility}}"
                         Content="{x:Bind Homepage}"
                         NavigateUri="{x:Bind Homepage}"
