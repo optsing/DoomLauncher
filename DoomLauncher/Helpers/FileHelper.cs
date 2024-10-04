@@ -182,7 +182,7 @@ internal static partial class FileHelper
         {
             return title;
         }
-        return iWadFile;
+        return Path.GetFileNameWithoutExtension(iWadFile);
     }
 
     public static string GetFileTitle(string filePath)

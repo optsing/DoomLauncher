@@ -460,7 +460,7 @@
                 x:Name="titleBar"
             >
                 <TextBlock
-                    Text="GZDoom Launcher"
+                    Text="Doom Launcher"
                     TextWrapping="NoWrap"
                     Margin="8,0"
                     VerticalAlignment="Center"

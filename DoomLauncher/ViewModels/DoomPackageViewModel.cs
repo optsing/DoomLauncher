@@ -27,7 +27,7 @@ public partial class DoomPackageViewModel : ObservableObject
             {
                 return path;
             }
-            return (Version?.ToString() ?? "unknown") + Arch switch
+            return "GZDoom " + (Version?.ToString() ?? "unknown") + Arch switch
             {
                 AssetArch.x64 => "",
                 AssetArch.x86 => " 32 bit",

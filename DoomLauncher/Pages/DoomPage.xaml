@@ -124,7 +124,7 @@
                         >
                             <StackPanel Orientation="Vertical">
                                 <TextBlock
-                                    Text="GZDoom"
+                                    x:Uid="DoomPageInfoSourcePort"
                                     FontSize="16"
                                     Style="{StaticResource BaseTextBlockStyle}"
                                   />
@@ -134,7 +134,7 @@
                             </StackPanel>
                             <StackPanel Orientation="Vertical">
                                 <TextBlock
-                                    Text="IWAD"
+                                    x:Uid="DoomPageInfoIWAD"
                                     FontSize="16"
                                     Style="{StaticResource BaseTextBlockStyle}"
                                 />

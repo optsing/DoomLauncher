@@ -54,7 +54,7 @@ public class GitHubAssetEntry
 
 public partial class WebAPI
 {
-    public static readonly WebAPI Current = new("GZDoom Launcher");
+    public static readonly WebAPI Current = new("Doom Launcher");
 
     public const string DoomWorldDlGermany = "https://www.quaddicted.com/files/idgames/";
 
@@ -88,22 +88,6 @@ public partial class WebAPI
     public Task<Stream> DownloadUrl(string url)
     {
         return httpClient.GetStreamAsync(url);
-    }
-
-    public const string GitHubGZDoomEndpoint = "https://api.github.com/repos/ZDoom/gzdoom/releases?per_page=100";
-
-    public async Task<List<GitHubReleaseEntry>> GetGZDoomGitHubReleases()
-    {
-        try
-        {
-            var jsonResponse = await httpClient.GetFromJsonAsync(GitHubGZDoomEndpoint, JsonWebApiContext.Default.ListGitHubReleaseEntry);
-            return jsonResponse ?? [];
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine(ex);
-            return [];
-        }
     }
 
     public async Task<DownloadEntryList?> DownloadEntriesFromJson(string url)

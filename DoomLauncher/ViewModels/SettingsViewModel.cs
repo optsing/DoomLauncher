@@ -15,7 +15,7 @@ internal partial class JsonSettingsContext : JsonSerializerContext
 
 public partial class SettingsViewModel : ObservableObject
 {
-    public const string DefaultOnlineSource = "https://raw.githubusercontent.com/optsing/gzdoom-free-files/refs/heads/main/index.json";
+    public const string DefaultOnlineSource = "https://raw.githubusercontent.com/optsing/doom-free-files-source/refs/heads/main/index.json";
 
     public static bool IsCustomTitleBar = false;
 

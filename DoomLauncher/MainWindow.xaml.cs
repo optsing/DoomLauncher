@@ -20,7 +20,7 @@ public sealed partial class MainWindow : Window
         WinApi.HWND = WinRT.Interop.WindowNative.GetWindowHandle(this);
         WinApi.WindowId = AppWindow.Id;
 
-        AppWindow.Title = "GZDoom Launcher";
+        AppWindow.Title = "Doom Launcher";
         AppWindow.SetIcon("Assets/app.ico");
         SettingsViewModel.IsCustomTitleBar = AppWindowTitleBar.IsCustomizationSupported();
         if (SettingsViewModel.IsCustomTitleBar)

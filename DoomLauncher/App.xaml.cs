@@ -39,7 +39,7 @@ public partial class App : Application
     protected async override void OnLaunched(LaunchActivatedEventArgs args)
     {
         // Get or register the main instance
-        var mainInstance = AppInstance.FindOrRegisterForKey("GZDoomLauncher");
+        var mainInstance = AppInstance.FindOrRegisterForKey("com.optsing.DoomLauncher");
 
         // Get the activation args
         var appArgs = AppInstance.GetCurrent().GetActivatedEventArgs();

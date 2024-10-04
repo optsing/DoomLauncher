@@ -193,7 +193,7 @@
     <value>Введите подробное описание</value>
   </data>
   <data name="EditEntryDialogGZDoomVersion.Text" xml:space="preserve">
-    <value>Версия GZDoom</value>
+    <value>Порт</value>
   </data>
   <data name="EditEntryDialogSteamIntegration.Text" xml:space="preserve">
     <value>Интеграция Steam</value>
@@ -253,7 +253,7 @@
     <value>Скачать Freedoom</value>
   </data>
   <data name="SettingsPageGZDoom.HeaderTitle" xml:space="preserve">
-    <value>Установленные GZDoom</value>
+    <value>Установленные порты</value>
   </data>
   <data name="SettingsPageGZDoom.HeaderButtonTitle" xml:space="preserve">
     <value>Добавить</value>
@@ -449,7 +449,7 @@
     <comment>#Format[String]</comment>
   </data>
   <data name="DialogDownloadEntryText" xml:space="preserve">
-    <value>Вы уверены, что хотите скачать {0} версии {1}?</value>
+    <value>Вы уверены, что хотите скачать {0} версия {1}?</value>
     <comment>#Format[String,String]</comment>
   </data>
   <data name="DialogLaunchErrorTitle" xml:space="preserve">
@@ -552,7 +552,7 @@
     <value>IWAD</value>
   </data>
   <data name="DownloadPageGroupPorts" xml:space="preserve">
-    <value>Source ports</value>
+    <value>Порты</value>
   </data>
   <data name="DownloadPageGroupFiles" xml:space="preserve">
     <value>Файлы</value>
@@ -562,5 +562,11 @@
   </data>
   <data name="ProgressLoadingOnlineEntries" xml:space="preserve">
     <value>Загрузка онлайн каталога</value>
+  </data>
+  <data name="DoomPageInfoSourcePort.Text" xml:space="preserve">
+    <value>Порт</value>
+  </data>
+  <data name="DoomPageInfoIWAD.Text" xml:space="preserve">
+    <value>IWAD</value>
   </data>
 </root>
