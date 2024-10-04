@@ -65,21 +65,4 @@ internal static class DialogHelper
             ViewModel = viewModel,
         };
     }
-
-    public static async Task<DoomPackageViewModel?> ShowPackageSelectorAsync(List<DoomPackageViewModel> packages)
-    {
-        if (XamlRoot == null)
-        {
-            return null;
-        }
-        var dialog = new PackageSelectorDialog(packages)
-        {
-            XamlRoot = XamlRoot,
-        };
-        if (ContentDialogResult.Primary == await dialog.ShowAsync())
-        {
-            return dialog.SelectedPackage;
-        }
-        return null;
-    }
 }
