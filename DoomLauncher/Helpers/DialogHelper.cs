@@ -24,19 +24,37 @@ internal static class DialogHelper
         {
             return false;
         }
-        try
+        var dialog = new AskDialog(title, text, primaryButton, "", closeButton)
         {
-            var dialog = new AskDialog(title, text, primaryButton, closeButton)
-            {
-                XamlRoot = XamlRoot,
-            };
-            return ContentDialogResult.Primary == await dialog.ShowAsync();
-        }
-        catch (Exception ex)
+            XamlRoot = XamlRoot,
+        };
+        return ContentDialogResult.Primary == await dialog.ShowAsync();
+    }
+
+    public static async Task<ContentDialogResult> ShowAskAsync(string title, string text, string primaryButton, string secondaryButton, string closeButton)
+    {
+        if (XamlRoot == null)
         {
-            Console.WriteLine(ex);
-            return false;
+            return ContentDialogResult.None;
         }
+        var dialog = new AskDialog(title, text, primaryButton, secondaryButton, closeButton)
+        {
+            XamlRoot = XamlRoot,
+        };
+        return await dialog.ShowAsync();
+    }
+
+    public static async Task ShowAskAsync(string title, string text, string closeButton)
+    {
+        if (XamlRoot == null)
+        {
+            return;
+        }
+        var dialog = new AskDialog(title, text, "", "", closeButton)
+        {
+            XamlRoot = XamlRoot,
+        };
+        await dialog.ShowAsync();
     }
 
     public static async Task<EditEntryDialogResult> ShowEditEntryAsync(DoomEntryViewModel entry, EditDialogMode mode, List<string>? modFiles = null, List<string>? imageFiles = null)

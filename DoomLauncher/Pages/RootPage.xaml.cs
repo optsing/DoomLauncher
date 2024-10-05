@@ -224,6 +224,7 @@ public sealed partial class RootPage : Page
             var newEntry = new DoomEntryViewModel()
             {
                 Id = Guid.NewGuid().ToString(),
+                Name = "",
                 Created = DateTime.Now,
                 SelectedImageIndex = entry.SelectedImageIndex,
                 ModFiles = new(entry.ModFiles),
@@ -278,18 +279,18 @@ public sealed partial class RootPage : Page
                     var error = await LaunchHelper.CurrentProcess.StandardError.ReadToEndAsync();
                     if (string.IsNullOrEmpty(error))
                     {
-                        await DialogHelper.ShowAskAsync(Strings.Resources.DialogLaunchErrorTitle, Strings.Resources.DialogLaunchErrorCodeText(LaunchHelper.CurrentProcess.ExitCode), "", Strings.Resources.DialogCancelAction);
+                        await DialogHelper.ShowAskAsync(Strings.Resources.DialogLaunchErrorTitle, Strings.Resources.DialogLaunchErrorCodeText(LaunchHelper.CurrentProcess.ExitCode), Strings.Resources.DialogCancelAction);
                     }
                     else
                     {
-                        await DialogHelper.ShowAskAsync(Strings.Resources.DialogLaunchErrorTitle, Strings.Resources.DialogLaunchErrorText(error), "", Strings.Resources.DialogCancelAction);
+                        await DialogHelper.ShowAskAsync(Strings.Resources.DialogLaunchErrorTitle, Strings.Resources.DialogLaunchErrorText(error), Strings.Resources.DialogCancelAction);
                     }
                 }
             }
         }
         else if (result == LaunchResult.AlreadyLaunched && LaunchHelper.CurrentProcess != null)
         {
-            await DialogHelper.ShowAskAsync(Strings.Resources.DialogLaunchErrorTitle, Strings.Resources.DialogLaunchErrorAlreadyLaunchedText, "", Strings.Resources.DialogCancelAction);
+            await DialogHelper.ShowAskAsync(Strings.Resources.DialogLaunchErrorTitle, Strings.Resources.DialogLaunchErrorAlreadyLaunchedText, Strings.Resources.DialogCancelAction);
         }
         else if (result == LaunchResult.PathNotValid)
         {
@@ -300,7 +301,7 @@ public sealed partial class RootPage : Page
         }
         else
         {
-            await DialogHelper.ShowAskAsync(Strings.Resources.DialogLaunchErrorTitle, Strings.Resources.DialogLaunchErrorUnknownText, "", Strings.Resources.DialogCancelAction);
+            await DialogHelper.ShowAskAsync(Strings.Resources.DialogLaunchErrorTitle, Strings.Resources.DialogLaunchErrorUnknownText, Strings.Resources.DialogCancelAction);
         }
     }
 
@@ -368,6 +369,7 @@ public sealed partial class RootPage : Page
             var newEntry = new DoomEntryViewModel()
             {
                 Id = Guid.NewGuid().ToString(),
+                Name = "",
                 Created = DateTime.Now,
                 SelectedImageIndex = 0,
             };

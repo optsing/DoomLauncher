@@ -6,7 +6,7 @@ namespace DoomLauncher.ViewModels;
 
 public partial class DoomEntryViewModel : ObservableObject
 {
-    public string Name { get => name; set => SetProperty(ref name, value); }
+    public required string Name { get => name; set => SetProperty(ref name, value); }
     private string name = "";
 
     public string Description { get => description; set => SetProperty(ref description, value); }
@@ -29,7 +29,7 @@ public partial class DoomEntryViewModel : ObservableObject
     public bool UniqueSavesFolder { get => uniqueSavesFolder; set => SetProperty(ref uniqueSavesFolder, value); }
     private bool uniqueSavesFolder = false;
 
-    public string Id { get; set; } = "";
+    public required string Id { get; set; } = "";
 
     public int SelectedImageIndex { get => selectedImageIndex; set => SetProperty(ref selectedImageIndex, value); }
     private int selectedImageIndex = 0;
@@ -39,7 +39,7 @@ public partial class DoomEntryViewModel : ObservableObject
     public List<string> ImageFiles { get; set; } = [];
     public List<string> ModFiles { get; set; } = [];
 
-    public DateTime? Created { get => created; set => SetProperty(ref created, value); }
+    public required DateTime? Created { get => created; set => SetProperty(ref created, value); }
     private DateTime? created = null;
 
     public DateTime? LastLaunch { get => lastLaunch; set => SetProperty(ref lastLaunch, value); }

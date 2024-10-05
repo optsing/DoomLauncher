@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DoomLauncher.Helpers;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,8 +35,16 @@ public partial class DownloadPageViewModel : ObservableObject
         HasNoItems = Visibility.Collapsed;
         EventBus.Progress(this, Strings.Resources.ProgressLoadingOnlineEntries);
         var entries = await WebAPI.Current.DownloadEntriesFromJson(SettingsViewModel.Current.OnlineSource);
+        EventBus.Progress(this, null);
         Entries.Clear();
-        if (entries != null)
+        if (entries == null)
+        {
+            await DialogHelper.ShowAskAsync(
+                Strings.Resources.DialogWrongOnlineEntriesUrlTitle,
+                Strings.Resources.DialogWrongOnlineEntriesUrlText,
+                Strings.Resources.DialogOKAction);
+        }
+        else 
         {
             var PortEntries = new ObservableGroup<string, DownloadEntryViewModel>(Strings.Resources.DownloadPageGroupPorts);
             var IWADEntries = new ObservableGroup<string, DownloadEntryViewModel>(Strings.Resources.DownloadPageGroupIWAD);
@@ -105,27 +114,62 @@ public partial class DownloadPageViewModel : ObservableObject
         {
             HasNoItems = Visibility.Visible;
         }
-        EventBus.Progress(this, null);
     }
 
     [RelayCommand]
     private async Task DownloadEntry(DownloadEntryViewModel vm)
     {
         var version = vm.CurrentVersion;
-        if (await DialogHelper.ShowAskAsync(
-            Strings.Resources.DialogDownloadEntryTitle(vm.Name),
-            Strings.Resources.DialogDownloadEntryText(vm.Name, version),
-            Strings.Resources.DialogDownloadAction,
-            Strings.Resources.DialogCancelAction)
-        )
+        if (vm.Source is DownloadEntry entry)
         {
-            if (vm.Source is DownloadEntry entry)
+            
+            var result = await DialogHelper.ShowAskAsync(
+                Strings.Resources.DialogDownloadEntryTitle(vm.Name),
+                Strings.Resources.DialogCreateOrDownloadEntryText(vm.Name, version),
+                Strings.Resources.DialogDownloadAndCreateAction,
+                Strings.Resources.DialogDownloadOnlyAction,
+                Strings.Resources.DialogCancelAction);
+            if (result != ContentDialogResult.None)
             {
-                await DownloadEntryHelper.InstallEntry(entry, version, vm.Type, progress => EventBus.Progress(this, progress));
+                try
+                {
+                    var entries = await DownloadEntryHelper.InstallEntry(entry, version, vm.Type, result == ContentDialogResult.Primary, progress => EventBus.Progress(this, progress));
+                    foreach (var item in entries)
+                    {
+                        SettingsViewModel.Current.Entries.Add(item);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine(ex);
+                    await DialogHelper.ShowAskAsync(
+                        Strings.Resources.DialogDownloadErrorTitle,
+                        Strings.Resources.DialogDownloadErrorText,
+                        Strings.Resources.DialogOKAction);
+                }
             }
-            else if (vm.Source is DownloadPort port)
+        }
+        else if (vm.Source is DownloadPort port)
+        {
+            if (await DialogHelper.ShowAskAsync(
+                Strings.Resources.DialogDownloadEntryTitle(vm.Name),
+                Strings.Resources.DialogDownloadEntryText(vm.Name, version),
+                Strings.Resources.DialogDownloadAction,
+                Strings.Resources.DialogCancelAction)
+            )
             {
-                await DownloadEntryHelper.InstallPort(port, version, progress => EventBus.Progress(this, progress));
+                try
+                {
+                    await DownloadEntryHelper.InstallPort(port, version, progress => EventBus.Progress(this, progress));
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine(ex);
+                    await DialogHelper.ShowAskAsync(
+                        Strings.Resources.DialogDownloadErrorTitle,
+                        Strings.Resources.DialogDownloadErrorText,
+                        Strings.Resources.DialogOKAction);
+                }
             }
         }
     }

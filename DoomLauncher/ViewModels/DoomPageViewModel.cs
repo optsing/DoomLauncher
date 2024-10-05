@@ -52,7 +52,12 @@ public partial class ImageFileViewModel : ObservableObject
 
 public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableObject
 {
-    public DoomEntryViewModel Entry = new();
+    public DoomEntryViewModel Entry = new()
+    {
+        Id = "",
+        Name = "",
+        Created = null,
+    };
 
     public readonly DispatcherTimer SlideshowTimer = new();
     public readonly TimeSpan SlideshowInterval = TimeSpan.FromSeconds(1);

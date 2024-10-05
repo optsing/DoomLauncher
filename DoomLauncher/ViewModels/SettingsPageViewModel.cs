@@ -71,7 +71,6 @@ public partial class SettingsPageViewModel : ObservableObject
                 await DialogHelper.ShowAskAsync(
                     Strings.Resources.DialogWrongOnlineEntriesUrlTitle,
                     Strings.Resources.DialogWrongOnlineEntriesUrlText,
-                    "",
                     Strings.Resources.DialogOKAction
                 );
             }

@@ -11,12 +11,13 @@ public sealed partial class AskDialog : ContentDialog
 {
     public string Text { get; set; }
 
-    public AskDialog(string title, string text, string primaryButton, string closeButton)
+    public AskDialog(string title, string text, string primaryButton, string secondaryButton, string closeButton)
     {
         InitializeComponent();
         Title = title;
         Text = text;
         PrimaryButtonText = primaryButton;
+        SecondaryButtonText = secondaryButton;
         CloseButtonText = closeButton;
     }
 }

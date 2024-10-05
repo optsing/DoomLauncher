@@ -425,11 +425,23 @@
   <data name="DialogCancelAction" xml:space="preserve">
     <value>Отмена</value>
   </data>
+  <data name="DialogDownloadAndCreateAction" xml:space="preserve">
+    <value>Скачать и создать</value>
+  </data>
   <data name="DialogOKAction" xml:space="preserve">
     <value>ОК</value>
   </data>
   <data name="DialogDownloadAction" xml:space="preserve">
     <value>Скачать</value>
+  </data>
+  <data name="DialogDownloadErrorText" xml:space="preserve">
+    <value>Не удалось скачать, распаковать или скопировать файлы</value>
+  </data>
+  <data name="DialogDownloadErrorTitle" xml:space="preserve">
+    <value>Ошибка при скачивании</value>
+  </data>
+  <data name="DialogDownloadOnlyAction" xml:space="preserve">
+    <value>Только скачать</value>
   </data>
   <data name="DialogRemoveLinkTitle" xml:space="preserve">
     <value>Удалить ссылку</value>
@@ -495,10 +507,10 @@
     <value>Заменить файл</value>
   </data>
   <data name="DialogWrongOnlineEntriesUrlTitle" xml:space="preserve">
-    <value>Некорректный URL-адрес</value>
+    <value>Ошибка при получении данных</value>
   </data>
   <data name="DialogWrongOnlineEntriesUrlText" xml:space="preserve">
-    <value>Ошибка при подключении к серверу или при разборе JSON</value>
+    <value>Не удалось подключиться к серверу или разобрать JSON</value>
   </data>
   <data name="DialogFileReplaceCancelAction" xml:space="preserve">
     <value>Не заменять</value>
@@ -568,5 +580,9 @@
   </data>
   <data name="DoomPageInfoIWAD.Text" xml:space="preserve">
     <value>IWAD</value>
+  </data>
+  <data name="DialogCreateOrDownloadEntryText" xml:space="preserve">
+    <value>Вы хотите создать новые сборки или только скачать {0} версия {1}?</value>
+    <comment>#Format[String,String]</comment>
   </data>
 </root>

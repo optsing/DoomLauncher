@@ -31,7 +31,9 @@ internal static partial class EntryHelper
             }
             newEntry ??= new DoomEntryViewModel()
             {
+                Id = Guid.NewGuid().ToString(),
                 Name = Path.GetFileNameWithoutExtension(file.Name).Trim(),
+                Created = DateTime.Now,
             };
             var modFiles = new List<string>();
             var imageFiles = new List<string>();
@@ -118,7 +120,9 @@ internal static partial class EntryHelper
 
             var newEntry = new DoomEntryViewModel()
             {
+                Id = Guid.NewGuid().ToString(),
                 Name = wadInfo.Title.Trim(),
+                Created = DateTime.Now,
                 LongDescription = reLineBreak().Replace(wadInfo.Description, "\n").Trim(),
             };
             var modFiles = new List<string>();
@@ -208,7 +212,9 @@ internal static partial class EntryHelper
 
             var newEntry = new DoomEntryViewModel()
             {
+                Id = Guid.NewGuid().ToString(),
                 Name = title.Trim(),
+                Created = DateTime.Now,
             };
             var modFiles = new List<string>();
             var imageFiles = new List<string>();

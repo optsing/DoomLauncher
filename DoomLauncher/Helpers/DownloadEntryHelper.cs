@@ -4,7 +4,6 @@ using SharpCompress.Archives.Rar;
 using SharpCompress.Archives.Zip;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -24,8 +23,7 @@ public enum DownloadEntryInstallType
 {
     AsIs,
     Zip,
-    RAR,
-    User
+    RAR
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter<DownloadEntryUrlType>))]
@@ -73,15 +71,10 @@ public class DownloadPort
 
 public static class DownloadEntryHelper
 {
-    public static async Task<bool> InstallEntry(DownloadEntry entry, string version, DownloadEntryType type, Action<string?> SetProgress)
+    public static async Task<List<DoomEntryViewModel>> InstallEntry(DownloadEntry entry, string version, DownloadEntryType type, bool createEntries, Action<string?> SetProgress)
     {
-        var success = false;
+        List<DoomEntryViewModel> result = [];
         var targetVersion = entry.Versions.GetValueOrDefault(version) ?? throw new Exception("Version not found");
-        if (targetVersion.InstallType == DownloadEntryInstallType.User)
-        {
-            Process.Start(new ProcessStartInfo() { FileName = targetVersion.Url, UseShellExecute = true });
-            return true;
-        }
         var targetFolder = type switch
         {
             DownloadEntryType.File => FileHelper.ModsFolderPath,
@@ -106,20 +99,32 @@ public static class DownloadEntryHelper
             {
                 throw new Exception("File name required for InstallType == AsIs");
             }
-            SetProgress(Strings.Resources.ProgressLongDownload);
             try
             {
+                SetProgress(Strings.Resources.ProgressLongDownload);
                 using var stream = await WebAPI.Current.DownloadUrl(url);
-                await FileHelper.CopyFileWithConfirmation(stream, targetVersion.InstallTypeAsIsFileName, targetFolder);
-                if (!targetList.Contains(targetVersion.InstallTypeAsIsFileName))
+                var fileName = targetVersion.InstallTypeAsIsFileName;
+                await FileHelper.CopyFileWithConfirmation(stream, fileName, targetFolder);
+                if (!targetList.Contains(fileName))
                 {
-                    targetList.Add(targetVersion.InstallTypeAsIsFileName);
+                    targetList.Add(fileName);
                 }
-                success = true;
+                if (createEntries)
+                {
+                    result.Add(new DoomEntryViewModel()
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = Path.GetFileNameWithoutExtension(fileName),
+                        Created = DateTime.Now,
+                        LongDescription = entry.Description ?? "",
+                        IWadFile = type == DownloadEntryType.IWAD ? fileName : "",
+                        ModFiles = type == DownloadEntryType.File ? [fileName] : [],
+                    });
+                }
             }
-            catch (Exception ex)
+            finally
             {
-                Console.Error.WriteLine(ex);
+                SetProgress(null);
             }
         }
         else if (targetVersion.InstallType == DownloadEntryInstallType.Zip || targetVersion.InstallType == DownloadEntryInstallType.RAR)
@@ -128,9 +133,9 @@ public static class DownloadEntryHelper
             {
                 throw new Exception("Archive file names required for InstallType Zip or RAR");
             }
-            SetProgress(Strings.Resources.ProgressDownloadAndExtractArchive);
             try
             {
+                SetProgress(Strings.Resources.ProgressDownloadAndExtractArchive);
                 using var stream = await WebAPI.Current.DownloadUrl(url);
                 using var ms = new MemoryStream();
                 await stream.CopyToAsync(ms);
@@ -138,44 +143,53 @@ public static class DownloadEntryHelper
                 using IArchive archive = targetVersion.InstallType == DownloadEntryInstallType.RAR
                     ? RarArchive.Open(ms)
                     : ZipArchive.Open(ms);
-                List<(string name, IArchiveEntry entry)> archiveEntries = [];
-                foreach (var (name, path) in targetVersion.InstallTypeArchiveFileNames)
+                List<(string fileName, IArchiveEntry entry)> archiveEntries = [];
+                foreach (var (fileName, path) in targetVersion.InstallTypeArchiveFileNames)
                 {
                     var archiveEntry = archive.Entries.FirstOrDefault(ae => ae.Key == path) ?? throw new Exception($"File '{path}' not found in archive");
-                    archiveEntries.Add((name, archiveEntry) );
+                    archiveEntries.Add((fileName, archiveEntry) );
                 }
-                foreach (var (name, archiveEntry) in archiveEntries)
+                foreach (var (fileName, archiveEntry) in archiveEntries)
                 {
-                    SetProgress(Strings.Resources.ProgressExtract(archiveEntry.Key!));
+                    SetProgress(Strings.Resources.ProgressExtract(fileName));
                     using var fileStream = archiveEntry.OpenEntryStream();
-                    await FileHelper.CopyFileWithConfirmation(fileStream, name, targetFolder);
-                    if (!targetList.Contains(name))
+                    await FileHelper.CopyFileWithConfirmation(fileStream, fileName, targetFolder);
+                    if (!targetList.Contains(fileName))
                     {
-                        targetList.Add(name);
+                        targetList.Add(fileName);
                     }
-                }
-                success = true;
+                    if (createEntries)
+                    {
+                        result.Add(new DoomEntryViewModel()
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            Name = Path.GetFileNameWithoutExtension(fileName),
+                            Created = DateTime.Now,
+                            LongDescription = entry.Description ?? "",
+                            IWadFile = type == DownloadEntryType.IWAD ? fileName : "",
+                            ModFiles = type == DownloadEntryType.File ? [fileName] : [],
+                        });
+                    }
+                }             
             }
-            catch (Exception ex)
+            finally
             {
-                Console.Error.WriteLine(ex);
+                SetProgress(null);
             }
         }
-        SetProgress(null);
-        return success;
+        return result;
     }
 
-    public static async Task<bool> InstallPort(DownloadPort port, string version, Action<string?> SetProgress)
+    public static async Task InstallPort(DownloadPort port, string version, Action<string?> SetProgress)
     {
-        var success = false;
         if (!Version.TryParse(version, out var parsedVersion))
         {
             throw new Exception("Version can't be parsed");
         }
         var targetUrl = port.Versions.GetValueOrDefault(version) ?? throw new Exception("Version not found");
-        SetProgress(Strings.Resources.ProgressDownload);
         try
         {
+            SetProgress(Strings.Resources.ProgressDownload);
             using var stream = await WebAPI.Current.DownloadUrl(targetUrl);
             using var ms = new MemoryStream();
             await stream.CopyToAsync(ms);
@@ -202,13 +216,10 @@ public static class DownloadEntryHelper
             {
                 SettingsViewModel.Current.GZDoomInstalls.Add(newPackage);
             }
-            success = true;
         }
-        catch (Exception ex)
+        finally
         {
-            Console.Error.WriteLine(ex);
+            SetProgress(null);
         }
-        SetProgress(null);
-        return success;
     }
 }
