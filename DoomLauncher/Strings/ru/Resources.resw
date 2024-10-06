@@ -510,7 +510,7 @@
     <value>Ошибка при получении данных</value>
   </data>
   <data name="DialogWrongOnlineEntriesUrlText" xml:space="preserve">
-    <value>Не удалось подключиться к серверу или разобрать JSON</value>
+    <value>Не удалось подключиться к серверу или разобрать данные.</value>
   </data>
   <data name="DialogFileReplaceCancelAction" xml:space="preserve">
     <value>Не заменять</value>

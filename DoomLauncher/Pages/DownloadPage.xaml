@@ -14,58 +14,96 @@
         <CollectionViewSource x:Name="GroupedEntries" Source="{x:Bind ViewModel.Entries}" IsSourceGrouped="True"/>
         <converters:DoubleToObjectConverter x:Key="HasMoreThanOneItemsToVisiblity" GreaterThan="1" TrueValue="Visible" FalseValue="Collapsed" />
         <converters:EmptyObjectToObjectConverter x:Key="HasHomePageToVisibility" NotEmptyValue="Visible" EmptyValue="Collapsed" />
+        <converters:EmptyCollectionToObjectConverter x:Key="HasImagesToVisibility" NotEmptyValue="Visible" EmptyValue="Collapsed" />
         <DataTemplate x:Key="DownloadEntryTemplate" x:DataType="vm:DownloadEntryViewModel">
-            <Grid
-                ColumnDefinitions="*,Auto,Auto"
-                ColumnSpacing="8"
-                CornerRadius="8"
+            <StackPanel
                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                 BorderThickness="1"
                 Padding="16"
+                Orientation="Vertical"
+                CornerRadius="8"
+                Spacing="4"
+                Margin="-1"
             >
-                <StackPanel
-                    Grid.Column="0"
-                    Orientation="Vertical"
-                    Spacing="4"
+                <Grid
+                    ColumnDefinitions="*,Auto,Auto"
+                    ColumnSpacing="8"
                 >
                     <TextBlock
+                        Grid.Column="0"
                         Text="{x:Bind Name}"
                         Style="{ThemeResource BaseTextBlockStyle}"
                         FontSize="16"
+                        VerticalAlignment="Center"
                     />
-                    <HyperlinkButton
-                        Padding="4,0"
-                        Margin="-4,0"
-                        Visibility="{x:Bind Homepage, Converter={StaticResource HasHomePageToVisibility}}"
-                        Content="{x:Bind Homepage}"
-                        NavigateUri="{x:Bind Homepage}"
+                    <ComboBox
+                        Grid.Column="1"
+                        SelectedItem="{x:Bind CurrentVersion, Mode=TwoWay}"
+                        ItemsSource="{x:Bind Versions}"
+                        VerticalAlignment="Center"
+                        Visibility="{x:Bind Versions.Count, Converter={StaticResource HasMoreThanOneItemsToVisiblity}}"
+                        MinWidth="100"
                     />
-                    <TextBlock
-                        Text="{x:Bind Description}"
-                        TextWrapping="WrapWholeWords"
-                    />
-                </StackPanel>
-                <ComboBox
-                    Grid.Column="1"
-                    SelectedItem="{x:Bind CurrentVersion, Mode=TwoWay}"
-                    ItemsSource="{x:Bind Versions}"
-                    VerticalAlignment="Center"
-                    Visibility="{x:Bind Versions.Count, Converter={StaticResource HasMoreThanOneItemsToVisiblity}}"
-                    MinWidth="100"
-                />
-                <Button
-                    Grid.Column="2"
-                    Command="{x:Bind DownloadCommand}"
-                    CommandParameter="{x:Bind}"
-                    VerticalAlignment="Center"
+                    <Button
+                        Grid.Column="2"
+                        Command="{x:Bind DownloadCommand}"
+                        CommandParameter="{x:Bind}"
+                        VerticalAlignment="Center"
+                    >
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <FontIcon FontSize="14" Glyph="&#xE896;" />
+                            <TextBlock x:Uid="DownloadPageDownload" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+                <ListView
+                    ItemsSource="{x:Bind Images}"
+                    ScrollViewer.HorizontalScrollMode="Enabled"
+                    ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                    ScrollViewer.VerticalScrollMode="Disabled"
+                    SelectionMode="None"
+                    Visibility="{x:Bind Images, Converter={StaticResource HasImagesToVisibility}}"
                 >
-                    <StackPanel Orientation="Horizontal" Spacing="4">
-                        <FontIcon FontSize="14" Glyph="&#xE896;" />
-                        <TextBlock x:Uid="DownloadPageDownload" />
-                    </StackPanel>
-                </Button>
-            </Grid>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Template" Value="{StaticResource PictureListViewItem}"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="8" />
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <Image
+                                Width="288"
+                                Height="216"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center"
+                                Stretch="UniformToFill"
+                            >
+                                <Image.Source>
+                                    <BitmapImage UriSource="{x:Bind}" />
+                                    
+                                </Image.Source>
+                            </Image>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <HyperlinkButton
+                     Padding="4,0"
+                     Margin="-4,0"
+                     Visibility="{x:Bind Homepage, Converter={StaticResource HasHomePageToVisibility}}"
+                     Content="{x:Bind Homepage}"
+                     NavigateUri="{x:Bind Homepage}"
+                 />
+                <TextBlock
+                    Text="{x:Bind Description}"
+                    TextWrapping="WrapWholeWords"
+                />
+            </StackPanel>
         </DataTemplate>
     </Page.Resources>
     <ScrollView>

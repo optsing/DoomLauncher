@@ -16,6 +16,7 @@ public partial class DownloadEntryViewModel
     public required object Source { get; init; }
     public required string Name { get; init; }
     public required Uri? Homepage { get; init; }
+    public required List<string> Images { get; init; }
     public required DownloadEntryType Type { get; init; }
     public required string? Description { get; init; }
     public required string CurrentVersion { get; set; }
@@ -60,6 +61,7 @@ public partial class DownloadPageViewModel : ObservableObject
                     Type = DownloadEntryType.IWAD,
                     Description = file.Description,
                     Homepage = uri,
+                    Images = file.Images,
                     CurrentVersion = versions[0],
                     Versions = versions,
                     DownloadCommand = DownloadEntryCommand,
@@ -76,6 +78,7 @@ public partial class DownloadPageViewModel : ObservableObject
                     Type = DownloadEntryType.IWAD,
                     Description = file.Description,
                     Homepage = uri,
+                    Images = file.Images,
                     CurrentVersion = versions[0],
                     Versions = versions,
                     DownloadCommand = DownloadEntryCommand,
@@ -92,6 +95,7 @@ public partial class DownloadPageViewModel : ObservableObject
                     Type = DownloadEntryType.File,
                     Description = file.Description,
                     Homepage = uri,
+                    Images = file.Images,
                     CurrentVersion = versions[0],
                     Versions = versions,
                     DownloadCommand = DownloadEntryCommand,
