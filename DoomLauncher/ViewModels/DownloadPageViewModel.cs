@@ -17,7 +17,6 @@ public partial class DownloadEntryViewModel
     public required string Name { get; init; }
     public required Uri? Homepage { get; init; }
     public required List<string> Images { get; init; }
-    public required DownloadEntryType Type { get; init; }
     public required string? Description { get; init; }
     public required string CurrentVersion { get; set; }
     public required List<string> Versions { get; init; }
@@ -58,7 +57,6 @@ public partial class DownloadPageViewModel : ObservableObject
                 {
                     Source = file,
                     Name = file.Name,
-                    Type = DownloadEntryType.IWAD,
                     Description = file.Description,
                     Homepage = uri,
                     Images = file.Images,
@@ -75,7 +73,6 @@ public partial class DownloadPageViewModel : ObservableObject
                 {
                     Source = file,
                     Name = file.Name,
-                    Type = DownloadEntryType.IWAD,
                     Description = file.Description,
                     Homepage = uri,
                     Images = file.Images,
@@ -92,7 +89,6 @@ public partial class DownloadPageViewModel : ObservableObject
                 {
                     Source = file,
                     Name = file.Name,
-                    Type = DownloadEntryType.File,
                     Description = file.Description,
                     Homepage = uri,
                     Images = file.Images,
@@ -137,7 +133,7 @@ public partial class DownloadPageViewModel : ObservableObject
             {
                 try
                 {
-                    var entries = await DownloadEntryHelper.InstallEntry(entry, version, vm.Type, result == ContentDialogResult.Primary, progress => EventBus.Progress(this, progress));
+                    var entries = await DownloadEntryHelper.InstallEntry(entry, version, result == ContentDialogResult.Primary, progress => EventBus.Progress(this, progress));
                     foreach (var item in entries)
                     {
                         SettingsViewModel.Current.Entries.Add(item);
