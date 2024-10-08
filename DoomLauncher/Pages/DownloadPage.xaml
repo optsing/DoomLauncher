@@ -63,6 +63,7 @@
                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
                     ScrollViewer.VerticalScrollMode="Disabled"
                     SelectionMode="None"
+                    Padding="0,16"
                     Visibility="{x:Bind Images, Converter={StaticResource HasImagesToVisibility}}"
                 >
                     <ListView.ItemContainerStyle>

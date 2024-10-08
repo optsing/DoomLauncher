@@ -73,6 +73,7 @@ public class DownloadEntryList
 public class DownloadEntry
 {
     public required string Name { get; init; }
+    public string? Title { get; init; }
     public string? Description { get; init; }
     public string? Homepage { get; init; }
     public List<string> Images { get; set; } = [];
@@ -81,6 +82,8 @@ public class DownloadEntry
 
 public class DownloadEntryVersion
 {
+    public string? Title { get; init; }
+    public string? Description { get; init; }
     public required string Url { get; init; }
     public DownloadEntryUrlType UrlType { get; set; } = DownloadEntryUrlType.Direct;
     public required DownloadEntryInstallType InstallType { get; init; }
@@ -90,8 +93,11 @@ public class DownloadEntryVersion
 
 public class InstallTypeArchiveFile
 {
-    public required string Path { get; set; }
-    public string Name { get; set; } = "";
+    public required string Path { get; init; }
+    public string? Name { get; init; } = null;
+    public string? Title { get; init; } = null;
+    public string? Description { get; init; } = null;
+    public List<int>? Images { get; init; } = null;
 }
 
 public class DownloadPort
@@ -160,9 +166,10 @@ public static class DownloadEntryHelper
                     result.Add(new DoomEntryViewModel()
                     {
                         Id = Guid.NewGuid().ToString(),
-                        Name = Path.GetFileNameWithoutExtension(fileName),
+                        Name = entry.Name,
                         Created = DateTime.Now,
-                        LongDescription = entry.Description ?? "",
+                        Description = targetVersion.Title ?? entry.Title ?? "",
+                        LongDescription = targetVersion.Description ?? entry.Description ?? "",
                         IWadFile = type == DownloadEntryType.IWAD ? fileName : "",
                         ModFiles = type == DownloadEntryType.File ? [fileName] : [],
                     });
@@ -189,13 +196,14 @@ public static class DownloadEntryHelper
                 using IArchive archive = targetVersion.InstallType == DownloadEntryInstallType.RAR
                     ? RarArchive.Open(ms)
                     : ZipArchive.Open(ms);
-                List<(string fileName, string title, IArchiveEntry entry)> archiveEntries = [];
+                List<(string fileName, InstallTypeArchiveFile file, IArchiveEntry entry)> archiveEntries = [];
                 foreach (var (fileName, file) in targetVersion.InstallTypeArchiveFileNames)
                 {
                     var archiveEntry = archive.Entries.FirstOrDefault(ae => ae.Key == file.Path) ?? throw new Exception($"File '{file.Path}' not found in archive");
-                    archiveEntries.Add((fileName, string.IsNullOrEmpty(file.Name) ? Path.GetFileNameWithoutExtension(fileName) : file.Name, archiveEntry));
+                    archiveEntries.Add((fileName, file, archiveEntry));
                 }
-                foreach (var (fileName, title, archiveEntry) in archiveEntries)
+                Dictionary<string, string> requiredImages = [];
+                foreach (var (fileName, file, archiveEntry) in archiveEntries)
                 {
                     SetProgress(Strings.Resources.ProgressExtract(fileName));
                     using var fileStream = archiveEntry.OpenEntryStream();
@@ -206,32 +214,55 @@ public static class DownloadEntryHelper
                     }
                     if (createEntries)
                     {
+                        List<string> images = [];
+                        if (requiredImages.Count < entry.Images.Count)
+                        {
+                            if (file.Images == null)
+                            {
+                                foreach (var imageUrl in entry.Images)
+                                {
+                                    if (Uri.TryCreate(imageUrl, UriKind.Absolute, out var uri))
+                                    {
+                                        var imageName = Path.GetFileName(uri.LocalPath);
+                                        requiredImages.Add(imageUrl, imageName);
+                                        images.Add(imageName);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                foreach (var imageInd in file.Images)
+                                {
+                                    if (imageInd >= 0 && imageInd < entry.Images.Count)
+                                    {
+                                        var imageUrl = entry.Images[imageInd];
+                                        if (!requiredImages.ContainsKey(imageUrl) && Uri.TryCreate(imageUrl, UriKind.Absolute, out var uri))
+                                        {
+                                            var imageName = Path.GetFileName(uri.LocalPath);
+                                            requiredImages.Add(imageUrl, imageName);
+                                            images.Add(imageName);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                         result.Add(new DoomEntryViewModel()
                         {
                             Id = Guid.NewGuid().ToString(),
-                            Name = title,
+                            Name = string.IsNullOrEmpty(file.Name) ? Path.GetFileNameWithoutExtension(fileName) : file.Name,
                             Created = DateTime.Now,
-                            LongDescription = entry.Description ?? "",
+                            Description = file.Title ?? targetVersion.Title ?? entry.Title ?? "",
+                            LongDescription = file.Description ?? targetVersion.Description ?? entry.Description ?? "",
                             IWadFile = type == DownloadEntryType.IWAD ? fileName : "",
                             ModFiles = type == DownloadEntryType.File ? [fileName] : [],
+                            ImageFiles = images,
                         });
                     }
                 }
-                if (createEntries)
+                foreach (var (imageUrl, imageName) in requiredImages)
                 {
-                    foreach (var imageUrl in entry.Images)
-                    {
-                        if (Uri.TryCreate(imageUrl, UriKind.Absolute, out var uri))
-                        {
-                            using var imageStream = await WebAPI.Current.DownloadUrl(imageUrl);
-                            var imageName = Path.GetFileName(uri.LocalPath);
-                            await FileHelper.CopyFileWithConfirmation(imageStream, imageName, FileHelper.ImagesFolderPath);
-                            foreach (var newEntry in result)
-                            {
-                                newEntry.ImageFiles.Add(imageName);
-                            }
-                        }
-                    }
+                    using var imageStream = await WebAPI.Current.DownloadUrl(imageUrl);
+                    await FileHelper.CopyFileWithConfirmation(imageStream, imageName, FileHelper.ImagesFolderPath);
                 }
             }
             finally
