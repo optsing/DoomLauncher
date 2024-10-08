@@ -5,7 +5,6 @@ using SharpCompress.Archives.Zip;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Pipes;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -138,7 +137,7 @@ public static class DownloadEntryHelper
         {
             if (targetVersion.InstallTypeAsIsFileName == null)
             {
-                throw new Exception("File name required for InstallType == AsIs");
+                throw new Exception("File name required for InstallType AsIs");
             }
             try
             {
