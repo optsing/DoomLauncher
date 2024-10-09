@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
@@ -60,10 +59,15 @@ public class DownloadEntryVersion
 {
     public string? Title { get; init; }
     public string? Description { get; init; }
-    public required string Url { get; init; }
-    public DownloadEntryUrlType UrlType { get; set; } = DownloadEntryUrlType.Direct;
-    public required DownloadEntryInstallType InstallType { get; init; }
     public required List<DownloadEntryVersionEntry> Entries { get; init; }
+    public required DownloadEntryVersionSource Source { get; init; }
+}
+
+public class DownloadEntryVersionSource
+{
+    public required string Url { get; init; }
+    public required DownloadEntryInstallType Type { get; init; }
+    public DownloadEntryUrlType UrlType { get; set; } = DownloadEntryUrlType.Direct;
 }
 
 public class DownloadEntryVersionEntry
@@ -112,12 +116,6 @@ public static class DownloadEntryHelper
     {
         List<DoomEntryViewModel> result = [];
         var targetVersion = entry.Versions.GetValueOrDefault(version) ?? throw new Exception("Version not found");
-        var url = targetVersion.UrlType switch
-        {
-            DownloadEntryUrlType.Direct => targetVersion.Url,
-            DownloadEntryUrlType.ModDB => await WebAPI.Current.GetDirectUrlFromModDB(targetVersion.Url),
-            _ => throw new NotSupportedException(),
-        };
         Dictionary<string, string> requiredImages = [];
         List<(DownloadEntryVersionEntryFile file, DownloadEntryType type)> requiredFiles = [];
         foreach (var subEntry in targetVersion.Entries)
@@ -134,35 +132,20 @@ public static class DownloadEntryHelper
             if (createEntries)
             {
                 List<string> images = [];
-                if (requiredImages.Count < entry.Images.Count)
+                var imageUrlList = subEntry.Images == null
+                    ? entry.Images
+                    : subEntry.Images
+                        .Where(ind => ind >= 0 && ind < entry.Images.Count)
+                        .Select(ind => entry.Images[ind]);
+                foreach (var imageUrl in imageUrlList)
                 {
-                    if (subEntry.Images == null)
+                    if (!requiredImages.ContainsKey(imageUrl) && Uri.TryCreate(imageUrl, UriKind.Absolute, out var uri))
                     {
-                        foreach (var imageUrl in entry.Images)
-                        {
-                            if (Uri.TryCreate(imageUrl, UriKind.Absolute, out var uri))
-                            {
-                                var imageName = Path.GetFileName(uri.LocalPath);
-                                requiredImages.Add(imageUrl, imageName);
-                                images.Add(imageName);
-                            }
-                        }
+                        requiredImages.Add(imageUrl, Path.GetFileName(uri.LocalPath));
                     }
-                    else
+                    if (requiredImages.TryGetValue(imageUrl, out string? imageName))
                     {
-                        foreach (var imageInd in subEntry.Images)
-                        {
-                            if (imageInd >= 0 && imageInd < entry.Images.Count)
-                            {
-                                var imageUrl = entry.Images[imageInd];
-                                if (!requiredImages.ContainsKey(imageUrl) && Uri.TryCreate(imageUrl, UriKind.Absolute, out var uri))
-                                {
-                                    var imageName = Path.GetFileName(uri.LocalPath);
-                                    requiredImages.Add(imageUrl, imageName);
-                                    images.Add(imageName);
-                                }
-                            }
-                        }
+                        images.Add(imageName);
                     }
                 }
                 result.Add(new DoomEntryViewModel()
@@ -178,9 +161,15 @@ public static class DownloadEntryHelper
                 });
             }
         }
+        var url = targetVersion.Source.UrlType switch
+        {
+            DownloadEntryUrlType.Direct => targetVersion.Source.Url,
+            DownloadEntryUrlType.ModDB => await WebAPI.Current.GetDirectUrlFromModDB(targetVersion.Source.Url),
+            _ => throw new NotSupportedException(),
+        };
         try
         {
-            if (targetVersion.InstallType == DownloadEntryInstallType.AsIs)
+            if (targetVersion.Source.Type == DownloadEntryInstallType.AsIs)
             {
                 SetProgress(Strings.Resources.ProgressLongDownload);
                 using var stream = await WebAPI.Current.DownloadUrl(url);
@@ -195,14 +184,14 @@ public static class DownloadEntryHelper
                     }
                 }
             }
-            else if (targetVersion.InstallType == DownloadEntryInstallType.Zip || targetVersion.InstallType == DownloadEntryInstallType.RAR)
+            else if (targetVersion.Source.Type == DownloadEntryInstallType.Zip || targetVersion.Source.Type == DownloadEntryInstallType.RAR)
             {
                 SetProgress(Strings.Resources.ProgressDownloadAndExtractArchive);
                 using var stream = await WebAPI.Current.DownloadUrl(url);
                 using var ms = new MemoryStream();
                 await stream.CopyToAsync(ms);
                 ms.Seek(0, SeekOrigin.Begin);
-                using IArchive archive = targetVersion.InstallType == DownloadEntryInstallType.RAR
+                using IArchive archive = targetVersion.Source.Type == DownloadEntryInstallType.RAR
                     ? RarArchive.Open(ms)
                     : ZipArchive.Open(ms);
                 List<(DownloadEntryVersionEntryFile file, DownloadEntryType type, IArchiveEntry entry)> archiveEntries = [];
