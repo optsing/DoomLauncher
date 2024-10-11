@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml;
+﻿using DoomLauncher.ViewModels;
+using Microsoft.UI.Xaml;
 using System;
 
 namespace DoomLauncher.Helpers;
@@ -11,6 +12,8 @@ static class EventBus
     public static void ChangeBackground(object sender, string? imagePath, AnimationDirection direction) => OnChangeBackground?.Invoke(sender, (imagePath, direction));
     public static event EventHandler<string?>? OnChangeCaption;
     public static void ChangeCaption(object sender, string? caption) => OnChangeCaption?.Invoke(sender, caption);
+    public static event EventHandler<DoomEntryViewModel?>? OnSetCurrentEntry;
+    public static void SetCurrentEntry(object sender, DoomEntryViewModel? currentEntry) => OnSetCurrentEntry?.Invoke(sender, currentEntry);
     public static event EventHandler<bool>? OnDropHelper;
     public static void DropHelper(object sender, bool isDropHelperVisible) => OnDropHelper?.Invoke(sender, isDropHelperVisible);
 

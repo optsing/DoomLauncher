@@ -21,26 +21,26 @@
         <MenuFlyout x:Key="flyoutEntry" Placement="Bottom">
             <MenuFlyoutItem
                 x:Uid="FlyoutEntryEdit"
-                Command="{x:Bind EditEntryCommand}"
+                Command="{x:Bind ViewModel.EditEntryCommand}"
                 CommandParameter="{Binding}"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE70F;}"
             />
             <MenuFlyoutSeparator />
             <MenuFlyoutItem
                 x:Uid="FlyoutEntryExport"
-                Command="{x:Bind ExportEntryCommand}"
+                Command="{x:Bind ViewModel.ExportEntryCommand}"
                 CommandParameter="{Binding}"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74E;}"
             />
             <MenuFlyoutItem
                 x:Uid="FlyoutEntryCreateShortcut"
-                Command="{x:Bind CreateShortcutEntryCommand}"
+                Command="{x:Bind ViewModel.CreateShortcutEntryCommand}"
                 CommandParameter="{Binding}"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE71B;}"
             />
             <MenuFlyoutItem
                 x:Uid="FlyoutEntryRemove"
-                Command="{x:Bind RemoveEntryCommand}"
+                Command="{x:Bind ViewModel.RemoveEntryCommand}"
                 CommandParameter="{Binding}"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
             />
@@ -48,19 +48,19 @@
         <MenuFlyout x:Key="flyoutEntryShort" Placement="Bottom">
             <MenuFlyoutItem
                 x:Uid="FlyoutEntryExport"
-                Command="{x:Bind ExportEntryCommand}"
+                Command="{x:Bind ViewModel.ExportEntryCommand}"
                 CommandParameter="{Binding}"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74E;}"
             />
             <MenuFlyoutItem
                 x:Uid="FlyoutEntryCreateShortcut"
-                Command="{x:Bind CreateShortcutEntryCommand}"
+                Command="{x:Bind ViewModel.CreateShortcutEntryCommand}"
                 CommandParameter="{Binding}"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE71B;}"
             />
             <MenuFlyoutItem
                 x:Uid="FlyoutEntryRemove"
-                Command="{x:Bind RemoveEntryCommand}"
+                Command="{x:Bind ViewModel.RemoveEntryCommand}"
                 CommandParameter="{Binding}"
                 Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
             />
@@ -386,7 +386,7 @@
                             Height="32"
                         />
                         <Button 
-                            Command="{x:Bind EditEntryCommand}"
+                            Command="{x:Bind ViewModel.EditEntryCommand}"
                             CommandParameter="{x:Bind ViewModel.CurrentEntry, Mode=OneWay}"
                             VerticalAlignment="Center"
                         >
@@ -396,7 +396,7 @@
                             </StackPanel>
                         </Button>
                         <Button 
-                            Command="{x:Bind LaunchEntryCommand}"
+                            Command="{x:Bind ViewModel.LaunchEntryCommand}"
                             CommandParameter="{x:Bind ViewModel.CurrentEntry, Mode=OneWay}"
                             Width="180"
                             VerticalAlignment="Center"

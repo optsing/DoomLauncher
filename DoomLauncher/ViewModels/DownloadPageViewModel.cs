@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -25,7 +26,44 @@ public partial class DownloadEntryViewModel
 
 public partial class DownloadPageViewModel : ObservableObject
 {
-    public ObservableGroupedCollection<string, DownloadEntryViewModel> Entries { get; } = [];
+    public ObservableCollection<DownloadEntryViewModel> PortEntries { get; } = [];
+    public ObservableCollection<DownloadEntryViewModel> IWADEntries { get; } = [];
+    public ObservableCollection<DownloadEntryViewModel> FileEntries { get; } = [];
+
+    public ObservableCollection<DownloadEntryViewModel> PortEntriesView { get; } = [];
+    public ObservableCollection<DownloadEntryViewModel> IWADEntriesView { get; } = [];
+    public ObservableCollection<DownloadEntryViewModel> FileEntriesView { get; } = [];
+
+    private SyncCollection<DownloadEntryViewModel> SyncPortEntries;
+    private SyncCollection<DownloadEntryViewModel> SyncIWADEntries;
+    private SyncCollection<DownloadEntryViewModel> SyncFileEntries;
+
+    [ObservableProperty]
+    private string searchQuery = "";
+
+    public DownloadPageViewModel()
+    {
+        Func<DownloadEntryViewModel, bool> filter = vm => string.IsNullOrEmpty(SearchQuery) || vm.Name.Contains(SearchQuery, System.StringComparison.CurrentCultureIgnoreCase);
+        SyncPortEntries = new(PortEntries, PortEntriesView)
+        {
+            Filter = filter,
+        };
+        SyncIWADEntries = new(IWADEntries, IWADEntriesView)
+        {
+            Filter = filter,
+        };
+        SyncFileEntries = new(FileEntries, FileEntriesView)
+        {
+            Filter = filter,
+        };
+    }
+
+    partial void OnSearchQueryChanged(string value)
+    {
+        SyncPortEntries.SyncDebounce();
+        SyncIWADEntries.SyncDebounce();
+        SyncFileEntries.SyncDebounce();
+    }
 
     [ObservableProperty]
     private Visibility hasNoItems = Visibility.Collapsed;
@@ -36,7 +74,9 @@ public partial class DownloadPageViewModel : ObservableObject
         EventBus.Progress(this, Strings.Resources.ProgressLoadingOnlineEntries);
         var entries = await WebAPI.Current.DownloadEntriesFromJson(SettingsViewModel.Current.OnlineSource);
         EventBus.Progress(this, null);
-        Entries.Clear();
+        PortEntries.Clear();
+        IWADEntries.Clear();
+        FileEntries.Clear();
         if (entries == null)
         {
             await DialogHelper.ShowAskAsync(
@@ -46,9 +86,6 @@ public partial class DownloadPageViewModel : ObservableObject
         }
         else 
         {
-            var PortEntries = new ObservableGroup<string, DownloadEntryViewModel>(Strings.Resources.DownloadPageGroupPorts);
-            var IWADEntries = new ObservableGroup<string, DownloadEntryViewModel>(Strings.Resources.DownloadPageGroupIWAD);
-            var FileEntries = new ObservableGroup<string, DownloadEntryViewModel>(Strings.Resources.DownloadPageGroupFiles);
             foreach (var file in entries.Ports.OrderBy(p => p.Name))
             {
                 var versions = file.Versions.Keys.ToList();
@@ -97,20 +134,8 @@ public partial class DownloadPageViewModel : ObservableObject
                     DownloadCommand = DownloadEntryCommand,
                 });
             }
-            if (PortEntries.Count > 0)
-            {
-                Entries.Add(PortEntries);
-            }
-            if (IWADEntries.Count > 0)
-            {
-                Entries.Add(IWADEntries);
-            }
-            if (FileEntries.Count > 0)
-            {
-                Entries.Add(FileEntries);
-            }
         }
-        if (Entries.Count == 0)
+        if (PortEntries.Count == 0 && IWADEntries.Count == 0 && FileEntries.Count == 0)
         {
             HasNoItems = Visibility.Visible;
         }

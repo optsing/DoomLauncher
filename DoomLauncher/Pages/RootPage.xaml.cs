@@ -36,12 +36,13 @@ public sealed partial class RootPage : Page
 
     private readonly TimeSpan SlideshowAnimationDuration = TimeSpan.FromMilliseconds(150);
 
-    private RootPageViewModel ViewModel { get; set; }
+    public RootPageViewModel ViewModel { get; set; }
 
     public RootPage()
     {
         InitializeComponent();
 
+        EventBus.OnSetCurrentEntry += (_, entry) => SetCurrentEntry(entry);
         EventBus.OnProgress += EventBus_OnProgress;
         EventBus.OnChangeBackground += EventBus_OnChangeBackground;
         EventBus.OnChangeCaption += EventBus_OnChangeCaption;
@@ -187,125 +188,6 @@ public sealed partial class RootPage : Page
     }
 
     [RelayCommand]
-    private async Task RemoveEntry(DoomEntryViewModel? entry)
-    {
-        if (entry == null)
-        {
-            return;
-        }
-        if (await DialogHelper.ShowAskAsync(Strings.Resources.DialogEntryRemoveTitle, Strings.Resources.DialogEntryRemoveText(entry.Name), Strings.Resources.DialogRemoveAction, Strings.Resources.DialogCancelAction))
-        {
-            if (entry == ViewModel.CurrentEntry)
-            {
-                SetCurrentEntry(null);
-            }
-            SettingsViewModel.Current.Entries.Remove(entry);
-            SettingsViewModel.Current.Save();
-            await JumpListHelper.Update();
-        }
-    }
-
-    [RelayCommand]
-    private async Task EditEntry(DoomEntryViewModel? entry)
-    {
-        if (entry == null)
-        {
-            return;
-        }
-        var result = await DialogHelper.ShowEditEntryAsync(entry, EditDialogMode.Edit);
-        if (result.Result == ContentDialogResult.Primary)
-        {
-            result.ViewModel.UpdateEntry(entry);
-            SettingsViewModel.Current.Save();
-            await JumpListHelper.Update();
-        }
-        else if (result.Result == ContentDialogResult.Secondary)
-        {
-            var newEntry = new DoomEntryViewModel()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "",
-                Created = DateTime.Now,
-                SelectedImageIndex = entry.SelectedImageIndex,
-                ModFiles = new(entry.ModFiles),
-                ImageFiles = new(entry.ImageFiles),
-            };
-            result.ViewModel.UpdateEntry(newEntry);
-            AddEntries([newEntry]);
-        }
-    }
-
-    public void LaunchEntryById(string entryId, bool forceClose)
-    {
-        var entry = SettingsViewModel.Current.Entries.FirstOrDefault(entry => string.Equals(entry.Id, entryId));
-        LaunchEntry(entry, forceClose);
-    }
-
-    public void LaunchEntryByName(string entryName, bool forceClose)
-    {
-        var entry = SettingsViewModel.Current.Entries.FirstOrDefault(entry => string.Equals(entry.Name, entryName));
-        LaunchEntry(entry, forceClose);
-    }
-
-    [RelayCommand]
-    private void LaunchEntry(DoomEntryViewModel? entry)
-    {
-        LaunchEntry(entry, false);
-    }
-
-    private async void LaunchEntry(DoomEntryViewModel? entry, bool forceClose)
-    {
-        if (entry == null)
-        {
-            await DialogHelper.ShowAskAsync(Strings.Resources.DialogLaunchErrorTitle, Strings.Resources.DialogLaunchErrorNoEntryText, "", Strings.Resources.DialogCancelAction);
-            return;
-        }
-        SetCurrentEntry(entry);
-        var result = LaunchHelper.LaunchEntry(entry);
-        if (result == LaunchResult.Success && LaunchHelper.CurrentProcess != null)
-        {
-            entry.LastLaunch = DateTime.Now;
-            await JumpListHelper.Update();
-            if (SettingsViewModel.Current.CloseOnLaunch || forceClose)
-            {
-                Application.Current.Exit();
-            }
-            else
-            {
-                await LaunchHelper.CurrentProcess.WaitForExitAsync();
-                entry.PlayTime = (entry.PlayTime ?? new()) + (LaunchHelper.CurrentProcess.ExitTime - LaunchHelper.CurrentProcess.StartTime);
-                if (LaunchHelper.CurrentProcess.ExitCode != 0)
-                {
-                    var error = await LaunchHelper.CurrentProcess.StandardError.ReadToEndAsync();
-                    if (string.IsNullOrEmpty(error))
-                    {
-                        await DialogHelper.ShowAskAsync(Strings.Resources.DialogLaunchErrorTitle, Strings.Resources.DialogLaunchErrorCodeText(LaunchHelper.CurrentProcess.ExitCode), Strings.Resources.DialogCancelAction);
-                    }
-                    else
-                    {
-                        await DialogHelper.ShowAskAsync(Strings.Resources.DialogLaunchErrorTitle, Strings.Resources.DialogLaunchErrorText(error), Strings.Resources.DialogCancelAction);
-                    }
-                }
-            }
-        }
-        else if (result == LaunchResult.AlreadyLaunched && LaunchHelper.CurrentProcess != null)
-        {
-            await DialogHelper.ShowAskAsync(Strings.Resources.DialogLaunchErrorTitle, Strings.Resources.DialogLaunchErrorAlreadyLaunchedText, Strings.Resources.DialogCancelAction);
-        }
-        else if (result == LaunchResult.PathNotValid)
-        {
-            if (await DialogHelper.ShowAskAsync(Strings.Resources.DialogLaunchErrorTitle, Strings.Resources.DialogLaunchErrorGZDoomPathNotValidText, Strings.Resources.DialogEditAction, Strings.Resources.DialogCancelAction))
-            {
-                await EditEntry(entry);
-            }
-        }
-        else
-        {
-            await DialogHelper.ShowAskAsync(Strings.Resources.DialogLaunchErrorTitle, Strings.Resources.DialogLaunchErrorUnknownText, Strings.Resources.DialogCancelAction);
-        }
-    }
-
-    [RelayCommand]
     private void ToggleSidebar()
     {
         swMain.IsPaneOpen = !swMain.IsPaneOpen;
@@ -356,7 +238,7 @@ public sealed partial class RootPage : Page
             var newEntry = await EntryHelper.CreateFromFiles(files, withConfirm: true, SetProgress);
             if (newEntry != null)
             {
-                AddEntries([newEntry]);
+                ViewModel.AddEntries([newEntry]);
             }
         }
     }
@@ -374,7 +256,7 @@ public sealed partial class RootPage : Page
                 SelectedImageIndex = 0,
             };
             result.ViewModel.UpdateEntry(newEntry);
-            AddEntries([newEntry]);
+            ViewModel.AddEntries([newEntry]);
         }
     }
 
@@ -398,58 +280,6 @@ public sealed partial class RootPage : Page
         }
     }
 
-    [RelayCommand]
-    private async Task CreateShortcutEntry(DoomEntryViewModel? entry)
-    {
-        if (entry == null)
-        {
-            return;
-        }
-        var picker = new Windows.Storage.Pickers.FileSavePicker();
-
-        // Need to initialize the picker object with the hwnd / IInitializeWithWindow
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, WinApi.HWND);
-
-        // Now we can use the picker object as normal
-        picker.FileTypeChoices.Add(Strings.Resources.FileTypeShortcutTitle, [".url"]);
-        picker.SuggestedFileName = entry.Name;
-        picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Desktop;
-        picker.CommitButtonText = Strings.Resources.CreateShortcut;
-
-        var file = await picker.PickSaveFileAsync();
-        if (file == null)
-        {
-            return;
-        }
-
-        SetProgress(Strings.Resources.ProgressCreatingShortcut);
-        await FileHelper.CreateEntryShortcut(entry, file);
-        SetProgress(null);
-    }
-
-    [RelayCommand]
-    private async Task ExportEntry(DoomEntryViewModel? entry)
-    {
-        if (entry == null)
-        {
-            return;
-        }
-        var picker = new Windows.Storage.Pickers.FileSavePicker();
-
-        // Need to initialize the picker object with the hwnd / IInitializeWithWindow
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, WinApi.HWND);
-
-        // Now we can use the picker object as normal
-        picker.FileTypeChoices.Add(Strings.Resources.FileTypeGZDLTitle, [".gzdl"]);
-        picker.SuggestedFileName = entry.Name;
-        picker.CommitButtonText = Strings.Resources.Export;
-
-        var file = await picker.PickSaveFileAsync();
-        if (file != null)
-        {
-            await EntryHelper.ExportToGZDLFile(entry, file, SetProgress);
-        }
-    }
 
     public async Task ImportEntriesFromGZDLFiles(IReadOnlyList<StorageFile> files, bool withConfirm)
     {
@@ -462,7 +292,7 @@ public sealed partial class RootPage : Page
                 addedEntries.Add(newEntry);
             }
         }
-        AddEntries(addedEntries);
+        ViewModel.AddEntries(addedEntries);
     }
 
     public async Task ImportEntryFromDoomWorldId(string wadId, bool withConfirm)
@@ -474,7 +304,7 @@ public sealed partial class RootPage : Page
             var newEntry = await EntryHelper.ImportFromDoomWorld(wadInfo, withConfirm, SetProgress);
             if (newEntry != null)
             {
-                AddEntries([newEntry]);
+                ViewModel.AddEntries([newEntry]);
             }
         }
         SetProgress(null);
@@ -551,7 +381,7 @@ public sealed partial class RootPage : Page
                     var newEntry = await EntryHelper.CreateFromFiles(otherFiles, withConfirm: true, SetProgress);
                     if (newEntry != null)
                     {
-                        AddEntries([newEntry]);
+                        ViewModel.AddEntries([newEntry]);
                     }
                 }
             }
@@ -583,18 +413,6 @@ public sealed partial class RootPage : Page
         ViewModel.IsRightDropHelperVisible = false;
     }
 
-    public void AddEntries(List<DoomEntryViewModel> entries)
-    {
-        if (entries.Count > 0)
-        {
-            foreach (var entry in entries)
-            {
-                SettingsViewModel.Current.Entries.Add(entry);
-            }
-            SetCurrentEntry(entries.Last());
-            SettingsViewModel.Current.Save();
-        }
-    }
 
     public void SetCurrentEntry(DoomEntryViewModel? entry)
     {

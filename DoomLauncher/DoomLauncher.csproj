@@ -31,7 +31,7 @@
 		<PublishTrimmed Condition="'$(Configuration)' == 'Debug'">false</PublishTrimmed>
 		<PublishTrimmed Condition="'$(Configuration)' != 'Debug'">true</PublishTrimmed>
 		<PublishSingleFile>false</PublishSingleFile>
-		<PublishAOT>false</PublishAOT>
+		<PublishAOT>true</PublishAOT>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(WindowsPackageType)' == 'None'">

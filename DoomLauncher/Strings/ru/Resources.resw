@@ -540,7 +540,7 @@
     <value>По дате создания</value>
   </data>
   <data name="RootPageSearchTextBox.PlaceholderText" xml:space="preserve">
-    <value>Поиск по названию</value>
+    <value>Поиск по сборкам</value>
   </data>
   <data name="FileTypeShortcutTitle" xml:space="preserve">
     <value>Ярлык</value>
@@ -560,13 +560,13 @@
   <data name="DownloadPageNoItems.Text" xml:space="preserve">
     <value>Элементы не найдены</value>
   </data>
-  <data name="DownloadPageGroupIWAD" xml:space="preserve">
+  <data name="DownloadPageGroupIWAD.Text" xml:space="preserve">
     <value>IWAD</value>
   </data>
-  <data name="DownloadPageGroupPorts" xml:space="preserve">
+  <data name="DownloadPageGroupPorts.Text" xml:space="preserve">
     <value>Порты</value>
   </data>
-  <data name="DownloadPageGroupFiles" xml:space="preserve">
+  <data name="DownloadPageGroupFiles.Text" xml:space="preserve">
     <value>Файлы</value>
   </data>
   <data name="DoomPageGZDoomCustom" xml:space="preserve">
@@ -584,5 +584,8 @@
   <data name="DialogCreateOrDownloadEntryText" xml:space="preserve">
     <value>Вы хотите создать новые сборки или только скачать {0} версия {1}?</value>
     <comment>#Format[String,String]</comment>
+  </data>
+  <data name="DownloadPageSearchTextBox.PlaceholderText" xml:space="preserve">
+    <value>Поиск по каталогу</value>
   </data>
 </root>

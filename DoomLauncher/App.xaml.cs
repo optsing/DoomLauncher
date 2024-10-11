@@ -112,11 +112,11 @@ public partial class App : Application
                         var forceClose = query.GetValues(null)?.Contains("force-close") ?? false;
                         if (query["id"] is string entryId)
                         {
-                            rootPage.LaunchEntryById(entryId, forceClose);
+                            rootPage.ViewModel.LaunchEntryById(entryId, forceClose);
                         }
                         else if (query["name"] is string entryName)
                         {
-                            rootPage.LaunchEntryByName(entryName, forceClose);
+                            rootPage.ViewModel.LaunchEntryByName(entryName, forceClose);
                         }
                     }
                 }
@@ -153,11 +153,11 @@ public partial class App : Application
                 {
                     if (launchOptions.EntryId is string entryId)
                     {
-                        rootPage.LaunchEntryById(entryId, launchOptions.ForceClose);
+                        rootPage.ViewModel.LaunchEntryById(entryId, launchOptions.ForceClose);
                     }
                     else if (launchOptions.EntryName is string entryName)
                     {
-                        rootPage.LaunchEntryByName(entryName, launchOptions.ForceClose);
+                        rootPage.ViewModel.LaunchEntryByName(entryName, launchOptions.ForceClose);
                     }
                 }
             }

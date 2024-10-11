@@ -11,10 +11,16 @@
     xmlns:collections="using:CommunityToolkit.Mvvm.Collections"
     mc:Ignorable="d">
     <Page.Resources>
-        <CollectionViewSource x:Name="GroupedEntries" Source="{x:Bind ViewModel.Entries}" IsSourceGrouped="True"/>
         <converters:DoubleToObjectConverter x:Key="HasMoreThanOneItemsToVisiblity" GreaterThan="1" TrueValue="Visible" FalseValue="Collapsed" />
         <converters:EmptyObjectToObjectConverter x:Key="HasHomePageToVisibility" NotEmptyValue="Visible" EmptyValue="Collapsed" />
-        <converters:EmptyCollectionToObjectConverter x:Key="HasImagesToVisibility" NotEmptyValue="Visible" EmptyValue="Collapsed" />
+        <converters:EmptyCollectionToObjectConverter x:Key="HasItemsToVisibility" NotEmptyValue="Visible" EmptyValue="Collapsed" />
+        <converters:DoubleToVisibilityConverter x:Key="HasItemsCountToVisibility" GreaterThan="0" />
+        <ItemsPanelTemplate x:Key="DownloadEntryItemsPanel">
+            <StackPanel
+                Orientation="Vertical"
+                Spacing="8"
+            />
+        </ItemsPanelTemplate>
         <DataTemplate x:Key="DownloadEntryTemplate" x:DataType="vm:DownloadEntryViewModel">
             <StackPanel
                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
@@ -64,7 +70,7 @@
                     ScrollViewer.VerticalScrollMode="Disabled"
                     SelectionMode="None"
                     Padding="0,16"
-                    Visibility="{x:Bind Images, Converter={StaticResource HasImagesToVisibility}}"
+                    Visibility="{x:Bind Images, Converter={StaticResource HasItemsToVisibility}}"
                 >
                     <ListView.ItemContainerStyle>
                         <Style TargetType="ListViewItem">
@@ -87,7 +93,6 @@
                             >
                                 <Image.Source>
                                     <BitmapImage UriSource="{x:Bind}" />
-                                    
                                 </Image.Source>
                             </Image>
                         </DataTemplate>
@@ -107,46 +112,93 @@
             </StackPanel>
         </DataTemplate>
     </Page.Resources>
-    <ScrollView>
-        <Grid>
-            <ItemsControl
-                ItemsSource="{x:Bind GroupedEntries.View}"     
-                ItemTemplate="{StaticResource DownloadEntryTemplate}"
-                MaxWidth="992"
-                Margin="16,8,16,16"
-            >
-                <ItemsControl.GroupStyle>
-                    <GroupStyle>
-                        <GroupStyle.HeaderTemplate>
-                            <DataTemplate x:DataType="collections:IReadOnlyObservableGroup">
-                                <TextBlock
-                                    Margin="16,8"
-                                    Text="{x:Bind Key}"
-                                    Style="{ThemeResource BaseTextBlockStyle}"
-                                    FontSize="16"
-                                />
-                            </DataTemplate>
-                        </GroupStyle.HeaderTemplate>
-                        <GroupStyle.Panel>
-                            <ItemsPanelTemplate>
-                                <StackPanel
-                                    Orientation="Vertical"
-                                    Spacing="8"
-                                />
-                            </ItemsPanelTemplate>
-                        </GroupStyle.Panel>
-                    </GroupStyle>
-                </ItemsControl.GroupStyle>
-            </ItemsControl>
-            <TextBlock
-                x:Uid="DownloadPageNoItems"
-                Visibility="{x:Bind ViewModel.HasNoItems, Mode=OneWay}"
-                Margin="16"
-                FontSize="24"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                TextAlignment="Center"
+    <Grid RowDefinitions="Auto,*">
+        <Grid
+            MaxWidth="992"
+            Margin="16,8"
+        >
+            <TextBox 
+                Text="{x:Bind ViewModel.SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                x:Uid="DownloadPageSearchTextBox"
+                Grid.Row="0"
+                HorizontalAlignment="Right"
+                Width="200"
             />
         </Grid>
-    </ScrollView>
+        <ScrollView Grid.Row="1">
+            <Grid>
+                <StackPanel 
+                    Orientation="Vertical"
+                    Spacing="8"
+                    MaxWidth="992"
+                    Margin="16,8,16,16"
+                >
+                    <StackPanel
+                        Orientation="Vertical"
+                        Spacing="8"
+                        Visibility="{x:Bind ViewModel.PortEntriesView.Count, Converter={StaticResource HasItemsCountToVisibility}, Mode=OneWay}"
+                    >
+                        <TextBlock
+                            Margin="16,8"
+                            x:Uid="DownloadPageGroupPorts"
+                            Style="{ThemeResource BaseTextBlockStyle}"
+                            FontSize="16"
+                        >
+                        </TextBlock>
+                        <ItemsControl
+                            ItemsSource="{x:Bind ViewModel.PortEntriesView}"     
+                            ItemTemplate="{StaticResource DownloadEntryTemplate}"
+                            ItemsPanel="{StaticResource DownloadEntryItemsPanel}"
+                        />
+                    </StackPanel>
+                    <StackPanel
+                        Orientation="Vertical"
+                        Spacing="8"
+                        Visibility="{x:Bind ViewModel.IWADEntriesView.Count, Converter={StaticResource HasItemsCountToVisibility}, Mode=OneWay}"
+                    >
+                        <TextBlock
+                            x:Uid="DownloadPageGroupIWADs"
+                            Margin="16,8"
+                            Style="{ThemeResource BaseTextBlockStyle}"
+                            FontSize="16"
+                        >   
+                        </TextBlock>
+                        <ItemsControl
+                            ItemsSource="{x:Bind ViewModel.IWADEntriesView}"     
+                            ItemTemplate="{StaticResource DownloadEntryTemplate}"
+                            ItemsPanel="{StaticResource DownloadEntryItemsPanel}"
+                        />
+                    </StackPanel>
+                    <StackPanel
+                        Orientation="Vertical"
+                        Spacing="8"
+                        Visibility="{x:Bind ViewModel.FileEntriesView.Count, Converter={StaticResource HasItemsCountToVisibility}, Mode=OneWay}"
+                    >
+                        <TextBlock
+                            x:Uid="DownloadPageGroupFiles"
+                            Margin="16,8"
+                            Style="{ThemeResource BaseTextBlockStyle}"
+                            FontSize="16"
+                        >
+                        </TextBlock>
+                        <ItemsControl
+                            ItemsSource="{x:Bind ViewModel.FileEntriesView}"     
+                            ItemTemplate="{StaticResource DownloadEntryTemplate}"
+                            ItemsPanel="{StaticResource DownloadEntryItemsPanel}"
+                        />
+                    </StackPanel>
+                </StackPanel>
+                <TextBlock
+                    x:Uid="DownloadPageNoItems"
+                    Visibility="{x:Bind ViewModel.HasNoItems, Mode=OneWay}"
+                    Margin="16"
+                    FontSize="24"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    TextAlignment="Center"
+                >
+                </TextBlock>
+            </Grid>
+        </ScrollView>
+    </Grid>
 </Page>

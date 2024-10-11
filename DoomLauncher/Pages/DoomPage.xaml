@@ -23,7 +23,6 @@
         <converters:BoolToObjectConverter x:Key="IsInFavoritesTextConverter" x:Uid="IsInFavoritesTextConverter" />
         <converters:BoolToObjectConverter x:Key="IsInFavoritesGlyphConverter" TrueValue="&#xE734;" FalseValue="&#xE735;" />
         <converters:DoubleToObjectConverter x:Key="HasItemsToMargin" GreaterThan="0" TrueValue="8,0,16,0" FalseValue="0,0,16,0" />
-
     </Page.Resources>
     <Grid
         RowDefinitions="*,Auto"
