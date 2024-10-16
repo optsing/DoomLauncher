@@ -67,7 +67,7 @@
             />
         </MenuFlyout>
     </Page.Resources>
-    <ScrollView>
+    <ScrollView Margin="0,48,0,0">
         <StackPanel
             Orientation="Vertical"
             MaxWidth="992"

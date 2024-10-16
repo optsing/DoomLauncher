@@ -410,7 +410,8 @@
                     </StackPanel>
                 </Grid>
                 <Frame
-                    Grid.Row="2"
+                    Grid.Row="1"
+                    Grid.RowSpan="2"
                     x:Name="frameMain"
                 />
                 <Border

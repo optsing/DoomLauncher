@@ -313,7 +313,7 @@
     <value>Настройки</value>
   </data>
   <data name="RootPageDownloads.Text" xml:space="preserve">
-    <value>Онлайн</value>
+    <value>Каталог</value>
   </data>
   <data name="RootPageLaunch.Text" xml:space="preserve">
     <value>Играть</value>
@@ -461,7 +461,7 @@
     <comment>#Format[String]</comment>
   </data>
   <data name="DialogDownloadEntryText" xml:space="preserve">
-    <value>Вы уверены, что хотите скачать {0} версия {1}?</value>
+    <value>Вы уверены, что хотите скачать {0} {1}?</value>
     <comment>#Format[String,String]</comment>
   </data>
   <data name="DialogLaunchErrorTitle" xml:space="preserve">
@@ -558,9 +558,9 @@
     <value>Скачать</value>
   </data>
   <data name="DownloadPageNoItems.Text" xml:space="preserve">
-    <value>Элементы не найдены</value>
+    <value>Ничего не найдено</value>
   </data>
-  <data name="DownloadPageGroupIWAD.Text" xml:space="preserve">
+  <data name="DownloadPageGroupIWADs.Text" xml:space="preserve">
     <value>IWAD</value>
   </data>
   <data name="DownloadPageGroupPorts.Text" xml:space="preserve">
@@ -582,7 +582,7 @@
     <value>IWAD</value>
   </data>
   <data name="DialogCreateOrDownloadEntryText" xml:space="preserve">
-    <value>Вы хотите создать новые сборки или только скачать {0} версия {1}?</value>
+    <value>Вы хотите создать новые сборки или только скачать {0} {1}?</value>
     <comment>#Format[String,String]</comment>
   </data>
   <data name="DownloadPageSearchTextBox.PlaceholderText" xml:space="preserve">

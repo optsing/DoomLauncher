@@ -23,7 +23,7 @@ public sealed partial class DownloadPage : Page
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         EventBus.ChangeBackground(this, null, AnimationDirection.None);
-        EventBus.ChangeCaption(this, "Online");
+        EventBus.ChangeCaption(this, "Catalog");
         base.OnNavigatedTo(e);
 
         ViewModel.LoadEntries();

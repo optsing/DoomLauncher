@@ -7,7 +7,7 @@
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
 		<TargetPlatformMinVersion>10.0.18362.0</TargetPlatformMinVersion>
-		<WindowsSdkPackageVersion>10.0.26100.47</WindowsSdkPackageVersion>
+		<WindowsSdkPackageVersion>10.0.26100.53</WindowsSdkPackageVersion>
 		<RootNamespace>DoomLauncher</RootNamespace>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<UseWinUI>true</UseWinUI>
@@ -61,7 +61,7 @@
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.1.5" />
+		<PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.1.6" />
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.240923002" />
 		<PackageReference Include="ReswPlus" Version="0.2.6" PrivateAssets="all" />

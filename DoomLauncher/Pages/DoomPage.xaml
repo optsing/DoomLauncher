@@ -24,302 +24,298 @@
         <converters:BoolToObjectConverter x:Key="IsInFavoritesGlyphConverter" TrueValue="&#xE734;" FalseValue="&#xE735;" />
         <converters:DoubleToObjectConverter x:Key="HasItemsToMargin" GreaterThan="0" TrueValue="8,0,16,0" FalseValue="0,0,16,0" />
     </Page.Resources>
-    <Grid
-        RowDefinitions="*,Auto"
-    >
-        <ScrollView Grid.Row="0">
-            <StackPanel
-                Orientation="Vertical"
-                Spacing="8"
-                VerticalAlignment="Bottom"
-                ChildrenTransitions="{StaticResource PageCardsAnimations}"
+    <ScrollView Margin="0,48,0,0">
+        <StackPanel
+            Orientation="Vertical"
+            Spacing="8"
+            VerticalAlignment="Bottom"
+            ChildrenTransitions="{StaticResource PageCardsAnimations}"
+        >
+            <Grid
+                ColumnDefinitions="*,*"
+                ColumnSpacing="8"
+                HorizontalAlignment="Stretch"
+                MaxWidth="992"
+                Margin="16,0"
             >
-                <Grid
-                    ColumnDefinitions="*,*"
-                    ColumnSpacing="8"
-                    HorizontalAlignment="Stretch"
-                    MaxWidth="992"
-                    Margin="16,0"
-                >
-                    <Border
-                        Grid.Column="0"
-                        CornerRadius="8"
-                        Padding="16,20"
-                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="1"
-                        Margin="-1"
-                    >
-                        <tk:WrapPanel
-                            Orientation="Horizontal"
-                            HorizontalSpacing="32"
-                            VerticalSpacing="16"
-                        >
-                            <StackPanel Orientation="Vertical">
-                                <TextBlock
-                                    x:Uid="DoomPageInfoSourcePort"
-                                    FontSize="16"
-                                    Style="{StaticResource BaseTextBlockStyle}"
-                                  />
-                                <TextBlock
-                                    Text="{x:Bind local:FileHelper.GZDoomPathToShortTitle(ViewModel.Entry.GZDoomPath, ViewModel.DefaultGZDoomPath), Mode=OneWay}"
-                                />
-                            </StackPanel>
-                            <StackPanel Orientation="Vertical">
-                                <TextBlock
-                                    x:Uid="DoomPageInfoIWAD"
-                                    FontSize="16"
-                                    Style="{StaticResource BaseTextBlockStyle}"
-                                />
-                                <TextBlock
-                                    Text="{x:Bind local:FileHelper.GetIWadFileTitle(ViewModel.Entry.IWadFile, ViewModel.DefaultIWadFile), Mode=OneWay}"
-                                />
-                            </StackPanel>
-                            <StackPanel Orientation="Vertical">
-                                <TextBlock
-                                    x:Uid="DoomPageInfoSteamIntegration"
-                                    FontSize="16"
-                                    Style="{StaticResource BaseTextBlockStyle}"
-                                />
-                                <TextBlock
-                                Text="{x:Bind local:FileHelper.SteamGameTitle(ViewModel.Entry.SteamGame, ViewModel.DefaultSteamGame), Mode=OneWay}"
-                                />
-                            </StackPanel>
-                            <StackPanel Orientation="Vertical">
-                                <TextBlock
-                                    x:Uid="DoomPageInfoCreated"
-                                    FontSize="16"
-                                    Style="{StaticResource BaseTextBlockStyle}"
-                                />
-                                <TextBlock
-                                    Text="{x:Bind helpers:XamlHelper.DateToText(ViewModel.Entry.Created), Mode=OneWay}"
-                                />
-                            </StackPanel>
-                            <StackPanel Orientation="Vertical">
-                                <TextBlock
-                                    x:Uid="DoomPageInfoLastLaunch"
-                                    FontSize="16"
-                                    Style="{StaticResource BaseTextBlockStyle}"
-                                />
-                                <TextBlock
-                                    Text="{x:Bind helpers:XamlHelper.DateToText(ViewModel.Entry.LastLaunch), Mode=OneWay}"
-                                />
-                            </StackPanel>
-                            <StackPanel Orientation="Vertical">
-                                <TextBlock
-                                    x:Uid="DoomPageInfoPlayTime"
-                                    FontSize="16"
-                                    Style="{StaticResource BaseTextBlockStyle}"
-                                />
-                                <TextBlock
-                                    Text="{x:Bind helpers:XamlHelper.TimeSpanToText(ViewModel.Entry.PlayTime), Mode=OneWay}"
-                                />
-                            </StackPanel>
-                        </tk:WrapPanel>
-                    </Border>
-                    <controls:DoomItemList
-                        Grid.Column="1"
-                        x:Uid="DoomPageFiles"
-                        VerticalAlignment="Stretch"
-                        ItemsSource="{x:Bind ViewModel.ModFileList}"
-                    >
-                        <controls:DoomItemList.HeaderFlyout>
-                            <MenuFlyout
-                                Placement="Bottom"
-                                Opening="MenuFlyout_Opening"
-                            />
-                        </controls:DoomItemList.HeaderFlyout>
-                        <controls:DoomItemList.ItemTemplate>
-                            <DataTemplate x:DataType="vm:ModFileViewModel">
-                                <Border>
-                                    <Border.Resources>
-                                        <MenuFlyout x:Key="flyoutFile" Placement="Bottom">
-                                            <MenuFlyoutItem
-                                                Command="{x:Bind ToggleFavoriteFileCommand}"
-                                                CommandParameter="{x:Bind}"
-                                                Text="{x:Bind IsInFavorites, Converter={StaticResource IsInFavoritesTextConverter}, Mode=OneWay}"
-                                            >       
-                                                <MenuFlyoutItem.Icon>
-                                                    <FontIcon
-                                                        FontSize="14"
-                                                        Glyph="{x:Bind IsInFavorites, Converter={StaticResource IsInFavoritesGlyphConverter}, Mode=OneWay}" 
-                                                    />  
-                                                </MenuFlyoutItem.Icon>
-                                            </MenuFlyoutItem>
-                                            <MenuFlyoutItem
-                                                x:Uid="FlyoutFileOpenFolder"
-                                                Command="{x:Bind OpenContainingFolderCommand}"
-                                                CommandParameter="{x:Bind}"
-                                                Icon="{ui:FontIcon FontSize=14, Glyph=&#xE838;}"
-                                            />
-                                            <MenuFlyoutItem
-                                                x:Uid="FlyoutFileRemove"
-                                                Command="{x:Bind RemoveModFileCommand}"
-                                                CommandParameter="{x:Bind}"
-                                                Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
-                                            />
-                                        </MenuFlyout>
-                                    </Border.Resources>
-                                    <Grid ColumnDefinitions="*,Auto" ContextFlyout="{StaticResource flyoutFile}">
-                                        <TextBlock
-                                            Grid.Column="0"
-                                            Text="{x:Bind Title}"
-                                            VerticalAlignment="Center"
-                                        />
-                                        <Button
-                                            Grid.Column="1"
-                                            Style="{ThemeResource EllipsisButton}"
-                                            Height="40"
-                                            Width="40"
-                                            Flyout="{StaticResource flyoutFile}"            
-                                            Content="{ui:FontIcon FontSize=14, Glyph=&#xE712;}"
-                                        />
-                                    </Grid>
-                                </Border>                              
-                            </DataTemplate>
-                        </controls:DoomItemList.ItemTemplate>
-                    </controls:DoomItemList>
-                </Grid>
-                <ScrollView
+                <Border
                     Grid.Column="0"
-                    MaxHeight="192"
-                    MaxWidth="992"
-                    Margin="15,-1"
+                    CornerRadius="8"
+                    Padding="16,20"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                     BorderThickness="1"
-                    CornerRadius="8"
-                    HorizontalAlignment="Stretch"
-                    Visibility="{x:Bind helpers:XamlHelper.HasText(ViewModel.Entry.LongDescription), Mode=OneWay}"
+                    Margin="-1"
                 >
-                    <TextBlock
-                        Margin="16"
-                        Text="{x:Bind ViewModel.Entry.LongDescription, Mode=OneWay}"
-                        Visibility="{x:Bind helpers:XamlHelper.HasText(ViewModel.Entry.LongDescription), Mode=OneWay}"
-                        TextWrapping="WrapWholeWords"
-                    />
-                </ScrollView>
-                <ListView
-                    Padding="0,0,0,16"
-                    HorizontalAlignment="Center"
-                    ItemsSource="{x:Bind ViewModel.ImageFileList}"
-                    SelectedIndex="{x:Bind ViewModel.Entry.SelectedImageIndex, Mode=OneWay}"
-                    ScrollViewer.HorizontalScrollMode="Enabled"
-                    ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                    ScrollViewer.VerticalScrollMode="Disabled"
-                    SelectionMode="Single"
-                    CanReorderItems="True"
-                    AllowDrop="True"
-                    IsItemClickEnabled="True"
-                    ItemClick="ListView_ItemClick"        
+                    <tk:WrapPanel
+                        Orientation="Horizontal"
+                        HorizontalSpacing="32"
+                        VerticalSpacing="16"
+                    >
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock
+                                x:Uid="DoomPageInfoSourcePort"
+                                FontSize="16"
+                                Style="{StaticResource BaseTextBlockStyle}"
+                                />
+                            <TextBlock
+                                Text="{x:Bind local:FileHelper.GZDoomPathToShortTitle(ViewModel.Entry.GZDoomPath, ViewModel.DefaultGZDoomPath), Mode=OneWay}"
+                            />
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock
+                                x:Uid="DoomPageInfoIWAD"
+                                FontSize="16"
+                                Style="{StaticResource BaseTextBlockStyle}"
+                            />
+                            <TextBlock
+                                Text="{x:Bind local:FileHelper.GetIWadFileTitle(ViewModel.Entry.IWadFile, ViewModel.DefaultIWadFile), Mode=OneWay}"
+                            />
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock
+                                x:Uid="DoomPageInfoSteamIntegration"
+                                FontSize="16"
+                                Style="{StaticResource BaseTextBlockStyle}"
+                            />
+                            <TextBlock
+                            Text="{x:Bind local:FileHelper.SteamGameTitle(ViewModel.Entry.SteamGame, ViewModel.DefaultSteamGame), Mode=OneWay}"
+                            />
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock
+                                x:Uid="DoomPageInfoCreated"
+                                FontSize="16"
+                                Style="{StaticResource BaseTextBlockStyle}"
+                            />
+                            <TextBlock
+                                Text="{x:Bind helpers:XamlHelper.DateToText(ViewModel.Entry.Created), Mode=OneWay}"
+                            />
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock
+                                x:Uid="DoomPageInfoLastLaunch"
+                                FontSize="16"
+                                Style="{StaticResource BaseTextBlockStyle}"
+                            />
+                            <TextBlock
+                                Text="{x:Bind helpers:XamlHelper.DateToText(ViewModel.Entry.LastLaunch), Mode=OneWay}"
+                            />
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock
+                                x:Uid="DoomPageInfoPlayTime"
+                                FontSize="16"
+                                Style="{StaticResource BaseTextBlockStyle}"
+                            />
+                            <TextBlock
+                                Text="{x:Bind helpers:XamlHelper.TimeSpanToText(ViewModel.Entry.PlayTime), Mode=OneWay}"
+                            />
+                        </StackPanel>
+                    </tk:WrapPanel>
+                </Border>
+                <controls:DoomItemList
+                    Grid.Column="1"
+                    x:Uid="DoomPageFiles"
+                    VerticalAlignment="Stretch"
+                    ItemsSource="{x:Bind ViewModel.ModFileList}"
                 >
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="ListViewItem">
-                            <Setter Property="Template" Value="{StaticResource PictureListViewItem}"/>
-                        </Style>
-                    </ListView.ItemContainerStyle>
-                    <ListView.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Orientation="Horizontal" Spacing="8" Margin="16,0,0,0" />
-                        </ItemsPanelTemplate>
-                    </ListView.ItemsPanel>
-                    <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="vm:ImageFileViewModel">
-                            <Grid
-                                Width="192"
-                                Height="144"
-                            >
-                                <Grid.Resources>
-                                    <MenuFlyout x:Key="flyoutImage" Placement="Bottom">
+                    <controls:DoomItemList.HeaderFlyout>
+                        <MenuFlyout
+                            Placement="Bottom"
+                            Opening="MenuFlyout_Opening"
+                        />
+                    </controls:DoomItemList.HeaderFlyout>
+                    <controls:DoomItemList.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ModFileViewModel">
+                            <Border>
+                                <Border.Resources>
+                                    <MenuFlyout x:Key="flyoutFile" Placement="Bottom">
                                         <MenuFlyoutItem
-                                            x:Uid="FlyoutImageOpenFolder"
-                                            Command="{x:Bind OpenImageContainingFolderCommand}"
+                                            Command="{x:Bind ToggleFavoriteFileCommand}"
+                                            CommandParameter="{x:Bind}"
+                                            Text="{x:Bind IsInFavorites, Converter={StaticResource IsInFavoritesTextConverter}, Mode=OneWay}"
+                                        >
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon
+                                                    FontSize="14"
+                                                    Glyph="{x:Bind IsInFavorites, Converter={StaticResource IsInFavoritesGlyphConverter}, Mode=OneWay}" 
+                                                />
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                        <MenuFlyoutItem
+                                            x:Uid="FlyoutFileOpenFolder"
+                                            Command="{x:Bind OpenContainingFolderCommand}"
                                             CommandParameter="{x:Bind}"
                                             Icon="{ui:FontIcon FontSize=14, Glyph=&#xE838;}"
                                         />
                                         <MenuFlyoutItem
-                                            x:Uid="FlyoutImageRemove"
-                                            Command="{x:Bind RemoveImageFileCommand}"
+                                            x:Uid="FlyoutFileRemove"
+                                            Command="{x:Bind RemoveModFileCommand}"
                                             CommandParameter="{x:Bind}"
                                             Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
                                         />
                                     </MenuFlyout>
-                                </Grid.Resources>
-                                <Image
-                                    VerticalAlignment="Center"
-                                    HorizontalAlignment="Center"
-                                    Source="{x:Bind Image, Mode=OneWay}"
-                                    Stretch="UniformToFill"
-                                    ContextFlyout="{StaticResource flyoutImage}"
-                                />
-                                <Button
-                                    VerticalAlignment="Top"
-                                    HorizontalAlignment="Right"
-                                    Style="{ThemeResource EllipsisButton}"
-                                    Height="40"
-                                    Width="40"
-                                    Flyout="{StaticResource flyoutImage}"
-                                    Content="{ui:FontIcon FontSize=14, Glyph=&#xE712;}"
-                                />
-                            </Grid>
+                                </Border.Resources>
+                                <Grid ColumnDefinitions="*,Auto" ContextFlyout="{StaticResource flyoutFile}">
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        Text="{x:Bind Title}"
+                                        VerticalAlignment="Center"
+                                    />
+                                    <Button
+                                        Grid.Column="1"
+                                        Style="{ThemeResource EllipsisButton}"
+                                        Height="40"
+                                        Width="40"
+                                        Flyout="{StaticResource flyoutFile}"            
+                                        Content="{ui:FontIcon FontSize=14, Glyph=&#xE712;}"
+                                    />
+                                </Grid>
+                            </Border>
                         </DataTemplate>
-                    </ListView.ItemTemplate>
-                    <ListView.Footer>
-                        <StackPanel
-                            Margin="{x:Bind ViewModel.ImageFileList.Count, Converter={StaticResource HasItemsToMargin}, Mode=OneWay}"
-                            Orientation="Horizontal"
-                            Spacing="8"
+                    </controls:DoomItemList.ItemTemplate>
+                </controls:DoomItemList>
+            </Grid>
+            <ScrollView
+                Grid.Column="0"
+                MaxHeight="192"
+                MaxWidth="992"
+                Margin="15,-1"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                HorizontalAlignment="Stretch"
+                Visibility="{x:Bind helpers:XamlHelper.HasText(ViewModel.Entry.LongDescription), Mode=OneWay}"
+            >
+                <TextBlock
+                    Margin="16"
+                    Text="{x:Bind ViewModel.Entry.LongDescription, Mode=OneWay}"
+                    Visibility="{x:Bind helpers:XamlHelper.HasText(ViewModel.Entry.LongDescription), Mode=OneWay}"
+                    TextWrapping="WrapWholeWords"
+                />
+            </ScrollView>
+            <ListView
+                Padding="0,0,0,16"
+                HorizontalAlignment="Center"
+                ItemsSource="{x:Bind ViewModel.ImageFileList}"
+                SelectedIndex="{x:Bind ViewModel.Entry.SelectedImageIndex, Mode=OneWay}"
+                ScrollViewer.HorizontalScrollMode="Enabled"
+                ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                ScrollViewer.VerticalScrollMode="Disabled"
+                SelectionMode="Single"
+                CanReorderItems="True"
+                AllowDrop="True"
+                IsItemClickEnabled="True"
+                ItemClick="ListView_ItemClick"        
+            >
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="Template" Value="{StaticResource PictureListViewItem}"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="16,0,0,0" />
+                    </ItemsPanelTemplate>
+                </ListView.ItemsPanel>
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ImageFileViewModel">
+                        <Grid
+                            Width="192"
+                            Height="144"
                         >
+                            <Grid.Resources>
+                                <MenuFlyout x:Key="flyoutImage" Placement="Bottom">
+                                    <MenuFlyoutItem
+                                        x:Uid="FlyoutImageOpenFolder"
+                                        Command="{x:Bind OpenImageContainingFolderCommand}"
+                                        CommandParameter="{x:Bind}"
+                                        Icon="{ui:FontIcon FontSize=14, Glyph=&#xE838;}"
+                                    />
+                                    <MenuFlyoutItem
+                                        x:Uid="FlyoutImageRemove"
+                                        Command="{x:Bind RemoveImageFileCommand}"
+                                        CommandParameter="{x:Bind}"
+                                        Icon="{ui:FontIcon FontSize=14, Glyph=&#xE74D;}"
+                                    />
+                                </MenuFlyout>
+                            </Grid.Resources>
+                            <Image
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center"
+                                Source="{x:Bind Image, Mode=OneWay}"
+                                Stretch="UniformToFill"
+                                ContextFlyout="{StaticResource flyoutImage}"
+                            />
                             <Button
-                                Command="{x:Bind ViewModel.AddBackgroundCommand}"
-                                CornerRadius="8"
-                                Width="192"
-                                Height="144"
-                            >
-                                <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Stretch" Spacing="4">
+                                VerticalAlignment="Top"
+                                HorizontalAlignment="Right"
+                                Style="{ThemeResource EllipsisButton}"
+                                Height="40"
+                                Width="40"
+                                Flyout="{StaticResource flyoutImage}"
+                                Content="{ui:FontIcon FontSize=14, Glyph=&#xE712;}"
+                            />
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.Footer>
+                    <StackPanel
+                        Margin="{x:Bind ViewModel.ImageFileList.Count, Converter={StaticResource HasItemsToMargin}, Mode=OneWay}"
+                        Orientation="Horizontal"
+                        Spacing="8"
+                    >
+                        <Button
+                            Command="{x:Bind ViewModel.AddBackgroundCommand}"
+                            CornerRadius="8"
+                            Width="192"
+                            Height="144"
+                        >
+                            <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Stretch" Spacing="4">
+                                <FontIcon
+                                    FontSize="20"
+                                    Width="32"
+                                    Height="32"
+                                    Glyph="&#xE710;"
+                                    HorizontalAlignment="Center"
+                                />
+                                <TextBlock x:Uid="DoomPageAddImage" />
+                            </StackPanel>
+                        </Button>
+                        <Button
+                            Command="{x:Bind ViewModel.ToggleSlideshowCommand}"
+                            CornerRadius="8"
+                            Width="192"
+                            Height="144"
+                            IsEnabled="{x:Bind helpers:XamlHelper.HasMoreItems(ViewModel.ImageFileList.Count, 1), Mode=OneWay}"
+                        >
+                            <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Stretch" Spacing="4">
+                                <Grid>
+                                    <ProgressRing
+                                        Visibility="{x:Bind ViewModel.IsSlideshowEnabled, Mode=OneWay}"
+                                        IsIndeterminate="False"
+                                        Minimum="0"
+                                        Maximum="{x:Bind ViewModel.TicksToSlideshow}"
+                                        Value="{x:Bind ViewModel.CurrentTicksToSlideshow, Mode=OneWay}"
+                                        Width="32"
+                                        Height="32"
+                                    />
                                     <FontIcon
                                         FontSize="20"
                                         Width="32"
                                         Height="32"
-                                        Glyph="&#xE710;"
+                                        Glyph="{x:Bind ViewModel.IsSlideshowEnabled, Converter={StaticResource SlideshowGlyphConverter}, Mode=OneWay}"
                                         HorizontalAlignment="Center"
                                     />
-                                    <TextBlock x:Uid="DoomPageAddImage" />
-                                </StackPanel>
-                            </Button>
-                            <Button
-                                Command="{x:Bind ViewModel.ToggleSlideshowCommand}"
-                                CornerRadius="8"
-                                Width="192"
-                                Height="144"
-                                IsEnabled="{x:Bind helpers:XamlHelper.HasMoreItems(ViewModel.ImageFileList.Count, 1), Mode=OneWay}"
-                            >
-                                <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Stretch" Spacing="4">
-                                    <Grid>
-                                        <ProgressRing
-                                            Visibility="{x:Bind ViewModel.IsSlideshowEnabled, Mode=OneWay}"
-                                            IsIndeterminate="False"
-                                            Minimum="0"
-                                            Maximum="{x:Bind ViewModel.TicksToSlideshow}"
-                                            Value="{x:Bind ViewModel.CurrentTicksToSlideshow, Mode=OneWay}"
-                                            Width="32"
-                                            Height="32"
-                                        />
-                                        <FontIcon
-                                            FontSize="20"
-                                            Width="32"
-                                            Height="32"
-                                            Glyph="{x:Bind ViewModel.IsSlideshowEnabled, Converter={StaticResource SlideshowGlyphConverter}, Mode=OneWay}"
-                                            HorizontalAlignment="Center"
-                                        />
-                                    </Grid>
-                                    <TextBlock Text="{x:Bind ViewModel.IsSlideshowEnabled, Converter={StaticResource SlideshowTextConverter}, Mode=OneWay}" />
-                                </StackPanel>
-                            </Button>
-                        </StackPanel>
-                    </ListView.Footer>
-                </ListView>
-            </StackPanel>
-        </ScrollView>
-    </Grid>
+                                </Grid>
+                                <TextBlock Text="{x:Bind ViewModel.IsSlideshowEnabled, Converter={StaticResource SlideshowTextConverter}, Mode=OneWay}" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </ListView.Footer>
+            </ListView>
+        </StackPanel>
+    </ScrollView>
 </Page>

@@ -34,9 +34,9 @@ public partial class DownloadPageViewModel : ObservableObject
     public ObservableCollection<DownloadEntryViewModel> IWADEntriesView { get; } = [];
     public ObservableCollection<DownloadEntryViewModel> FileEntriesView { get; } = [];
 
-    private SyncCollection<DownloadEntryViewModel> SyncPortEntries;
-    private SyncCollection<DownloadEntryViewModel> SyncIWADEntries;
-    private SyncCollection<DownloadEntryViewModel> SyncFileEntries;
+    private readonly SyncCollection<DownloadEntryViewModel> SyncPortEntries;
+    private readonly SyncCollection<DownloadEntryViewModel> SyncIWADEntries;
+    private readonly SyncCollection<DownloadEntryViewModel> SyncFileEntries;
 
     [ObservableProperty]
     private string searchQuery = "";
@@ -60,9 +60,20 @@ public partial class DownloadPageViewModel : ObservableObject
 
     partial void OnSearchQueryChanged(string value)
     {
-        SyncPortEntries.SyncDebounce();
-        SyncIWADEntries.SyncDebounce();
-        SyncFileEntries.SyncDebounce();
+        int count = 3;
+        void synced ()
+        {
+            count--;
+            if (count == 0)
+            {
+                HasNoItems = PortEntriesView.Count + IWADEntriesView.Count + FileEntriesView.Count == 0
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+            }
+        }
+        SyncPortEntries.SyncDebounce(synced);
+        SyncIWADEntries.SyncDebounce(synced);
+        SyncFileEntries.SyncDebounce(synced);
     }
 
     [ObservableProperty]
@@ -135,7 +146,7 @@ public partial class DownloadPageViewModel : ObservableObject
                 });
             }
         }
-        if (PortEntries.Count == 0 && IWADEntries.Count == 0 && FileEntries.Count == 0)
+        if (PortEntriesView.Count + IWADEntriesView.Count + FileEntriesView.Count == 0)
         {
             HasNoItems = Visibility.Visible;
         }

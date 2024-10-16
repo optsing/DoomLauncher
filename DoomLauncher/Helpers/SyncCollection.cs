@@ -131,7 +131,7 @@ public class SyncCollection<T> where T : class
     }
 
     private int debounce = 0;
-    public async void SyncDebounce()
+    public async void SyncDebounce(Action? synced = null)
     {
         debounce++;
         await Task.Delay(DebounceTime);
@@ -139,6 +139,7 @@ public class SyncCollection<T> where T : class
         if (debounce == 0)
         {
             SyncImmediate();
+            synced?.Invoke();
         }
     }
 }

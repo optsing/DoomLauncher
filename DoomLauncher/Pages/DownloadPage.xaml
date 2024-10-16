@@ -112,10 +112,12 @@
             </StackPanel>
         </DataTemplate>
     </Page.Resources>
-    <Grid RowDefinitions="Auto,*">
+    <Grid RowDefinitions="48,*">
         <Grid
             MaxWidth="992"
+            Grid.Row="0"
             Margin="16,8"
+            VerticalAlignment="Center"
         >
             <TextBox 
                 Text="{x:Bind ViewModel.SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -196,8 +198,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     TextAlignment="Center"
-                >
-                </TextBlock>
+                />
             </Grid>
         </ScrollView>
     </Grid>
