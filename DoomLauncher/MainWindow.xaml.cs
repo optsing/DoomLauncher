@@ -32,29 +32,6 @@ public sealed partial class MainWindow : Window
             AppWindow.TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
         }
 
-#if IS_NON_PACKAGED
-        var dataFolderPath = Directory.GetCurrentDirectory();
-#else
-        var dataFolderPath = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
-#endif
-
-        FileHelper.ConfigFilePath = Path.Combine(dataFolderPath, "config.json");
-        FileHelper.PackagesFolderPath = Path.Combine(dataFolderPath, "gzdoom");
-        FileHelper.IWadFolderPath = Path.Combine(dataFolderPath, "iwads");
-        FileHelper.ModsFolderPath = Path.Combine(dataFolderPath, "mods");
-        FileHelper.ImagesFolderPath = Path.Combine(dataFolderPath, "images");
-        FileHelper.EntriesFolderPath = Path.Combine(dataFolderPath, "entries");
-
-        if (File.Exists(FileHelper.ConfigFilePath))
-        {
-            if (SettingsViewModel.Load() is SettingsViewModel settings)
-            {
-                SettingsViewModel.Current = settings;
-            }
-            var backupConfigFilePath = Path.Combine(dataFolderPath, "config.old.json");
-            File.Copy(FileHelper.ConfigFilePath, backupConfigFilePath, true);
-        }
-
         if (SettingsViewModel.Current.WindowX != null && SettingsViewModel.Current.WindowY != null && SettingsViewModel.Current.WindowWidth != null && SettingsViewModel.Current.WindowHeight != null)
         {
             AppWindow.MoveAndResize(new()

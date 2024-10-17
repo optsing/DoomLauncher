@@ -79,7 +79,7 @@ public partial class DownloadPageViewModel : ObservableObject
     [ObservableProperty]
     private Visibility hasNoItems = Visibility.Collapsed;
 
-    public async void LoadEntries()
+    public async Task LoadEntries()
     {
         HasNoItems = Visibility.Collapsed;
         EventBus.Progress(this, Strings.Resources.ProgressLoadingOnlineEntries);

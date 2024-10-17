@@ -24,8 +24,12 @@ public sealed partial class DownloadPage : Page
     {
         EventBus.ChangeBackground(this, null, AnimationDirection.None);
         EventBus.ChangeCaption(this, "Catalog");
-        base.OnNavigatedTo(e);
 
-        ViewModel.LoadEntries();
+        if (e.Parameter is DownloadPageViewModel vm)
+        {
+            ViewModel = vm;
+        }
+
+        base.OnNavigatedTo(e);
     }
 }

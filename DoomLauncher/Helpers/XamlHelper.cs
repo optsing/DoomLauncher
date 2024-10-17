@@ -11,6 +11,11 @@ static class XamlHelper
         return string.IsNullOrEmpty(text) ? Visibility.Collapsed : Visibility.Visible;
     }
 
+    public static Visibility HasTextAndNotEditMode(string text, bool editMode)
+    {
+        return editMode || string.IsNullOrEmpty(text) ? Visibility.Collapsed : Visibility.Visible;
+    }
+
     public static bool HasMoreItems(int itemsCount, int count)
     {
         return itemsCount > count;

@@ -36,7 +36,6 @@ public class EditEntryDialogViewModel(EditDialogMode mode)
 
     public string Name { get; set; } = "";
     public string Description { get; set; } = "";
-    public string LongDescription { get; set; } = "";
     public bool UniqueConfig { get; set; } = false;
     public bool UniqueSavesFolder { get; set; } = false;
 
@@ -61,7 +60,6 @@ public class EditEntryDialogViewModel(EditDialogMode mode)
         {
             Name = entry.Name,
             Description = entry.Description,
-            LongDescription = entry.LongDescription,
             UniqueConfig = entry.UniqueConfig,
             UniqueSavesFolder = entry.UniqueSavesFolder,
             ModFiles = modFiles?.Select(file => new TitleChecked(file)).ToList() ?? [],
@@ -80,7 +78,6 @@ public class EditEntryDialogViewModel(EditDialogMode mode)
     {
         entry.Name = Name.Trim();
         entry.Description = Description.Trim();
-        entry.LongDescription = LongDescription.Trim();
         entry.GZDoomPath = DoomPackage.Path;
         entry.IWadFile = IWadFile.Key;
         entry.SteamGame = SteamGame.Key;

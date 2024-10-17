@@ -7,6 +7,7 @@ using System.Linq;
 using System.Web;
 using Windows.Storage;
 using DoomLauncher.Helpers;
+using DoomLauncher.ViewModels;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -31,6 +32,32 @@ public partial class App : Application
         //gcTimer.Start();
     }
 
+    public static void LoadSettings()
+    {
+#if IS_NON_PACKAGED
+        var dataFolderPath = Directory.GetCurrentDirectory();
+#else
+        var dataFolderPath = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
+#endif
+
+        FileHelper.ConfigFilePath = Path.Combine(dataFolderPath, "config.json");
+        FileHelper.PackagesFolderPath = Path.Combine(dataFolderPath, "gzdoom");
+        FileHelper.IWadFolderPath = Path.Combine(dataFolderPath, "iwads");
+        FileHelper.ModsFolderPath = Path.Combine(dataFolderPath, "mods");
+        FileHelper.ImagesFolderPath = Path.Combine(dataFolderPath, "images");
+        FileHelper.EntriesFolderPath = Path.Combine(dataFolderPath, "entries");
+
+        if (File.Exists(FileHelper.ConfigFilePath))
+        {
+            if (SettingsViewModel.Load() is SettingsViewModel settings)
+            {
+                SettingsViewModel.Current = settings;
+            }
+            var backupConfigFilePath = Path.Combine(dataFolderPath, "config.old.json");
+            File.Copy(FileHelper.ConfigFilePath, backupConfigFilePath, true);
+        }
+    }
+
     /// <summary>
     /// Invoked when the application is launched normally by the end user.  Other entry points
     /// will be used such as when the application is launched to open a specific file.
@@ -47,6 +74,7 @@ public partial class App : Application
         if (mainInstance.IsCurrent)
         {
             mainInstance.Activated += MainInstance_Activated;
+            LoadSettings();
             m_window = new MainWindow();
             if (m_window.Content is RootPage rootPage)
             {

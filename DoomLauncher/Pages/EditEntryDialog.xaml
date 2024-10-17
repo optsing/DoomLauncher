@@ -39,16 +39,6 @@
                 Margin="0,8,0,8"
                 Text="{x:Bind ViewModel.Description, Mode=TwoWay}"
             />
-            <TextBlock x:Uid="EditEntryDialogLongDescription" />
-            <TextBox
-                x:Uid="EditEntryDialogLongDescriptionTextBox"
-                Height="64"
-                AcceptsReturn="True"
-                TextWrapping="Wrap" 
-                HorizontalAlignment="Stretch"
-                Margin="0,8,0,8"
-                Text="{x:Bind ViewModel.LongDescription, Mode=TwoWay}"
-            />
             <TextBlock x:Uid="EditEntryDialogGZDoomVersion" />
             <ComboBox
                 HorizontalAlignment="Stretch"

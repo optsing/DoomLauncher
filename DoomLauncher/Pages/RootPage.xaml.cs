@@ -194,11 +194,13 @@ public sealed partial class RootPage : Page
     }
 
     [RelayCommand]
-    private void NavigateToDownloadPage()
+    private async Task NavigateToDownloadPage()
     {
         if (frameMain.Content is not DownloadPage)
         {
-            frameMain.Navigate(typeof(DownloadPage));
+            DownloadPageViewModel vm = new();
+            await vm.LoadEntries();
+            frameMain.Navigate(typeof(DownloadPage), vm);
             SetCurrentEntry(null);
         }
     }

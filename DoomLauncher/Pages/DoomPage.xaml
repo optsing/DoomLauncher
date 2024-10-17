@@ -5,7 +5,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="using:CommunityToolkit.WinUI"
-    xmlns:tk="using:CommunityToolkit.WinUI.Controls"
     xmlns:converters="using:CommunityToolkit.WinUI.Converters"
     xmlns:local="using:DoomLauncher"
     xmlns:controls="using:DoomLauncher.Controls"
@@ -23,13 +22,13 @@
         <converters:BoolToObjectConverter x:Key="IsInFavoritesTextConverter" x:Uid="IsInFavoritesTextConverter" />
         <converters:BoolToObjectConverter x:Key="IsInFavoritesGlyphConverter" TrueValue="&#xE734;" FalseValue="&#xE735;" />
         <converters:DoubleToObjectConverter x:Key="HasItemsToMargin" GreaterThan="0" TrueValue="8,0,16,0" FalseValue="0,0,16,0" />
+        <converters:BoolToVisibilityConverter x:Key="NotEditModeToVisibility" TrueValue="Collapsed" FalseValue="Visible" />
     </Page.Resources>
     <ScrollView Margin="0,48,0,0">
         <StackPanel
             Orientation="Vertical"
             Spacing="8"
             VerticalAlignment="Bottom"
-            ChildrenTransitions="{StaticResource PageCardsAnimations}"
         >
             <Grid
                 ColumnDefinitions="*,*"
@@ -47,22 +46,24 @@
                     BorderThickness="1"
                     Margin="-1"
                 >
-                    <tk:WrapPanel
-                        Orientation="Horizontal"
-                        HorizontalSpacing="32"
-                        VerticalSpacing="16"
+                    <Grid
+                        RowDefinitions="*,*"
+                        ColumnDefinitions="*,*,*"
+                        RowSpacing="16"
+                        ColumnSpacing="16"
                     >
-                        <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="0">
                             <TextBlock
                                 x:Uid="DoomPageInfoSourcePort"
                                 FontSize="16"
                                 Style="{StaticResource BaseTextBlockStyle}"
-                                />
+                            />
                             <TextBlock
                                 Text="{x:Bind local:FileHelper.GZDoomPathToShortTitle(ViewModel.Entry.GZDoomPath, ViewModel.DefaultGZDoomPath), Mode=OneWay}"
+                                TextTrimming="CharacterEllipsis"
                             />
                         </StackPanel>
-                        <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="1">
                             <TextBlock
                                 x:Uid="DoomPageInfoIWAD"
                                 FontSize="16"
@@ -70,19 +71,21 @@
                             />
                             <TextBlock
                                 Text="{x:Bind local:FileHelper.GetIWadFileTitle(ViewModel.Entry.IWadFile, ViewModel.DefaultIWadFile), Mode=OneWay}"
+                                TextTrimming="CharacterEllipsis"
                             />
                         </StackPanel>
-                        <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="2">
                             <TextBlock
                                 x:Uid="DoomPageInfoSteamIntegration"
                                 FontSize="16"
                                 Style="{StaticResource BaseTextBlockStyle}"
                             />
                             <TextBlock
-                            Text="{x:Bind local:FileHelper.SteamGameTitle(ViewModel.Entry.SteamGame, ViewModel.DefaultSteamGame), Mode=OneWay}"
+                                Text="{x:Bind local:FileHelper.SteamGameTitle(ViewModel.Entry.SteamGame, ViewModel.DefaultSteamGame), Mode=OneWay}"
+                                TextTrimming="CharacterEllipsis"
                             />
                         </StackPanel>
-                        <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="0">
                             <TextBlock
                                 x:Uid="DoomPageInfoCreated"
                                 FontSize="16"
@@ -90,9 +93,10 @@
                             />
                             <TextBlock
                                 Text="{x:Bind helpers:XamlHelper.DateToText(ViewModel.Entry.Created), Mode=OneWay}"
+                                TextTrimming="CharacterEllipsis"
                             />
                         </StackPanel>
-                        <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="1">
                             <TextBlock
                                 x:Uid="DoomPageInfoLastLaunch"
                                 FontSize="16"
@@ -100,9 +104,10 @@
                             />
                             <TextBlock
                                 Text="{x:Bind helpers:XamlHelper.DateToText(ViewModel.Entry.LastLaunch), Mode=OneWay}"
+                                TextTrimming="CharacterEllipsis"
                             />
                         </StackPanel>
-                        <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="2">
                             <TextBlock
                                 x:Uid="DoomPageInfoPlayTime"
                                 FontSize="16"
@@ -110,9 +115,10 @@
                             />
                             <TextBlock
                                 Text="{x:Bind helpers:XamlHelper.TimeSpanToText(ViewModel.Entry.PlayTime), Mode=OneWay}"
+                                TextTrimming="CharacterEllipsis"
                             />
                         </StackPanel>
-                    </tk:WrapPanel>
+                    </Grid>
                 </Border>
                 <controls:DoomItemList
                     Grid.Column="1"
@@ -177,9 +183,8 @@
                     </controls:DoomItemList.ItemTemplate>
                 </controls:DoomItemList>
             </Grid>
-            <ScrollView
-                Grid.Column="0"
-                MaxHeight="192"
+            <Grid
+                Grid.RowDefinitions="*,Auto"
                 MaxWidth="992"
                 Margin="15,-1"
                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
@@ -187,15 +192,65 @@
                 BorderThickness="1"
                 CornerRadius="8"
                 HorizontalAlignment="Stretch"
-                Visibility="{x:Bind helpers:XamlHelper.HasText(ViewModel.Entry.LongDescription), Mode=OneWay}"
+                Padding="8"
             >
-                <TextBlock
-                    Margin="16"
-                    Text="{x:Bind ViewModel.Entry.LongDescription, Mode=OneWay}"
-                    Visibility="{x:Bind helpers:XamlHelper.HasText(ViewModel.Entry.LongDescription), Mode=OneWay}"
-                    TextWrapping="WrapWholeWords"
+                <Grid ColumnDefinitions="*,Auto" Margin="8">
+                    <TextBlock
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        x:Uid="DoomPageInfoLongDescription"
+                        Style="{ThemeResource BaseTextBlockStyle}"
+                        FontSize="16"
+                    />
+                    <Button
+                        Visibility="{x:Bind ViewModel.IsEditLongDescription, Converter={StaticResource NotEditModeToVisibility}, Mode=OneWay}"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Command="{x:Bind ViewModel.EditLongDescriptionCommand}"
+                        CommandParameter="{x:Bind LongDescriptionTextBox}"
+                    >
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <FontIcon FontSize="14" Glyph="&#xE70F;" />
+                            <TextBlock x:Uid="DoomPageLongDescriptionEdit" />
+                        </StackPanel>
+                    </Button>
+                    <Button
+                        Grid.Column="1"
+                        VerticalAlignment="Center" 
+                        Visibility="{x:Bind ViewModel.IsEditLongDescription, Mode=OneWay}"
+                        Command="{x:Bind ViewModel.SaveLongDescriptionCommand}"
+                    >
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <FontIcon FontSize="14" Glyph="&#xE8FB;" />
+                            <TextBlock x:Uid="DoomPageLongDescriptionApply" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+                <ScrollView
+                    Grid.Row="1"
+                    Visibility="{x:Bind helpers:XamlHelper.HasTextAndNotEditMode(ViewModel.Entry.LongDescription, ViewModel.IsEditLongDescription), Mode=OneWay}"
+                    Margin="-8,0,-8,-8"
+                    MaxHeight="192"
+                >
+                    <TextBlock
+                        Margin="16,8,16,16"
+                        Text="{x:Bind ViewModel.Entry.LongDescription, Mode=OneWay}"
+                        TextWrapping="WrapWholeWords"
+                    />
+                </ScrollView>
+                <TextBox
+                    x:Name="LongDescriptionTextBox"
+                    x:Uid="DoomPageLongDescriptionTextBox"
+                    PlaceholderText="Введите описание"
+                    Visibility="{x:Bind ViewModel.IsEditLongDescription, Mode=OneWay}"
+                    Grid.Row="1"
+                    Height="184"
+                    Padding="8"
+                    Text="{x:Bind ViewModel.EditLongDescriptionText, Mode=TwoWay}"
+                    AcceptsReturn="True"
+                    TextWrapping="Wrap"
                 />
-            </ScrollView>
+            </Grid>
             <ListView
                 Padding="0,0,0,16"
                 HorizontalAlignment="Center"

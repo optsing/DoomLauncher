@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using DoomLauncher.Helpers;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.Collections.Generic;
@@ -76,6 +77,27 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
 
     [ObservableProperty]
     private bool isSlideshowEnabled;
+
+    [ObservableProperty]
+    private bool isEditLongDescription = false;
+
+    [ObservableProperty]
+    private string editLongDescriptionText = "";
+
+    [RelayCommand]
+    private void EditLongDescription(TextBox? textBox)
+    {
+        EditLongDescriptionText = Entry.LongDescription;
+        IsEditLongDescription = true;
+        textBox?.Focus(FocusState.Programmatic);
+    }
+
+    [RelayCommand]
+    private void SaveLongDescription()
+    {
+        IsEditLongDescription = false;
+        Entry.LongDescription = EditLongDescriptionText.Trim();
+    }
 
     partial void OnIsSlideshowEnabledChanged(bool value)
     {
