@@ -75,6 +75,7 @@ public partial class App : Application
         {
             mainInstance.Activated += MainInstance_Activated;
             LoadSettings();
+            await JumpListHelper.Update();
             m_window = new MainWindow();
             if (m_window.Content is RootPage rootPage)
             {

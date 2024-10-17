@@ -19,11 +19,14 @@ internal class JumpListHelper
             .Where(entry => entry.LastLaunch != null)
             .OrderByDescending(entry => entry.LastLaunch);
 
+        var groupName = Strings.Resources.JumpListLastLaunchedGroupName;
+        var appLogo = new Uri("ms-appx:///Assets/app.ico");
+
         foreach (var entry in entries)
         {
             JumpListItem item = JumpListItem.CreateWithArguments($"launch --id {entry.Id}", entry.Name);
-            item.GroupName = Strings.Resources.JumpListLastLaunchedGroupName;
-            item.Logo = new Uri("ms-appx:///Assets/app.ico");
+            item.GroupName = groupName;
+            item.Logo = appLogo;
             jumpList.Items.Add(item);
         }
 
