@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -10,7 +9,6 @@ using System.Threading.Tasks;
 namespace DoomLauncher.Helpers;
 
 [JsonSerializable(typeof(DoomWorldGetResponse))]
-[JsonSerializable(typeof(List<GitHubReleaseEntry>))]
 internal partial class JsonWebApiContext : JsonSerializerContext { }
 
 public class DoomWorldGetResponse
@@ -37,20 +35,6 @@ public class DoomWorldFileEntry
     public string Filename { get; set; } = "";
 }
 
-public class GitHubReleaseEntry
-{
-    [JsonPropertyName("assets")]
-    public List<GitHubAssetEntry> Assets { get; set; } = [];
-}
-
-public class GitHubAssetEntry
-{
-    [JsonPropertyName("name")]
-    public string Name { get; set; } = "";
-
-    [JsonPropertyName("browser_download_url")]
-    public string DownloadUrl { get; set; } = "";
-}
 
 public partial class WebAPI
 {
