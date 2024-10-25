@@ -136,7 +136,7 @@ public sealed partial class DoomPage : Page
         return null;
     }
 
-    private async void Root_DragEnter(object sender, DragEventArgs e)
+    private async void Root_DragEnter(DragEventArgs e)
     {
         try
         {
@@ -150,7 +150,7 @@ public sealed partial class DoomPage : Page
                         var ext = Path.GetExtension(file.Name).ToLowerInvariant();
                         if (FileHelper.SupportedModExtensions.Contains(ext) || FileHelper.SupportedImageExtensions.Contains(ext))
                         {
-                            EventBus.DropHelper(this, true);
+                            EventBus.DropHelper(true);
                             return;
                         }
                     }
@@ -163,12 +163,12 @@ public sealed partial class DoomPage : Page
         }
     }
 
-    private void DropHelper_DragOver(object sender, DragEventArgs e)
+    private void DropHelper_DragOver(DragEventArgs e)
     {
         e.AcceptedOperation = DataPackageOperation.Copy;
     }
 
-    private async void DropHelper_Drop(object sender, DragEventArgs e)
+    private async void DropHelper_Drop(DragEventArgs e)
     {
         try
         {

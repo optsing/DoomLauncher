@@ -20,8 +20,8 @@ public sealed partial class SettingsPage : Page
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
-        EventBus.ChangeBackground(this, null, AnimationDirection.None);
-        EventBus.ChangeCaption(this, "Settings");
+        EventBus.ChangeBackground(null, AnimationDirection.None);
+        EventBus.ChangeCaption("Settings");
         base.OnNavigatedTo(e);
     }
 }

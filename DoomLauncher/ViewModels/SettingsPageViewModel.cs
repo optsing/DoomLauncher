@@ -61,7 +61,7 @@ public partial class SettingsPageViewModel : ObservableObject
             SettingsViewModel.Current.OnlineSource = "";
         }
         else {
-            EventBus.Progress(this, Strings.Resources.ProgressLoadingOnlineEntries);
+            EventBus.Progress(Strings.Resources.ProgressLoadingOnlineEntries);
             if (await WebAPI.Current.DownloadEntriesFromJson(OnlineSource) != null)
             {
                 SettingsViewModel.Current.OnlineSource = OnlineSource;
@@ -74,7 +74,7 @@ public partial class SettingsPageViewModel : ObservableObject
                     Strings.Resources.DialogOKAction
                 );
             }
-            EventBus.Progress(this, null);
+            EventBus.Progress(null);
         }
     }
 
@@ -128,14 +128,14 @@ public partial class SettingsPageViewModel : ObservableObject
 
         foreach (var file in files)
         {
-            EventBus.Progress(this, Strings.Resources.ProgressCopy(file.Name));
+            EventBus.Progress(Strings.Resources.ProgressCopy(file.Name));
             await FileHelper.CopyFileWithConfirmation(file, FileHelper.IWadFolderPath);
             if (!SettingsViewModel.Current.IWadFiles.Contains(file.Name))
             {
                 SettingsViewModel.Current.IWadFiles.Add(file.Name);
             }
         }
-        EventBus.Progress(this, null);
+        EventBus.Progress(null);
     }
 
     [RelayCommand]
@@ -223,14 +223,14 @@ public partial class SettingsPageViewModel : ObservableObject
 
         foreach (var file in files)
         {
-            EventBus.Progress(this, Strings.Resources.ProgressCopy(file.Name));
+            EventBus.Progress(Strings.Resources.ProgressCopy(file.Name));
             await FileHelper.CopyFileWithConfirmation(file, FileHelper.ModsFolderPath);
             if (!SettingsViewModel.Current.FavoriteFiles.Contains(file.Name))
             {
                 SettingsViewModel.Current.FavoriteFiles.Add(file.Name);
             }
         }
-        EventBus.Progress(this, null);
+        EventBus.Progress(null);
     }
 
     [RelayCommand]

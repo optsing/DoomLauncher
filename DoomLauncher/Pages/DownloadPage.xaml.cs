@@ -22,8 +22,8 @@ public sealed partial class DownloadPage : Page
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
-        EventBus.ChangeBackground(this, null, AnimationDirection.None);
-        EventBus.ChangeCaption(this, "Catalog");
+        EventBus.ChangeBackground(null, AnimationDirection.None);
+        EventBus.ChangeCaption("Catalog");
 
         if (e.Parameter is DownloadPageViewModel vm)
         {

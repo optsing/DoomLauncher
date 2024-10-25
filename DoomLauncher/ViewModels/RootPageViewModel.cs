@@ -103,7 +103,7 @@ public partial class RootPageViewModel : ObservableObject
             {
                 SettingsViewModel.Current.Entries.Add(entry);
             }
-            EventBus.SetCurrentEntry(this, entries.Last());
+            EventBus.SetCurrentEntry(entries.Last());
             SettingsViewModel.Current.Save();
         }
     }
@@ -162,9 +162,9 @@ public partial class RootPageViewModel : ObservableObject
             return;
         }
 
-        EventBus.Progress(this, Strings.Resources.ProgressCreatingShortcut);
+        EventBus.Progress(Strings.Resources.ProgressCreatingShortcut);
         await FileHelper.CreateEntryShortcut(entry, file);
-        EventBus.Progress(this, null);
+        EventBus.Progress(null);
     }
 
     [RelayCommand]
@@ -187,7 +187,7 @@ public partial class RootPageViewModel : ObservableObject
         var file = await picker.PickSaveFileAsync();
         if (file != null)
         {
-            await EntryHelper.ExportToGZDLFile(entry, file, progress => EventBus.Progress(this, progress));
+            await EntryHelper.ExportToGZDLFile(entry, file, progress => EventBus.Progress(progress));
         }
     }
 
@@ -202,7 +202,7 @@ public partial class RootPageViewModel : ObservableObject
         {
             if (entry == CurrentEntry)
             {
-                EventBus.SetCurrentEntry(this, null);
+                EventBus.SetCurrentEntry(null);
             }
             SettingsViewModel.Current.Entries.Remove(entry);
             SettingsViewModel.Current.Save();
@@ -236,7 +236,7 @@ public partial class RootPageViewModel : ObservableObject
             await DialogHelper.ShowAskAsync(Strings.Resources.DialogLaunchErrorTitle, Strings.Resources.DialogLaunchErrorNoEntryText, Strings.Resources.DialogOKAction);
             return;
         }
-        EventBus.SetCurrentEntry(this, entry);
+        EventBus.SetCurrentEntry(entry);
         var result = LaunchHelper.LaunchEntry(entry);
         if (result == LaunchResult.Success && LaunchHelper.CurrentProcess != null)
         {

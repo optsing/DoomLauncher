@@ -42,7 +42,7 @@ public sealed partial class RootPage : Page
     {
         InitializeComponent();
 
-        EventBus.OnSetCurrentEntry += (_, entry) => SetCurrentEntry(entry);
+        EventBus.OnSetCurrentEntry += entry => SetCurrentEntry(entry);
         EventBus.OnProgress += EventBus_OnProgress;
         EventBus.OnChangeBackground += EventBus_OnChangeBackground;
         EventBus.OnChangeCaption += EventBus_OnChangeCaption;
@@ -93,12 +93,12 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private void EventBus_OnDropHelper(object? sender, bool e)
+    private void EventBus_OnDropHelper(bool e)
     {
         ViewModel.IsRightDropHelperVisible = e;
     }
 
-    private void EventBus_OnChangeCaption(object? sender, string? e)
+    private void EventBus_OnChangeCaption(string? e)
     {
         ViewModel.Caption = e;
     }
@@ -129,20 +129,20 @@ public sealed partial class RootPage : Page
     }
 
     private readonly SemaphoreSlim semaphoreAnimation = new(1, 1);
-    private async void EventBus_OnChangeBackground(object? sender, (string? imagePath, AnimationDirection direction) e)
+    private async void EventBus_OnChangeBackground(string? imagePath, AnimationDirection direction)
     {
         await semaphoreAnimation.WaitAsync();
-        var bitmap = string.IsNullOrEmpty(e.imagePath) ? null : await BitmapHelper.CreateBitmapFromFile(e.imagePath, isPreview: false);
+        var bitmap = string.IsNullOrEmpty(imagePath) ? null : await BitmapHelper.CreateBitmapFromFile(imagePath, isPreview: false);
         bool hasPrevBitmap = ViewModel.Background != null;
         if (hasPrevBitmap)
         {
             if (bitmap != null)
             {
-                if (e.direction == AnimationDirection.Next)
+                if (direction == AnimationDirection.Next)
                 {
                     sbToLeft.Begin();
                 }
-                else if (e.direction == AnimationDirection.Previous)
+                else if (direction == AnimationDirection.Previous)
                 {
                     sbToRight.Begin();
                 }
@@ -155,11 +155,11 @@ public sealed partial class RootPage : Page
         {
             if (hasPrevBitmap)
             {
-                if (e.direction == AnimationDirection.Next)
+                if (direction == AnimationDirection.Next)
                 {
                     sbFromRight.Begin();
                 }
-                else if (e.direction == AnimationDirection.Previous)
+                else if (direction == AnimationDirection.Previous)
                 {
                     sbFromLeft.Begin();
                 }
@@ -182,7 +182,7 @@ public sealed partial class RootPage : Page
         }
     }
 
-    private void EventBus_OnProgress(object? sender, string? e)
+    private void EventBus_OnProgress(string? e)
     {
         SetProgress(e);
     }
@@ -396,18 +396,18 @@ public sealed partial class RootPage : Page
 
     private void RightDropHelper_DragOver(object sender, DragEventArgs e)
     {
-        EventBus.RightDragOver(this, e);
+        EventBus.RightDragOver(e);
     }
 
     private void RightDropHelper_Drop(object sender, DragEventArgs e)
     {
         ViewModel.IsRightDropHelperVisible = false;
-        EventBus.RightDrop(this, e);
+        EventBus.RightDrop(e);
     }
 
     private void RightDropHelper_DragEnter(object sender, DragEventArgs e)
     {
-        EventBus.RightDragEnter(this, e);
+        EventBus.RightDragEnter(e);
     }
 
     private void RightDropHelper_DragLeave(object sender, DragEventArgs e)

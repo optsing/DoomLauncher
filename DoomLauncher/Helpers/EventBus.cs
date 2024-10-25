@@ -6,21 +6,21 @@ namespace DoomLauncher.Helpers;
 
 static class EventBus
 {
-    public static event EventHandler<string?>? OnProgress;
-    public static void Progress(object sender, string? title) => OnProgress?.Invoke(sender, title);
-    public static event EventHandler<(string? imagePath, AnimationDirection direction)>? OnChangeBackground;
-    public static void ChangeBackground(object sender, string? imagePath, AnimationDirection direction) => OnChangeBackground?.Invoke(sender, (imagePath, direction));
-    public static event EventHandler<string?>? OnChangeCaption;
-    public static void ChangeCaption(object sender, string? caption) => OnChangeCaption?.Invoke(sender, caption);
-    public static event EventHandler<DoomEntryViewModel?>? OnSetCurrentEntry;
-    public static void SetCurrentEntry(object sender, DoomEntryViewModel? currentEntry) => OnSetCurrentEntry?.Invoke(sender, currentEntry);
-    public static event EventHandler<bool>? OnDropHelper;
-    public static void DropHelper(object sender, bool isDropHelperVisible) => OnDropHelper?.Invoke(sender, isDropHelperVisible);
+    public static event Action<string?>? OnProgress;
+    public static void Progress(string? title) => OnProgress?.Invoke(title);
+    public static event Action<string?, AnimationDirection>? OnChangeBackground;
+    public static void ChangeBackground(string? imagePath, AnimationDirection direction) => OnChangeBackground?.Invoke(imagePath, direction);
+    public static event Action<string?>? OnChangeCaption;
+    public static void ChangeCaption(string? caption) => OnChangeCaption?.Invoke(caption);
+    public static event Action<DoomEntryViewModel?>? OnSetCurrentEntry;
+    public static void SetCurrentEntry(DoomEntryViewModel? currentEntry) => OnSetCurrentEntry?.Invoke(currentEntry);
+    public static event Action<bool>? OnDropHelper;
+    public static void DropHelper(bool isDropHelperVisible) => OnDropHelper?.Invoke(isDropHelperVisible);
 
-    public static event DragEventHandler? OnRightDragEnter;
-    public static void RightDragEnter(object sender, DragEventArgs e) => OnRightDragEnter?.Invoke(sender, e);
-    public static event DragEventHandler? OnRightDragOver;
-    public static void RightDragOver(object sender, DragEventArgs e) => OnRightDragOver?.Invoke(sender, e);
-    public static event DragEventHandler? OnRightDrop;
-    public static void RightDrop(object sender, DragEventArgs e) => OnRightDrop?.Invoke(sender, e);
+    public static event Action<DragEventArgs>? OnRightDragEnter;
+    public static void RightDragEnter(DragEventArgs e) => OnRightDragEnter?.Invoke(e);
+    public static event Action<DragEventArgs>? OnRightDragOver;
+    public static void RightDragOver(DragEventArgs e) => OnRightDragOver?.Invoke(e);
+    public static event Action<DragEventArgs>? OnRightDrop;
+    public static void RightDrop(DragEventArgs e) => OnRightDrop?.Invoke(e);
 }

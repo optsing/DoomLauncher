@@ -18,8 +18,8 @@ public sealed partial class NotSelectedPage : Page
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
-        EventBus.ChangeBackground(this, null, AnimationDirection.None);
-        EventBus.ChangeCaption(this, null);
+        EventBus.ChangeBackground(null, AnimationDirection.None);
+        EventBus.ChangeCaption(null);
         base.OnNavigatedTo(e);
     }
 }

@@ -82,9 +82,9 @@ public partial class DownloadPageViewModel : ObservableObject
     public async Task LoadEntries()
     {
         HasNoItems = Visibility.Collapsed;
-        EventBus.Progress(this, Strings.Resources.ProgressLoadingOnlineEntries);
+        EventBus.Progress(Strings.Resources.ProgressLoadingOnlineEntries);
         var entries = await WebAPI.Current.DownloadEntriesFromJson(SettingsViewModel.Current.OnlineSource);
-        EventBus.Progress(this, null);
+        EventBus.Progress(null);
         PortEntries.Clear();
         IWADEntries.Clear();
         FileEntries.Clear();
@@ -169,7 +169,7 @@ public partial class DownloadPageViewModel : ObservableObject
             {
                 try
                 {
-                    var entries = await DownloadEntryHelper.InstallEntry(entry, version, result == ContentDialogResult.Primary, progress => EventBus.Progress(this, progress));
+                    var entries = await DownloadEntryHelper.InstallEntry(entry, version, result == ContentDialogResult.Primary, progress => EventBus.Progress(progress));
                     foreach (var item in entries)
                     {
                         SettingsViewModel.Current.Entries.Add(item);
@@ -196,7 +196,7 @@ public partial class DownloadPageViewModel : ObservableObject
             {
                 try
                 {
-                    await DownloadEntryHelper.InstallPort(port, version, progress => EventBus.Progress(this, progress));
+                    await DownloadEntryHelper.InstallPort(port, version, progress => EventBus.Progress(progress));
                 }
                 catch (Exception ex)
                 {

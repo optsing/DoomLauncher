@@ -148,7 +148,7 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
         }
         SetSlideshow();
         SetSelectedImageIndex(entry.SelectedImageIndex, direction: AnimationDirection.None);
-        EventBus.ChangeCaption(this, entry.Name);
+        EventBus.ChangeCaption(entry.Name);
     }
 
     [RelayCommand]
@@ -184,7 +184,7 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
     {
         foreach (var file in files)
         {
-            EventBus.Progress(this, Strings.Resources.ProgressCopy(file.Name));
+            EventBus.Progress(Strings.Resources.ProgressCopy(file.Name));
             await FileHelper.CopyFileWithConfirmation(file, FileHelper.ModsFolderPath);
             if (!ModFileList.Any(modFile => modFile.Path == file.Name))
             {
@@ -196,7 +196,7 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
                 });
             }
         }
-        EventBus.Progress(this, null);
+        EventBus.Progress(null);
     }
 
     [RelayCommand]
@@ -225,7 +225,7 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
         bool hasAddedImages = false;
         foreach (var file in files)
         {
-            EventBus.Progress(this, Strings.Resources.ProgressCopy(file.Name));
+            EventBus.Progress(Strings.Resources.ProgressCopy(file.Name));
             await FileHelper.CopyFileWithConfirmation(file, FileHelper.ImagesFolderPath);
             if (!ImageFileList.Any(imageFile => imageFile.Path == file.Name))
             {
@@ -237,7 +237,7 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
                 hasAddedImages = true;
             }
         }
-        EventBus.Progress(this, null);
+        EventBus.Progress(null);
         if (hasAddedImages)
         {
             SetSelectedImageIndex(ImageFileList.Count - 1, direction: AnimationDirection.Next);
@@ -310,12 +310,12 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
                 ind = 0;
             }
             Entry.SelectedImageIndex = ind;
-            EventBus.ChangeBackground(this, ImageFileList[Entry.SelectedImageIndex].FullPath, direction);
+            EventBus.ChangeBackground(ImageFileList[Entry.SelectedImageIndex].FullPath, direction);
         }
         else
         {
             Entry.SelectedImageIndex = 0;
-            EventBus.ChangeBackground(this, null, direction);
+            EventBus.ChangeBackground(null, direction);
         }
     }
 
