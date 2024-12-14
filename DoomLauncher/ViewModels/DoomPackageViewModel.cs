@@ -9,8 +9,8 @@ public partial class DoomPackageViewModel : ObservableObject
 {
     public string Path { get; set; } = "";
 
-    public Version? Version { get => version; set => SetProperty(ref version, value); }
-    private Version? version = null;
+    [ObservableProperty]
+    public partial Version? Version { get; set; } = null;
 
     public AssetArch Arch { get; set; } = AssetArch.unknown;
 

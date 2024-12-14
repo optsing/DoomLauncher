@@ -39,11 +39,11 @@ public partial class DownloadPageViewModel : ObservableObject
     private readonly SyncCollection<DownloadEntryViewModel> SyncFileEntries;
 
     [ObservableProperty]
-    private string searchQuery = "";
+    public partial string SearchQuery { get; set; } = "";
 
     public DownloadPageViewModel()
     {
-        Func<DownloadEntryViewModel, bool> filter = vm => string.IsNullOrEmpty(SearchQuery) || vm.Name.Contains(SearchQuery, System.StringComparison.CurrentCultureIgnoreCase);
+        bool filter(DownloadEntryViewModel vm) => string.IsNullOrEmpty(SearchQuery) || vm.Name.Contains(SearchQuery, System.StringComparison.CurrentCultureIgnoreCase);
         SyncPortEntries = new(PortEntries, PortEntriesView)
         {
             Filter = filter,
@@ -77,7 +77,7 @@ public partial class DownloadPageViewModel : ObservableObject
     }
 
     [ObservableProperty]
-    private Visibility hasNoItems = Visibility.Collapsed;
+    public partial Visibility HasNoItems { get; set; } = Visibility.Collapsed;
 
     public async Task LoadEntries()
     {

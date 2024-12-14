@@ -51,7 +51,7 @@ public partial class SettingsPageViewModel : ObservableObject
     }
 
     [ObservableProperty]
-    private string onlineSource = SettingsViewModel.Current.OnlineSource;
+    public partial string OnlineSource { get; set; } = SettingsViewModel.Current.OnlineSource;
 
     [RelayCommand]
     private async Task ApplyOnlineSource()

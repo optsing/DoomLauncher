@@ -21,7 +21,7 @@ public partial class ModFileViewModel(string filePath, bool isInFavorites) : Obs
     public string Title => FileHelper.GetFileTitle(filePath);
 
     [ObservableProperty]
-    private bool isInFavorites = isInFavorites;
+    public partial bool IsInFavorites { get; set; } = isInFavorites;
     public required IRelayCommand<ModFileViewModel> ToggleFavoriteFileCommand { get; init; }
     public required IRelayCommand<ModFileViewModel> OpenContainingFolderCommand { get; init; }
     public required IRelayCommand<ModFileViewModel> RemoveModFileCommand { get; init; }
@@ -34,7 +34,7 @@ public partial class ImageFileViewModel : ObservableObject
     public string FullPath => System.IO.Path.GetFullPath(Path, FileHelper.ImagesFolderPath);
 
     [ObservableProperty]
-    private BitmapImage? image = null;
+    public partial BitmapImage? Image { get; set; } = null;
 
     public ImageFileViewModel(string imagePath)
     {
@@ -73,16 +73,16 @@ public partial class DoomPageViewModel(SettingsViewModel settings) : ObservableO
     public ObservableCollection<ImageFileViewModel> ImageFileList { get; } = [];
 
     [ObservableProperty]
-    private int currentTicksToSlideshow;
+    public partial int CurrentTicksToSlideshow { get; set; }
 
     [ObservableProperty]
-    private bool isSlideshowEnabled;
+    public partial bool IsSlideshowEnabled { get; set; }
 
     [ObservableProperty]
-    private bool isEditLongDescription = false;
+    public partial bool IsEditLongDescription { get; set; } = false;
 
     [ObservableProperty]
-    private string editLongDescriptionText = "";
+    public partial string EditLongDescriptionText { get; set; } = "";
 
     [RelayCommand]
     private void EditLongDescription(TextBox? textBox)

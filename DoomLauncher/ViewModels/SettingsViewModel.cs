@@ -23,20 +23,20 @@ public partial class SettingsViewModel : ObservableObject
     public ObservableCollection<DoomPackageViewModel> GZDoomInstalls { get; set; } = [];
     public ObservableCollection<string> IWadFiles { get; set; } = [];
 
-    public string DefaultGZDoomPath { get => defaultGZDoomPath; set => SetProperty(ref defaultGZDoomPath, value); }
-    private string defaultGZDoomPath = "";
+    [ObservableProperty]
+    public partial string DefaultGZDoomPath { get; set; } = "";
 
-    public string DefaultIWadFile { get => defaultIWadFile; set => SetProperty(ref defaultIWadFile, value); }
-    private string defaultIWadFile = "";
+    [ObservableProperty]
+    public partial string DefaultIWadFile { get; set; } = "";
 
     public ObservableCollection<string> FavoriteFiles { get; set; } = [];
     public bool CloseOnLaunch { get; set; } = false;
 
-    public string SteamGame { get => steamGame; set => SetProperty(ref steamGame, value); }
-    private string steamGame = "off";
+    [ObservableProperty]
+    public partial string SteamGame { get; set; } = "off";
 
-    public string OnlineSource { get => onlineSource; set => SetProperty(ref onlineSource, value); }
-    private string onlineSource = DefaultOnlineSource;
+    [ObservableProperty]
+    public partial string OnlineSource { get; set; } = DefaultOnlineSource;
 
     public string SortOrder { get; set; } = "";
 

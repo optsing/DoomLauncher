@@ -14,22 +14,21 @@ namespace DoomLauncher.ViewModels;
 public partial class RootPageViewModel : ObservableObject
 {
     [ObservableProperty]
-    private string? caption = null;
+    public partial string? Caption { get; set; } = null;
 
     [ObservableProperty]
-    private BitmapImage? background = null;
+    public partial BitmapImage? Background { get; set; } = null;
 
     [ObservableProperty]
-    private DoomEntryViewModel? currentEntry = null;
+    public partial DoomEntryViewModel? CurrentEntry { get; set; } = null;
 
     [ObservableProperty]
-    private string? progressText = null;
+    public partial string? ProgressText { get; set; } = null;
 
     [ObservableProperty]
-    private bool isLeftDropHelperVisible;
-
+    public partial bool IsLeftDropHelperVisible { get; set; }
     [ObservableProperty]
-    private bool isRightDropHelperVisible;
+    public partial bool IsRightDropHelperVisible { get; set; }
 
     public List<KeyValue> SortOrders => [
         new("", Strings.Resources.SortOrderByName),
@@ -75,7 +74,7 @@ public partial class RootPageViewModel : ObservableObject
     }
 
     [ObservableProperty]
-    private string searchQuery = "";
+    public partial string SearchQuery { get; set; } = "";
 
     public RootPageViewModel()
     {

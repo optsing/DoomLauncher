@@ -6,46 +6,46 @@ namespace DoomLauncher.ViewModels;
 
 public partial class DoomEntryViewModel : ObservableObject
 {
-    public required string Name { get => name; set => SetProperty(ref name, value); }
-    private string name = "";
+    [ObservableProperty]
+    public required partial string Name { get; set; } = "";
 
-    public string Description { get => description; set => SetProperty(ref description, value); }
-    private string description = "";
+    [ObservableProperty]
+    public partial string Description { get; set; } = "";
 
-    public string LongDescription { get => longDescription; set => SetProperty(ref longDescription, value); }
-    private string longDescription = "";
+    [ObservableProperty]
+    public partial string LongDescription { get; set; } = "";
 
-    public string GZDoomPath { get => gZDoomPath; set => SetProperty(ref gZDoomPath, value); }
-    private string gZDoomPath = "";
+    [ObservableProperty]
+    public partial string GZDoomPath { get; set; } = "";
 
-    public string IWadFile { get => iWadFile; set => SetProperty(ref iWadFile, value); }
-    private string iWadFile = "";
+    [ObservableProperty]
+    public partial string IWadFile { get; set; } = "";
 
-    public string SteamGame { get => steamGame; set => SetProperty(ref steamGame, value); }
-    private string steamGame = "";
+    [ObservableProperty]
+    public partial string SteamGame { get; set; } = "";
 
-    public bool UniqueConfig { get => uniqueConfig; set => SetProperty(ref uniqueConfig, value); }
-    private bool uniqueConfig = false;
-    public bool UniqueSavesFolder { get => uniqueSavesFolder; set => SetProperty(ref uniqueSavesFolder, value); }
-    private bool uniqueSavesFolder = false;
+    [ObservableProperty]
+    public partial bool UniqueConfig { get; set; } = false;
+    [ObservableProperty]
+    public partial bool UniqueSavesFolder { get; set; } = false;
 
     public required string Id { get; set; } = "";
 
-    public int SelectedImageIndex { get => selectedImageIndex; set => SetProperty(ref selectedImageIndex, value); }
-    private int selectedImageIndex = 0;
+    [ObservableProperty]
+    public partial int SelectedImageIndex { get; set; } = 0;
 
     public bool Slideshow { get; set; } = true;
 
     public List<string> ImageFiles { get; set; } = [];
     public List<string> ModFiles { get; set; } = [];
 
-    public required DateTime? Created { get => created; set => SetProperty(ref created, value); }
-    private DateTime? created = null;
+    [ObservableProperty]
+    public required partial DateTime? Created { get; set; } = null;
 
-    public DateTime? LastLaunch { get => lastLaunch; set => SetProperty(ref lastLaunch, value); }
-    private DateTime? lastLaunch = null;
+    [ObservableProperty]
+    public partial DateTime? LastLaunch { get; set; } = null;
 
-    public TimeSpan? PlayTime { get => playTime; set => SetProperty(ref playTime, value); }
-    private TimeSpan? playTime;
+    [ObservableProperty]
+    public partial TimeSpan? PlayTime { get; set; }
 }
 
