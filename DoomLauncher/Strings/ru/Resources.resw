@@ -174,28 +174,25 @@
   <data name="EditEntryDialog.CloseButtonText" xml:space="preserve">
     <value>Отмена</value>
   </data>
-  <data name="EditEntryDialogName.Text" xml:space="preserve">
+  <data name="EditEntryDialogName.Header" xml:space="preserve">
     <value>Название</value>
   </data>
-  <data name="EditEntryDialogNameTextBox.PlaceholderText" xml:space="preserve">
+  <data name="EditEntryDialogName.PlaceholderText" xml:space="preserve">
     <value>Введите название</value>
   </data>
-  <data name="EditEntryDialogShortDescription.Text" xml:space="preserve">
+  <data name="EditEntryDialogShortDescription.Header" xml:space="preserve">
     <value>Краткое описание</value>
   </data>
-  <data name="EditEntryDialogLongDescription.Text" xml:space="preserve">
-    <value>Подробное описание</value>
-  </data>
-  <data name="EditEntryDialogShortDescriptionTextBox.PlaceholderText" xml:space="preserve">
+  <data name="EditEntryDialogShortDescription.PlaceholderText" xml:space="preserve">
     <value>Введите краткое описание</value>
   </data>
-  <data name="EditEntryDialogLongDescriptionTextBox.PlaceholderText" xml:space="preserve">
-    <value>Введите подробное описание</value>
-  </data>
-  <data name="EditEntryDialogGZDoomVersion.Text" xml:space="preserve">
+  <data name="EditEntryDialogGZDoomVersion.Header" xml:space="preserve">
     <value>Порт</value>
   </data>
-  <data name="EditEntryDialogSteamIntegration.Text" xml:space="preserve">
+  <data name="EditEntryDialogIWAD.Header" xml:space="preserve">
+    <value>IWAD</value>
+  </data>
+  <data name="EditEntryDialogSteamIntegration.Header" xml:space="preserve">
     <value>Интеграция Steam</value>
   </data>
   <data name="EditEntryDialogUniqueConfig.Content" xml:space="preserve">
@@ -204,10 +201,10 @@
   <data name="EditEntryDialogUniqueSavesFolder.Content" xml:space="preserve">
     <value>Использовать уникальную папку сохранений</value>
   </data>
-  <data name="EditEntryDialogFiles.Text" xml:space="preserve">
+  <data name="EditEntryDialogFiles.Header" xml:space="preserve">
     <value>Файлы</value>
   </data>
-  <data name="EditEntryDialogImages.Text" xml:space="preserve">
+  <data name="EditEntryDialogImages.Header" xml:space="preserve">
     <value>Изображения</value>
   </data>
   <data name="SettingsPageAbout.Text" xml:space="preserve">

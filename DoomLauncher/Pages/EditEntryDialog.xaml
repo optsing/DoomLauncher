@@ -18,31 +18,30 @@
     SecondaryButtonClick="EditEntryDialog_PrimaryOrSecondaryButtonClick"
 >
     <ScrollView
-        VerticalAlignment="Center"
-        HorizontalAlignment="Center"
         VerticalScrollBarVisibility="Auto"
         VerticalScrollMode="Enabled"
+        Margin="-24,0,-24,-24"
+        Width="392"
     >
-        <StackPanel>
-            <TextBlock x:Uid="EditEntryDialogName" />
+        <StackPanel
+            Orientation="Vertical"
+            Spacing="16"
+            Margin="24,0,24,24"
+        >
             <TextBox
-                x:Uid="EditEntryDialogNameTextBox"
+                x:Uid="EditEntryDialogName"
                 x:Name="tbModName"
                 HorizontalAlignment="Stretch"
-                Margin="0,8,0,8"
                 Text="{x:Bind ViewModel.Name, Mode=TwoWay}"
             />
-            <TextBlock x:Uid="EditEntryDialogShortDescription" />
             <TextBox
-                x:Uid="EditEntryDialogShortDescriptionTextBox" 
+                x:Uid="EditEntryDialogShortDescription" 
                 HorizontalAlignment="Stretch"
-                Margin="0,8,0,8"
                 Text="{x:Bind ViewModel.Description, Mode=TwoWay}"
             />
-            <TextBlock x:Uid="EditEntryDialogGZDoomVersion" />
             <ComboBox
+                x:Uid="EditEntryDialogGZDoomVersion"
                 HorizontalAlignment="Stretch"
-                Margin="0,8,0,8"
                 SelectedItem="{x:Bind ViewModel.DoomPackage, Mode=TwoWay}"
                 ItemsSource="{x:Bind ViewModel.DoomPackages}"
             >
@@ -52,10 +51,9 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <TextBlock>IWAD</TextBlock>
             <ComboBox
+                x:Uid="EditEntryDialogIWAD"
                 HorizontalAlignment="Stretch"
-                Margin="0,8,0,8"
                 SelectedItem="{x:Bind ViewModel.IWadFile, Mode=TwoWay}"
                 ItemsSource="{x:Bind ViewModel.IWadFiles}"
             >
@@ -65,10 +63,9 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <TextBlock x:Uid="EditEntryDialogSteamIntegration" />
             <ComboBox
+                x:Uid="EditEntryDialogSteamIntegration"               
                 HorizontalAlignment="Stretch"
-                Margin="0,8,0,8"
                 SelectedItem="{x:Bind ViewModel.SteamGame, Mode=TwoWay}"
                 ItemsSource="{x:Bind ViewModel.SteamGames}"
             >
@@ -78,19 +75,21 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <CheckBox
-                x:Uid="EditEntryDialogUniqueConfig"
-                IsChecked="{x:Bind ViewModel.UniqueConfig, Mode=TwoWay}"
-            />
-            <CheckBox
-                x:Uid="EditEntryDialogUniqueSavesFolder"
-                IsChecked="{x:Bind ViewModel.UniqueSavesFolder, Mode=TwoWay}"
-            />
-            <TextBlock
-                x:Uid="EditEntryDialogFiles"
-                Visibility="{x:Bind helpers:XamlHelper.HasItems(ViewModel.ModFiles.Count)}"
-            />
+            <StackPanel
+                Orientation="Vertical"
+                Spacing="8"
+            >
+                <CheckBox
+                    x:Uid="EditEntryDialogUniqueConfig"
+                    IsChecked="{x:Bind ViewModel.UniqueConfig, Mode=TwoWay}"
+                />
+                <CheckBox
+                    x:Uid="EditEntryDialogUniqueSavesFolder"
+                    IsChecked="{x:Bind ViewModel.UniqueSavesFolder, Mode=TwoWay}"
+                />
+            </StackPanel>
             <ListView
+                x:Uid="EditEntryDialogFiles"
                 ItemsSource="{x:Bind ViewModel.ModFiles}"
                 SelectionMode="None"
                 Visibility="{x:Bind helpers:XamlHelper.HasItems(ViewModel.ModFiles.Count)}"
@@ -110,11 +109,8 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <TextBlock
-                x:Uid="EditEntryDialogImages"
-                Visibility="{x:Bind helpers:XamlHelper.HasItems(ViewModel.ImageFiles.Count)}"
-            />
             <ListView
+                x:Uid="EditEntryDialogImages"
                 ItemsSource="{x:Bind ViewModel.ImageFiles}"
                 SelectionMode="None"
                 Visibility="{x:Bind helpers:XamlHelper.HasItems(ViewModel.ImageFiles.Count)}"
