@@ -1,6 +1,2 @@
-CoCreateInstance
-FileSaveDialog
-IFileSaveDialog
-SHCreateItemFromParsingName
 SetForegroundWindow
 GetDpiForMonitor
