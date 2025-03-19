@@ -14,7 +14,7 @@ namespace DoomLauncher;
 /// An empty window that can be used on its own or navigated to within a Frame.
 /// </summary>
 public sealed partial class MainWindow : Window
-{ 
+{
     public MainWindow()
     {
         WinApi.HWND = WinRT.Interop.WindowNative.GetWindowHandle(this);
@@ -31,7 +31,11 @@ public sealed partial class MainWindow : Window
             AppWindow.TitleBar.ButtonBackgroundColor = Colors.Transparent;
             AppWindow.TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
         }
-
+        if (AppWindow.Presenter is OverlappedPresenter presenter)
+        {
+            presenter.PreferredMinimumWidth = 800;
+            presenter.PreferredMinimumHeight = 600;
+        }
         if (SettingsViewModel.Current.WindowX != null && SettingsViewModel.Current.WindowY != null && SettingsViewModel.Current.WindowWidth != null && SettingsViewModel.Current.WindowHeight != null)
         {
             AppWindow.MoveAndResize(new()
@@ -42,9 +46,9 @@ public sealed partial class MainWindow : Window
                 Height = (int)SettingsViewModel.Current.WindowHeight,
             });
         }
-        if (SettingsViewModel.Current.WindowMaximized && AppWindow.Presenter is OverlappedPresenter presenter)
+        if (SettingsViewModel.Current.WindowMaximized && AppWindow.Presenter is OverlappedPresenter presenter2)
         {
-            presenter.Maximize();
+            presenter2.Maximize();
         }
         AppWindow.Changed += AppWindow_Changed;
         

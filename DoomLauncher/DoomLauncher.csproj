@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<AssemblyName>DoomLauncher</AssemblyName>
 		<AssemblyTitle>Doom Launcher</AssemblyTitle>
-		<AssemblyVersion>1.3.3.0</AssemblyVersion>
+		<AssemblyVersion>1.3.2.0</AssemblyVersion>
 		<ApplicationIcon>Assets\app.ico</ApplicationIcon>
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
@@ -63,7 +63,7 @@
 		</PackageReference>
 		<PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250228001" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250310001" />
 		<PackageReference Include="ReswPlus" Version="0.3.1.5" PrivateAssets="all" />
 		<PackageReference Include="SharpCompress" Version="0.39.0" />
 		<PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
