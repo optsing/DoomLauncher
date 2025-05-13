@@ -58,7 +58,7 @@
 		<AppxBundle>Never</AppxBundle>
 	</PropertyGroup>
 	<ItemGroup>
-		<AppxManifest Include="Package.appxmanifest" Condition="'$(Configuration)'=='Release'">
+		<AppxManifest Include="Package.appxmanifest" Condition="'$(Configuration)'!='Debug'">
 			<SubType>Designer</SubType>
 		</AppxManifest>
 		<AppxManifest Include="Package.Debug.appxmanifest" Condition="'$(Configuration)'=='Debug'">
