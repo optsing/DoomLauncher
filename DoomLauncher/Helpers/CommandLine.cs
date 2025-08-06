@@ -13,9 +13,9 @@ internal static class CommandLine
 {
     public static LaunchOptions? ParseCommandLine(string commandLine)
     {
-        var idOption = new Option<string?>("--id", "Entry id to launch");
-        var nameOption = new Option<string?>("--name", "Entry name to launch");
-        var forceCloseOption = new Option<bool>("--force-close", "Force close after launch");
+        var idOption = new Option<string>("--id") { Description = "Entry id to launch" };
+        var nameOption = new Option<string>("--name") { Description = "Entry name to launch" };
+        var forceCloseOption = new Option<bool>("--force-close") { Description = "Force close after launch" };
         var launchCommand = new Command("launch", "Launch entry on app start")
         {
             idOption,
@@ -29,22 +29,17 @@ internal static class CommandLine
 
         rootCommand.TreatUnmatchedTokensAsErrors = false;
 
-        LaunchOptions? result = null;
+        var parseResult = rootCommand.Parse(commandLine);
+        if (parseResult.GetResult(launchCommand) is { } launchResult)
+        {
+            return new()
+            {
+                EntryId = launchResult.GetValue(idOption),
+                EntryName = launchResult.GetValue(nameOption),
+                ForceClose = launchResult.GetValue(forceCloseOption),
+            };
+        }
 
-        launchCommand.SetHandler(
-            (id, name, forceClose) => {
-                result = new()
-                {
-                    EntryId = id,
-                    EntryName = name,
-                    ForceClose = forceClose,
-                };
-            },
-            idOption, nameOption, forceCloseOption
-        );
-
-        rootCommand.Invoke(commandLine);
-
-        return result;
+        return null;
     }
 }
