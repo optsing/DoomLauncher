@@ -95,6 +95,7 @@ internal static partial class FileHelper
     {
         { "off", new(Strings.Resources.SteamAppIdOff, 0) },
         { "doom", new("DOOM + DOOM II", 2280) },
+        { "heretic+hexen", new("Heretic + Hexen", 3286930) },
         { "doom2", new("Doom II", 2300) },
         { "doom64", new("Doom 64", 1148590) },
         { "heretic", new("Heretic", 2390) },
