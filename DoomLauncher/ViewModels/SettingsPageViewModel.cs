@@ -96,9 +96,9 @@ public partial class SettingsPageViewModel : ObservableObject
 
         // Now we can use the picker object as normal
         picker.FileTypeFilter.Add(".exe");
-        picker.CommitButtonText = Strings.Resources.ChooseGZDoom;
+        picker.CommitButtonText = Strings.Resources.ChoosePort;
         var file = await picker.PickSingleFileAsync();
-        if (file != null && FileHelper.ValidateGZDoomPath(file.Path))
+        if (file != null && FileHelper.ValidatePortPath(file.Path))
         {
             if (!SettingsViewModel.Current.GZDoomInstalls.Any(package => package.Path == file.Path))
             {

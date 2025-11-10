@@ -75,7 +75,7 @@
             Spacing="8"
         >
             <controls:DoomItemList
-                x:Uid="SettingsPageGZDoom"
+                x:Uid="SettingsPagePort"
                 ItemsSource="{x:Bind vm:SettingsViewModel.Current.GZDoomInstalls}"
             >
                 <controls:DoomItemList.HeaderFlyout>
@@ -83,7 +83,7 @@
                         Placement="Bottom"
                     >
                         <MenuFlyoutItem
-                            x:Uid="SettingsPageGZDoomAddLocal"
+                            x:Uid="SettingsPagePortAddLocal"
                             Command="{x:Bind ViewModel.AddLocalDoomPackageCommand}"
                             Icon="{ui:FontIcon FontSize=14, Glyph=&#xEC50;}"
                         />

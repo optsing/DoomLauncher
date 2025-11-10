@@ -269,7 +269,7 @@ public partial class RootPageViewModel : ObservableObject
         }
         else if (result == LaunchResult.PathNotValid)
         {
-            if (await DialogHelper.ShowAskAsync(Strings.Resources.DialogLaunchErrorTitle, Strings.Resources.DialogLaunchErrorGZDoomPathNotValidText, Strings.Resources.DialogEditAction, Strings.Resources.DialogCancelAction))
+            if (await DialogHelper.ShowAskAsync(Strings.Resources.DialogLaunchErrorTitle, Strings.Resources.DialogLaunchErrorPortPathNotValidText, Strings.Resources.DialogEditAction, Strings.Resources.DialogCancelAction))
             {
                 await EditEntry(entry);
             }

@@ -186,7 +186,7 @@
   <data name="EditEntryDialogShortDescription.PlaceholderText" xml:space="preserve">
     <value>Введите краткое описание</value>
   </data>
-  <data name="EditEntryDialogGZDoomVersion.Header" xml:space="preserve">
+  <data name="EditEntryDialogPort.Header" xml:space="preserve">
     <value>Порт</value>
   </data>
   <data name="EditEntryDialogIWAD.Header" xml:space="preserve">
@@ -249,16 +249,16 @@
   <data name="SettingsPageIWADAddFreedoom.Text" xml:space="preserve">
     <value>Скачать Freedoom</value>
   </data>
-  <data name="SettingsPageGZDoom.HeaderTitle" xml:space="preserve">
+  <data name="SettingsPagePort.HeaderTitle" xml:space="preserve">
     <value>Установленные порты</value>
   </data>
-  <data name="SettingsPageGZDoom.HeaderButtonTitle" xml:space="preserve">
+  <data name="SettingsPagePort.HeaderButtonTitle" xml:space="preserve">
     <value>Добавить</value>
   </data>
-  <data name="SettingsPageGZDoomAddLocal.Text" xml:space="preserve">
+  <data name="SettingsPagePortAddLocal.Text" xml:space="preserve">
     <value>Выбрать на устройстве</value>
   </data>
-  <data name="SettingsPageGZDoomAddRemote.Text" xml:space="preserve">
+  <data name="SettingsPagePortAddRemote.Text" xml:space="preserve">
     <value>Скачать с GitHub</value>
   </data>
   <data name="FlyoutFavFileOpenFolder.Text" xml:space="preserve">
@@ -401,8 +401,8 @@
   <data name="ChooseIWAD" xml:space="preserve">
     <value>Выбрать IWAD</value>
   </data>
-  <data name="ChooseGZDoom" xml:space="preserve">
-    <value>Выбрать GZDoom</value>
+  <data name="ChoosePort" xml:space="preserve">
+    <value>Выбрать порт</value>
   </data>
   <data name="ChooseLocal" xml:space="preserve">
     <value>Выбрать на устройстве</value>
@@ -482,8 +482,8 @@
   <data name="DialogLaunchErrorAlreadyLaunchedText" xml:space="preserve">
     <value>Игра уже запущена, закройте текущую игру</value>
   </data>
-  <data name="DialogLaunchErrorGZDoomPathNotValidText" xml:space="preserve">
-    <value>Не выбрана версия GZDoom, выберите нужную версию в настройках сборки</value>
+  <data name="DialogLaunchErrorPortPathNotValidText" xml:space="preserve">
+    <value>Не выбран порт, выберите нужный порт в настройках сборки</value>
   </data>
   <data name="DialogEditAction" xml:space="preserve">
     <value>Изменить</value>
@@ -566,7 +566,7 @@
   <data name="DownloadPageGroupFiles.Text" xml:space="preserve">
     <value>Файлы</value>
   </data>
-  <data name="DoomPageGZDoomCustom" xml:space="preserve">
+  <data name="DoomPagePortCustom" xml:space="preserve">
     <value>Пользовательский</value>
   </data>
   <data name="ProgressLoadingOnlineEntries" xml:space="preserve">

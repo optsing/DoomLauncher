@@ -18,13 +18,13 @@ internal static class LaunchHelper
         {
             return LaunchResult.AlreadyLaunched;
         }
-        var package = FileHelper.ResolveGZDoomPath(entry.GZDoomPath, SettingsViewModel.Current.DefaultGZDoomPath);
+        var package = FileHelper.ResolvePortPath(entry.GZDoomPath, SettingsViewModel.Current.DefaultGZDoomPath);
         if (package == null)
         {
             return LaunchResult.PathNotValid;
         }
-        var gZDoomPath = Path.GetFullPath(package.Path, FileHelper.PackagesFolderPath);
-        if (!FileHelper.ValidateGZDoomPath(gZDoomPath))
+        var portPath = Path.GetFullPath(package.Path, FileHelper.PackagesFolderPath);
+        if (!FileHelper.ValidatePortPath(portPath))
         {
             return LaunchResult.PathNotValid;
         }
@@ -32,8 +32,8 @@ internal static class LaunchHelper
         var steamAppId = FileHelper.ResolveSteamGame(entry.SteamGame, SettingsViewModel.Current.SteamGame).appId;
         if (steamAppId == 0)
         {
-            processInfo.FileName = gZDoomPath;
-            processInfo.WorkingDirectory = Path.GetDirectoryName(gZDoomPath);
+            processInfo.FileName = portPath;
+            processInfo.WorkingDirectory = Path.GetDirectoryName(portPath);
         }
         else
         {
@@ -41,7 +41,7 @@ internal static class LaunchHelper
             processInfo.UseShellExecute = false;
             processInfo.CreateNoWindow = true;
             processInfo.ArgumentList.Add(steamAppId.ToString());
-            processInfo.ArgumentList.Add(gZDoomPath);
+            processInfo.ArgumentList.Add(portPath);
         }
         if (entry.UniqueConfig)
         {

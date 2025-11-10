@@ -35,7 +35,7 @@ internal static partial class FileHelper
     public static readonly string[] SupportedModExtensions = [".pk3", ".wad", ".zip"];
     public static readonly string[] SupportedImageExtensions = [".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif", ".svg"];
 
-    public static bool ValidateGZDoomPath(string path)
+    public static bool ValidatePortPath(string path)
     {
         return !string.IsNullOrEmpty(path) && Path.GetExtension(path) == ".exe" && File.Exists(path);
     }
@@ -139,16 +139,16 @@ internal static partial class FileHelper
         return "";
     }
 
-    public static DoomPackageViewModel? ResolveGZDoomPath(string gZDoomPath, string defaultGZDoomPath)
+    public static DoomPackageViewModel? ResolvePortPath(string portPath, string defaultPortPath)
     {
-        if (!string.IsNullOrEmpty(gZDoomPath))
+        if (!string.IsNullOrEmpty(portPath))
         {
-            if (SettingsViewModel.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == gZDoomPath) is DoomPackageViewModel package)
+            if (SettingsViewModel.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == portPath) is DoomPackageViewModel package)
             {
                 return package;
             }
         }
-        return SettingsViewModel.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == defaultGZDoomPath);
+        return SettingsViewModel.Current.GZDoomInstalls.FirstOrDefault(package => package.Path == defaultPortPath);
     }
 
     public static string SteamGameTitle(string steamGame, string defaultSteamGame) =>
@@ -165,14 +165,14 @@ internal static partial class FileHelper
         return IWadFileToTitle(resolvedIWadFile);
     }
 
-    public static string GZDoomPathToShortTitle(string gZDoomPath, string defaultGZDoomPath)
+    public static string PortPathToShortTitle(string portPath, string defaultPortPath)
     {
-        var package = ResolveGZDoomPath(gZDoomPath, defaultGZDoomPath);
+        var package = ResolvePortPath(portPath, defaultPortPath);
         if (package == null)
         {
             return Strings.Resources.NotSelected;
         }
-        return package.Arch == AssetArch.manual ? Strings.Resources.DoomPageGZDoomCustom : package.Title;
+        return package.Arch == AssetArch.manual ? Strings.Resources.DoomPagePortCustom : package.Title;
     }
 
     public static string VersionAndArchToFolderName(Version? version, AssetArch arch) => (version?.ToString() ?? "unknown") + "-" + arch.ToString();

@@ -40,7 +40,7 @@
                 Text="{x:Bind ViewModel.Description, Mode=TwoWay}"
             />
             <ComboBox
-                x:Uid="EditEntryDialogGZDoomVersion"
+                x:Uid="EditEntryDialogPort"
                 HorizontalAlignment="Stretch"
                 SelectedItem="{x:Bind ViewModel.DoomPackage, Mode=TwoWay}"
                 ItemsSource="{x:Bind ViewModel.DoomPackages}"
